@@ -1,62 +1,62 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-	<head>
+<head>
 
-		<meta charset="UTF-8">
-		<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta http-equiv="X-UA-Compatible" content="IE=9" />
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 
-		<!-- Title -->
-		<title> CAPS Panel </title>
+    <!-- Title -->
+    <title> {{ env('APP_NAME') }} Panel </title>
 
-        <!-- styles -->
-        @include('layouts.vertical.styles')
+    <!-- styles -->
+    @include('layouts.vertical.styles')
 
-    </head>
+</head>
 
-    <body class="main-body app sidebar-mini">
+<body class="main-body app sidebar-mini">
 
-        <!-- Loader -->
-		<div id="global-loader">
-			<img src="{{asset('assets/img/loader.svg')}}" class="loader-img" alt="Loader">
-		</div>
-		<!-- /Loader -->
+<!-- Loader -->
+<div id="global-loader">
+    <img src="{{asset('assets/img/loader.svg')}}" class="loader-img" alt="Loader">
+</div>
+<!-- /Loader -->
 
-		<!-- Page -->
-		<div class="page">
+<!-- Page -->
+<div class="page">
 
-            <!-- main-sidebar -->
-            @include('layouts.vertical.app-sidebar')
+    <!-- main-sidebar -->
+    @include('layouts.vertical.app-sidebar')
 
-            <!-- main-content -->
-            <div class='main-content app-content'>
+    <!-- main-content -->
+    <div class='main-content app-content'>
 
-                <!-- main-header -->
-                @include('layouts.vertical.main-header')
+        <!-- main-header -->
+        @include('layouts.vertical.main-header')
 
-                <!-- Container open -->
-                <div class="container-fluid">
+        <!-- Container open -->
+        <div class="container-fluid">
 
-                    @yield('content')
-
-                </div>
-                <!-- Container closed -->
-
-            </div>
-            <!-- main-content closed -->
-
-            <!-- footer -->
-            @include('layouts.footer')
-
-            <!-- modal -->
-            @yield('modal')
+            @yield('content')
 
         </div>
-        <!-- Page closed -->
+        <!-- Container closed -->
 
-        <!-- scripts -->
-        @include('layouts.vertical.scripts')
+    </div>
+    <!-- main-content closed -->
+
+    <!-- footer -->
+    @include('layouts.footer')
+
+    <!-- modal -->
+    @yield('modal')
+
+</div>
+<!-- Page closed -->
+
+<!-- scripts -->
+@include('layouts.vertical.scripts')
 
     </body>
 
