@@ -3,242 +3,474 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | {{ env('APP_NAME') }}</title>
-    <!-- Favicon -->
+    <title>Login | {{ env('APP_NAME', 'Rehltna') }}</title>
+
     <link rel="icon" href="{{asset('assets/img/seo-img.png')}}" type="image/x-icon"/>
-    <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
-    <!-- Fonts & Bootstrap -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
 
-    <!-- Styles -->
     <style>
+        :root {
+            --primary: #00768b;
+            --primary-hover: #005f70;
+            --secondary: #f4b223;
+            --text-dark: #111827;
+            --text-muted: #6b7280;
+            --bg-light: #ffffff;
+            --border-color: #e5e7eb;
+            --input-focus-ring: rgba(0, 118, 139, 0.15);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Split Layout --- */
+        .auth-container {
             display: flex;
+            height: 100vh;
+        }
+
+        /* Left Side: Form */
+        .auth-form-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-        }
-
-        #title-text {
-            line-height: 42px;
-            height: 42px;
-            overflow: hidden;
-        }
-
-        #subtitle-text {
-            line-height: 24px;
-            height: 24px;
-            overflow: hidden;
-        }
-
-        .login-card {
+            padding: 2rem;
+            position: relative;
             background-color: #ffffff;
-            border-radius: 12px;
-            padding: 40px;
+            animation: fadeIn 0.8s ease-out;
+            z-index: 10;
+            box-shadow: 20px 0 50px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-wrapper {
             width: 100%;
-            max-width: 420px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
+            max-width: 400px;
         }
 
-        .login-card:hover {
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        /* Right Side: The Masterpiece Background */
+        .auth-brand-section {
+            flex: 1.3;
+            display: none;
+            background: linear-gradient(135deg, #042f3d 0%, #005f70 100%);
+            position: relative;
+            overflow: hidden;
         }
 
+        @media (min-width: 992px) {
+            .auth-brand-section {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 4rem;
+                color: white;
+            }
+        }
+
+        /* --- Magic Overlapping Shapes (Leaves/Waves) --- */
+        .shape-petal {
+            position: absolute;
+            border-radius: 50% 0 50% 50%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            opacity: 0.9;
+        }
+
+        /* Top Right Waves */
+        .petal-1 {
+            width: 700px;
+            height: 700px;
+            background: linear-gradient(135deg, #004d5e, #003644);
+            top: -250px;
+            right: -150px;
+            --rot: 15deg;
+            animation: floatPetal 12s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        .petal-2 {
+            width: 550px;
+            height: 550px;
+            background: linear-gradient(135deg, #0098b3, #00768b);
+            top: -150px;
+            right: 50px;
+            --rot: 45deg;
+            animation: floatPetal 14s infinite ease-in-out reverse;
+            z-index: 2;
+        }
+
+        /* Bottom Left Waves */
+        .petal-3 {
+            width: 800px;
+            height: 800px;
+            background: linear-gradient(135deg, #00222b, #003d4c);
+            bottom: -350px;
+            left: -250px;
+            border-radius: 50% 50% 50% 0; /* مقلوبة */
+            --rot: -20deg;
+            animation: floatPetal 15s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        .petal-4 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #008e9d, #005f70);
+            bottom: -150px;
+            left: -50px;
+            border-radius: 50% 50% 0 50%;
+            --rot: -5deg;
+            animation: floatPetal 10s infinite ease-in-out reverse;
+            z-index: 2;
+        }
+
+        @keyframes floatPetal {
+            0% {
+                transform: translateY(0) rotate(var(--rot));
+            }
+            50% {
+                transform: translateY(-25px) rotate(calc(var(--rot) + 8deg));
+            }
+            100% {
+                transform: translateY(0) rotate(var(--rot));
+            }
+        }
+
+        /* --- Line Art Overlay (Travel Theme) --- */
+        .line-art-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        /* --- Typography & Elements --- */
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .auth-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Pro Inputs */
         .form-control {
-            border-radius: 8px;
-            border-color: #d1d5db;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            background-color: #f9fafb;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) inset;
         }
 
         .form-control:focus {
-            border-color: #60a5fa;
-            box-shadow: 0 0 0 0.2rem rgba(96, 165, 250, 0.25);
+            background-color: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--input-focus-ring);
+            outline: none;
         }
 
-        .btn-primary {
-            background-color: #3b82f6;
-            border: none;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background-color: #2563eb;
+        .form-control::placeholder {
+            color: #9ca3af;
         }
 
         .field-icon {
-            float: right;
-            margin-top: -30px;
-            margin-right: 10px;
+            position: absolute;
+            right: 15px;
+            top: 42px;
             cursor: pointer;
-            color: #6b7280;
-        }
-    </style>
-    <style>
-        .btn-primary {
-            position: relative;
-            display: inline-block;
-            background: linear-gradient(45deg, #3b82f6, #06b6d4);
-            color: #fff;
-            font-weight: 600;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 25px;
-            font-size: 1rem;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s ease;
+            color: #9ca3af;
+            font-size: 0.9rem;
+            transition: color 0.2s;
         }
 
+        .field-icon:hover {
+            color: var(--primary);
+        }
+
+        /* Pro Button - Super Del3 */
+        .btn-primary {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary) 0%, #005f70 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 1.05rem;
+            padding: 0.85rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(0, 118, 139, 0.3);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Shine Effect */
         .btn-primary::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -75%;
+            left: -100%;
             width: 50%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.3);
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
             transform: skewX(-25deg);
-            transition: all 0.3s ease;
-            animation: shine 3s linear infinite;
+            animation: shine 4s infinite;
         }
 
         @keyframes shine {
             0% {
-                left: -75%;
+                left: -100%;
             }
-            50% {
-                left: 100%;
+            20% {
+                left: 200%;
             }
             100% {
-                left: -75%;
+                left: 200%;
             }
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #005f70 0%, var(--primary) 100%);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 10px 20px rgba(0, 118, 139, 0.4);
         }
 
         .btn-primary:active {
-            transform: translateY(-100px) rotate(-15deg) scale(0.8);
-            transition: transform 0.5s ease-in;
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.7);
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 2px 10px rgba(0, 118, 139, 0.3);
+        }
+
+        /* Icon Animation on Hover */
+        .btn-primary i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-primary:hover i {
+            transform: translateX(5px);
+        }
+
+        .text-danger {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 0.4rem;
+            color: #ef4444 !important;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Brand content styling */
+        .brand-content {
+            z-index: 10;
+            text-align: center;
+            background: rgba(0, 47, 61, 0.4);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            max-width: 550px;
+        }
+
+        .brand-content h1 {
+            font-weight: 700;
+            font-size: 3.8rem;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-content p {
+            font-size: 1.15rem;
+            opacity: 0.9;
+            margin: 0 auto;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        /* Logo Styling */
+        .brand-logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 1.5rem;
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
-
 </head>
 <body>
-<!-- Loader -->
-<div id="global-loader">
-    <img src="{{asset('assets/img/loader.svg')}}" class="loader-img" alt="Loader">
-</div>
-<!-- /Loader -->
-<div class="login-card">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold text-primary" id="title-text">{{ env('APP_NAME') }} Panel</h2>
-        <p class="text-muted" id="subtitle-text">Login To Your Admin Panel !</p>
+
+<div class="auth-container">
+
+    <div class="auth-form-section">
+        <div class="form-wrapper">
+            <div class="text-center">
+                <img src="{{ asset('rehltna.jpeg') }}" alt="Rehltna Logo" class="brand-logo">
+                <h2 class="auth-title">Welcome back</h2>
+                <p class="auth-subtitle">Please enter your details to access the admin panel.</p>
+            </div>
+
+            <form action="{{ route('admin.login.submit') }}" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label class="form-label" for="email">Email address</label>
+                    <input type="email" name="email" id="email"
+                           class="form-control @error('email') is-invalid @enderror"
+                           value="{{ old('email') }}" placeholder="admin@rehltna.com" required autofocus>
+                    @error('email')
+                    <div class="text-danger"><i class="fas fa-info-circle me-1"></i>{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4 position-relative">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" name="password" id="password"
+                           class="form-control @error('password') is-invalid @enderror"
+                           placeholder="••••••••" required>
+                    <span toggle="#password" class="fas fa-eye field-icon toggle-password mt-2"></span>
+                    @error('password')
+                    <div class="text-danger"><i class="fas fa-info-circle me-1"></i>{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-primary">
+                        <span>Sign in</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-5 text-center" style="font-size: 0.85rem; color: #9ca3af;">
+                &copy; {{ date('Y') }} {{ env('APP_NAME', 'Rehltna') }}. All rights reserved.
+            </div>
+        </div>
     </div>
 
-    <form action="{{ route('admin.login.submit') }}" method="POST">
-        @csrf
+    <div class="auth-brand-section">
 
-        <div class="mb-3">
-            <label class="form-label">Email Address</label>
-            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                   value="{{ old('email') }}" placeholder="Enter Your Email" required autofocus>
-            @error('email')
-            <div class="text-danger mt-1 small">{{ $message }}</div>
-            @enderror
-        </div>
+        <div class="shape-petal petal-1"></div>
+        <div class="shape-petal petal-2"></div>
+        <div class="shape-petal petal-3"></div>
+        <div class="shape-petal petal-4"></div>
 
-        <div class="mb-3 position-relative">
-            <label class="form-label">Password</label>
-            <input id="password-field" type="password" name="password"
-                   class="form-control @error('password') is-invalid @enderror" placeholder="Enter Your Password"
-                   required>
-            <span toggle="#password-field" class="fas fa-eye field-icon toggle-password"></span>
-            @error('password')
-            <div class="text-danger mt-1 small">{{ $message }}</div>
-            @enderror
+        <svg class="line-art-overlay" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <g transform="translate(150, 250) scale(0.8)" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.6">
+                <circle cx="0" cy="0" r="60" stroke-dasharray="4 4"/>
+                <circle cx="0" cy="0" r="45" opacity="0.3"/>
+                <path d="M0,-80 L0,80 M-80,0 L80,0"/>
+                <path d="M0,-90 L15,-20 L90,0 L15,20 L0,90 L-15,20 L-90,0 L-15,-20 Z" fill="rgba(255,255,255,0.15)"/>
+            </g>
+
+            <path d="M 150,700 Q 400,300 600,600 T 950,250" fill="none" stroke="#ffffff" stroke-width="2"
+                  stroke-dasharray="8 8" opacity="0.7"/>
+
+            <g transform="translate(150, 700) scale(0.08) translate(-256, -512)" fill="#ffffff" opacity="0.9">
+                <path
+                    d="M256,0C153.755,0,70.573,83.182,70.573,185.426c0,126.888,165.939,313.167,173.004,321.035c6.636,7.391,18.222,7.378,24.846,0c7.065-7.868,173.004-194.147,173.004-321.035C441.425,83.182,358.244,0,256,0z M256,278.719 c-51.442,0-93.292-41.851-93.292-93.293S204.559,92.134,256,92.134s93.291,41.851,93.291,93.293S307.441,278.719,256,278.719z"/>
+            </g>
+
+            <g transform="translate(930, 230) rotate(50) scale(0.1)" fill="#ffffff" opacity="0.9">
+                <path
+                    d="M510,255c0-20.4-16.5-36.9-36.9-36.9H286.9L205.6,41.5C202,30.5,191.8,23,180.2,23h-34.6c-11.4,0-17.7,13.2-10.6,22.1l111.8,173H108.2l-38.4-57.5c-4.4-6.5-11.7-10.5-19.5-10.5H19c-10.4,0-16.7,11.5-11,20.5l45.4,70.9l-45.4,70.9c-5.7,9,0.6,20.5,11,20.5h31.3c7.8,0,15.1-4,19.5-10.5l38.4-57.5h138.6L96.2,466.8c-7,8.9-0.7,22.1,10.6,22.1h34.6c11.5,0,21.8-7.5,25.4-18.5l81.3-176.6h186.2C493.5,291.9,510,275.4,510,255z"/>
+            </g>
+
+            <g transform="translate(600, 580) scale(1.5)" stroke="#ffffff" fill="none" stroke-width="2" opacity="0.6">
+                <path d="M0,40 L0,15 C0,0 20,-10 30,0 L30,40 Z"/>
+                <path d="M30,40 L30,20 C30,10 45,5 50,20 L50,40 Z"/>
+                <circle cx="15" cy="-10" r="2" fill="#ffffff"/>
+                <line x1="0" y1="40" x2="50" y2="40"/>
+            </g>
+        </svg>
+
+        <div class="brand-content">
+            <h1>{{ env('APP_NAME', 'Rehltna') }}</h1>
+            <p>Your comprehensive dashboard to manage content, track performance, and control your digital journey
+                efficiently.</p>
         </div>
-        <div class="d-grid mt-5">
-            <button type="submit" class="btn btn-primary">Login</button>
-        </div>
-    </form>
+    </div>
+
 </div>
-<!--- JQuery min js --->
-<script src="{{asset('assets/plugins/jquery/jquery.min.js')}}"></script>
 
-<!--- Custom js --->
-<script src="{{asset('assets/js/custom.js')}}"></script>
-
-<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-
 <script>
-
+    // Password Toggle
     $(".toggle-password").click(function () {
-        const input = $("#password-field");
+        const input = $($(this).attr("toggle"));
         const type = input.attr("type") === "password" ? "text" : "password";
         input.attr("type", type);
         $(this).toggleClass("fa-eye fa-eye-slash");
     });
 
-    @if(session('success'))
-    toastr.success("{{ session('success') }}");
+    // Toastr Notifications
+    toastr.options = {
+        "closeButton": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "timeOut": "4000",
+    };
+
+    @if(session('success')) toastr.success("{{ session('success') }}");
     @endif
-
-    @if(session('error'))
-    toastr.error("{{ session('error') }}");
+    @if(session('error')) toastr.error("{{ session('error') }}");
     @endif
-
-    @if(session('warning'))
-    toastr.warning("{{ session('warning') }}");
+    @if(session('warning')) toastr.warning("{{ session('warning') }}");
     @endif
-
-    @if(session('info'))
-    toastr.info("{{ session('info') }}");
-    @endif
-</script>
-<script>
-    function typeWriter(elementId, text, speed = 100, callback = null) {
-        const element = document.getElementById(elementId);
-        element.textContent = "";
-        let i = 0;
-
-        function type() {
-            if (i < text.length) {
-                element.textContent += text.charAt(i);
-                i++;
-                setTimeout(type, speed);
-            } else if (callback) {
-                setTimeout(callback, 1000);
-            }
-        }
-
-        type();
-    }
-
-    function loopTyping() {
-        const title = "{{ env('APP_NAME') }} Panel";
-        const subtitle = "Login To Your Admin Panel !";
-
-        typeWriter("title-text", title, 90, () => {
-            typeWriter("subtitle-text", subtitle, 60, () => {
-                setTimeout(() => {
-                    document.getElementById("title-text").textContent = "";
-                    document.getElementById("subtitle-text").textContent = "";
-                    setTimeout(loopTyping, 0);
-                }, 1000);
-            });
-        });
-    }
-
-    window.addEventListener('DOMContentLoaded', loopTyping);
+    @if(session('info')) toastr.info("{{ session('info') }}"); @endif
 </script>
 
 </body>
