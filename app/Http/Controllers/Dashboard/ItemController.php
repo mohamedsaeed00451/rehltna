@@ -1,0 +1,455 @@
+<?php
+
+namespace App\Http\Controllers\Dashboard;
+
+use App\Exports\ItemsErrorUploadedExport;
+use App\Exports\ItemsTempExport;
+use App\Http\Controllers\Controller;
+use App\Jobs\ImportItemsJob;
+use App\Models\Item;
+use App\Models\ItemPackage;
+use App\Models\ItemType;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+class ItemController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): view
+    {
+        $items = Item::query()->orderByDesc('id')->paginate(10);
+        return view('pages.items.index', compact('items'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): view
+    {
+        $itemTypes = ItemType::all();
+        return view('pages.items.create', compact('itemTypes'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        try {
+
+            $activeLangs = get_active_langs();
+
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'speakers_gallery', 'packages'];
+            foreach ($activeLangs as $lang) {
+                $fieldsToExclude[] = 'banner_' . $lang;
+            }
+
+            $data = $request->except($fieldsToExclude);
+
+            foreach ($activeLangs as $lang) {
+                if ($request->filled('banner_' . $lang)) {
+                    $data['banner_' . $lang] = $this->cleanPath($request->input('banner_' . $lang));
+                }
+            }
+
+            if ($request->filled('meta_img')) {
+                $data['meta_img'] = $this->cleanPath($request->input('meta_img'));
+            }
+
+            if ($request->hasFile('pdf')) {
+                $data['pdf'] = uploadFile($request->file('pdf'), 'pdfs', 'pdf');
+            }
+
+            $item = Item::query()->create($data);
+            $item->setAttribute('order', $request->get('order'));
+            $item->save();
+
+            if ($request->has('gallery')) {
+                $item->galleries()->delete();
+                foreach ($request->input('gallery') as $imagePath) {
+                    $item->galleries()->create(['image' => $this->cleanPath($imagePath)]);
+                }
+            }
+
+            if ($request->has('speakers_gallery')) {
+                $item->speakersGalleries()->delete();
+                foreach ($request->input('speakers_gallery') as $imagePath) {
+                    $item->speakersGalleries()->create([
+                        'image' => $this->cleanPath($imagePath),
+                        'type' => 'speakers'
+                    ]);
+                }
+            }
+
+            if ($request->has('packages')) {
+                foreach ($request->packages as $pkgData) {
+                    $package = new ItemPackage();
+                    $package->item_id = $item->id;
+                    $package->price = $pkgData['price'] ?? 0;
+                    $package->status = $pkgData['status'] ?? 0;
+
+                    foreach ($activeLangs as $lang) {
+                        $package->{"title_$lang"} = $pkgData["title_$lang"] ?? null;
+                        $package->{"features_$lang"} = $pkgData["features_$lang"] ?? null;
+                    }
+
+                    if (!empty($pkgData['attachment'])) {
+                        $package->attachment = $this->cleanPath($pkgData['attachment']);
+                    }
+
+                    $package->save();
+                }
+            }
+
+            return redirect()->route('items.index')->with('success', 'Item created successfully.');
+
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return redirect()->back()->with('error', 'Oops! Something went wrong');
+        }
+    }
+    /**
+     * Display the specified resource.
+     */
+    public function show(Item $item)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id): view
+    {
+        $item = Item::query()->findOrFail(decrypt($id));
+        $itemTypes = ItemType::all();
+        return view('pages.items.edit', compact('item', 'itemTypes'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id): RedirectResponse
+    {
+        try {
+
+            $item = Item::query()->findOrFail($id);
+
+            $activeLangs = get_active_langs();
+
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'speakers_gallery', 'packages'];
+            foreach ($activeLangs as $lang) {
+                $fieldsToExclude[] = 'banner_' . $lang;
+            }
+
+            $data = $request->except($fieldsToExclude);
+
+            foreach ($activeLangs as $lang) {
+                if ($request->filled('banner_' . $lang)) {
+                    $data['banner_' . $lang] = $this->cleanPath($request->input('banner_' . $lang));
+                }
+            }
+
+            if ($request->filled('meta_img')) {
+                $data['meta_img'] = $this->cleanPath($request->input('meta_img'));
+            }
+
+            if ($request->hasFile('pdf')) {
+                if ($item->pdf) deleteFiles([$item->pdf]);
+                $data['pdf'] = uploadFile($request->file('pdf'), 'pdfs', 'pdf');
+            }
+
+            if ($request->has('gallery')) {
+                $item->galleries()->delete();
+                foreach ($request->input('gallery') as $imagePath) {
+                    $item->galleries()->create(['image' => $this->cleanPath($imagePath)]);
+                }
+            } elseif ($request->has('gallery_cleared')) {
+                $item->galleries()->delete();
+            }
+
+            if ($request->has('speakers_gallery')) {
+                $item->speakersGalleries()->delete();
+                foreach ($request->input('speakers_gallery') as $imagePath) {
+                    $item->speakersGalleries()->create([
+                        'image' => $this->cleanPath($imagePath),
+                        'type' => 'speakers'
+                    ]);
+                }
+            } elseif ($request->has('speakers_cleared')) {
+                $item->speakersGalleries()->delete();
+            }
+
+            $item->fill($data);
+            $item->setAttribute('order', $request->get('order'));
+            $item->save();
+
+            if ($request->has('packages')) {
+                $existingIds = collect($request->packages)->pluck('id')->filter()->toArray();
+                $item->packages()->whereNotIn('id', $existingIds)->delete();
+
+                foreach ($request->packages as $pkgData) {
+                    $package = isset($pkgData['id']) ? ItemPackage::find($pkgData['id']) : new ItemPackage();
+                    if (!$package) $package = new ItemPackage();
+
+                    $package->item_id = $item->id;
+                    $package->price = $pkgData['price'] ?? 0;
+                    $package->status = $pkgData['status'] ?? 0;
+
+                    foreach ($activeLangs as $lang) {
+                        $package->{"title_$lang"} = $pkgData["title_$lang"] ?? null;
+                        $package->{"features_$lang"} = $pkgData["features_$lang"] ?? null;
+                    }
+
+                    // Attachment String
+                    if (!empty($pkgData['attachment'])) {
+                        $package->attachment = $this->cleanPath($pkgData['attachment']);
+                    }
+
+                    $package->save();
+                }
+            }
+
+            return redirect()->route('items.index')->with('success', 'Item updated successfully.');
+
+        } catch (\Exception $e) {
+            Log::error("Error update item: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Oops! Something went wrong');
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id): RedirectResponse
+    {
+        try {
+
+            $item = Item::query()->findOrFail($id);
+            $item->galleries()->delete();
+            $item->speakersGalleries()->delete();
+            $item->packages()->delete();
+            $item->delete();
+
+            return redirect()->route('items.index')->with('success', 'Item deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Oops! Something went wrong');
+        }
+    }
+
+    private function cleanPath($path): array|string
+    {
+        return str_replace(url('/'), '', $path);
+    }
+
+    public function itemsChangeStatus($id): JsonResponse
+    {
+        $item = Item::query()->findOrFail($id);
+        if ($item->status == 1) {
+            $item->status = 0;
+            $item->save();
+        } else {
+            $item->status = 1;
+            $item->save();
+        }
+        return response()->json(['status' => $item->status]);
+    }
+
+    public function itemsChangeIsFeature($id): JsonResponse
+    {
+        $item = Item::query()->findOrFail($id);
+        if ($item->is_feature == 1) {
+            $item->is_feature = 0;
+            $item->save();
+        } else {
+            $item->is_feature = 1;
+            $item->save();
+        }
+        return response()->json(['is_feature' => $item->is_feature]);
+    }
+
+    public function exportItemsTempExcel(): BinaryFileResponse
+    {
+        return Excel::download(new ItemsTempExport, 'itemsTemp.xlsx');
+    }
+
+    public function showUploadForm()
+    {
+        return view('pages.items.upload');
+    }
+
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls,txt'
+        ]);
+
+        $path = $request->file('file')->getRealPath();
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray(null, true, true, true);
+
+        $header = array_map('trim', $rows[1]);
+
+        Log::info('Import started', ['file' => $request->file('file')->getClientOriginalName()]);
+
+        $activeLangs = get_active_langs();
+
+        foreach (array_slice($rows, 1) as $index => $row) {
+            if (empty($row['A']) && empty($row['B'])) {
+                Log::warning("Row {$index} skipped - empty row", $row);
+                continue;
+            }
+
+            try {
+
+                $data = [
+                    'price' => $row[array_search('Price', $header)] ?? 0,
+                    'status' => $row[array_search('Status', $header)] ?? 1,
+                    'is_feature' => $row[array_search('Is Feature', $header)] ?? 0,
+                    'item_type_id' => $row[array_search('Item Type', $header)] ?? null,
+                ];
+
+                foreach ($activeLangs as $lang) {
+
+                    $langSuffix = ucfirst($lang);
+
+                    $data["title_{$lang}"] = $row[array_search("Title {$langSuffix}", $header)] ?? null;
+                    $data["short_description_{$lang}"] = $row[array_search("Short Description {$langSuffix}", $header)] ?? null;
+                    $data["description_{$lang}"] = $row[array_search("Description {$langSuffix}", $header)] ?? null;
+                    $data["meta_title_{$lang}"] = $row[array_search("Meta Title {$langSuffix}", $header)] ?? null;
+                    $data["meta_description_{$lang}"] = $row[array_search("Meta Description {$langSuffix}", $header)] ?? null;
+                    $data["meta_keywords_{$lang}"] = $row[array_search("Meta Keywords {$langSuffix}", $header)] ?? null;
+
+                    if (!empty($data["title_{$lang}"])) {
+                        $data["slug_{$lang}"] = $this->generateSlug("slug_{$lang}", $data["title_{$lang}"]);
+                    }
+                }
+
+                $imageLink = $row[array_search('Image 1', $header)] ?? null;
+                if ($imageLink) {
+
+                    $data['meta_img'] = $this->downloadGoogleImage($imageLink, 'meta', 'meta');
+
+                    foreach ($activeLangs as $lang) {
+                        $data["banner_{$lang}"] = $this->downloadGoogleImage($imageLink, 'banners', $lang);
+                    }
+                }
+
+                $item = Item::create($data);
+
+                $imageLink2 = $row[array_search('Image 2', $header)] ?? null;
+                if ($imageLink2) {
+                    $path = $this->downloadGoogleImage($imageLink2, 'gallery', 'gallery');
+                    if ($path) {
+                        $item->galleries()->create(['image' => $path]);
+                    }
+                }
+
+                Log::info("Row {$index} imported successfully"); // Removed specific title log to avoid errors if title_en is empty
+
+            } catch (\Exception $e) {
+                Log::error("Row {$index} failed to import", [
+                    'error' => $e->getMessage(),
+                    'row' => $row
+                ]);
+            }
+        }
+
+        Log::info('Import finished');
+
+        return back()->with('success', 'Items imported successfully!');
+    }
+
+    private function downloadGoogleImage($url, string $dist, string $prefix = null)
+    {
+        try {
+            preg_match('/\/d\/(.*?)\//', $url, $matches);
+            if (!isset($matches[1])) {
+                return null;
+            }
+
+            $fileId = $matches[1];
+            $downloadUrl = "https://drive.google.com/uc?export=download&id={$fileId}";
+
+            $response = Http::get($downloadUrl);
+            if ($response->successful()) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_buffer($finfo, $response->body());
+                finfo_close($finfo);
+
+                $extension = match ($mime) {
+                    'image/jpeg' => 'jpeg',
+                    'image/png' => 'png',
+                    'image/webp' => 'webp',
+                    'image/jpg' => 'jpg',
+                    default => 'jpg',
+                };
+
+                $filename = uniqid() . '_' . time() . ($prefix ? "_{$prefix}" : '') . '.' . $extension;
+                $path = "uploads/tenant_" . getTenantId() . "/{$dist}/" . $filename;
+
+                if (!file_exists(public_path("uploads/tenant_" . getTenantId() . "/{$dist}"))) {
+                    mkdir(public_path("uploads/tenant_" . getTenantId() . "/{$dist}"), 0777, true);
+                }
+
+                file_put_contents(public_path($path), $response->body());
+
+                return $path;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return null;
+    }
+
+
+    public function generateSlug($slugModel, $title)
+    {
+        $slug = Str::slug($title, '-');
+        $original = $slug;
+        $counter = 1;
+
+        while (Item::where($slugModel, $slug)->exists()) {
+            $slug = $original . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    public function exportItemsErrorUploadedExcel(): BinaryFileResponse
+    {
+        return Excel::download(new ItemsErrorUploadedExport, 'itemsErrorUploaded.xlsx');
+    }
+
+    public function importExcel(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+        $file = $request->file('excel_file');
+        $fileName = uniqid() . '_' . time() . '_' . $file->getClientOriginalName();
+        $filePath = public_path('uploads/tenant_' . getTenantId() . '/excels');
+        if (!file_exists($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
+        $file->move($filePath, $fileName);
+        ImportItemsJob::dispatch("uploads/tenant_" . getTenantId() . "/excels/{$fileName}");
+
+        return back()->with('success', 'File uploaded successfully, import will start in background.');
+    }
+
+}

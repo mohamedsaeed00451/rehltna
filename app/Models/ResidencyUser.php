@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
+class ResidencyUser extends Authenticatable
+{
+    use softDeletes;
+    use HasApiTokens, HasFactory, Notifiable;
+
+    protected $guarded = [];
+
+    protected $connection = 'tenant';
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    public function items(): BelongsToMany
+    {
+        return $this->belongsToMany(Item::class, 'item_residency_users', 'residency_user_id', 'item_id')
+            ->withPivot('id', 'attendees', 'item_package_id')
+            ->withTimestamps();
+    }
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'residency_user_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
