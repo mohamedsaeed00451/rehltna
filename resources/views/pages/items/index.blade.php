@@ -170,12 +170,12 @@
                 real-time.</p>
         </div>
         <div class="d-flex gap-3 align-items-center">
-            @if(\App\Models\ErrorUploaded::query()->where('type','item')->count() > 0)
-                <a href="{{ route('items.export-excel-error-uploaded') }}"
-                   class="btn btn-danger rounded-pill px-4 shadow-sm fw-bold">
-                    <i class="fas fa-bug me-2"></i> Error Logs
-                </a>
-            @endif
+{{--            @if(\App\Models\ErrorUploaded::query()->where('type','item')->count() > 0)--}}
+{{--                <a href="{{ route('items.export-excel-error-uploaded') }}"--}}
+{{--                   class="btn btn-danger rounded-pill px-4 shadow-sm fw-bold">--}}
+{{--                    <i class="fas fa-bug me-2"></i> Error Logs--}}
+{{--                </a>--}}
+{{--            @endif--}}
 
             {{--            <div class="dropdown btn-tools-container">--}}
             {{--                <button class="btn btn-tools dropdown-toggle rounded-pill px-4 shadow-sm" type="button"--}}
@@ -211,7 +211,7 @@
                             <tr>
                                 <th class="text-center" width="80">Index</th>
                                 @foreach(get_active_langs() as $lang)
-                                    <th>Course Title <span class="lang-tag">{{ strtoupper($lang) }}</span></th>
+                                    <th>Title <span class="lang-tag">{{ strtoupper($lang) }}</span></th>
                                 @endforeach
                                 <th>Price</th>
                                 <th class="text-center">Order</th>

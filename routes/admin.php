@@ -106,13 +106,11 @@ Route::group([
         Route::post('/testimonials/change-status/{id}', [TestimonialController::class, 'changeStatus'])->name('testimonials.change.status');
 
         // Change status
-        Route::post('/lead-magnets-change-status/{id}', [LeadMagnetController::class, 'changeStatus'])
-            ->name('lead-magnets.change.status');
+        Route::post('/lead-magnets-change-status/{id}', [LeadMagnetController::class, 'changeStatus'])->name('lead-magnets.change.status');
 
         // from server to upload
         Route::get('/items/upload', [ItemController::class, 'showUploadForm'])->name('items.upload.form');
         Route::post('/items/import', [ItemController::class, 'import'])->name('items.import');
-
 
         Route::resource('/items', ItemController::class);  #------------ Items => get -> create -> update -> delete -------------#
         Route::post('/items-change-status/{id}', [ItemController::class, 'itemsChangeStatus'])->name('items.change.status'); #-------- Items Change Status ---------#
