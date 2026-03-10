@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Tenant | CMS Panel</title>
+    <title>Create Tenant | {{ env('APP_NAME') }} Panel</title>
     <link rel="icon" href="{{ asset('assets/img/seo-img.png') }}" type="image/x-icon"/>
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -126,6 +126,9 @@
                 'leads' => 'Leads System',
                 'images_uploader' => 'Images Uploader',
                 'settings' => 'Settings',
+                'countries' => 'Countries',
+                'states' => 'States',
+                'cities' => 'Cities',
                 'failed_jobs' => 'Failed Jobs',
             ] as $value => $label)
                 <div class="col-md-4">

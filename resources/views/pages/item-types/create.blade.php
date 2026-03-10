@@ -181,7 +181,7 @@
 
     <div class="breadcrumb-header justify-content-between mb-4">
         <div class="my-auto">
-            <h4 class="content-title mb-0 my-auto text-dark">Create Item Type</h4>
+            <h4 class="content-title mb-0 my-auto text-dark">Create Category</h4>
         </div>
     </div>
 
@@ -328,7 +328,7 @@
                                     Next <i class="fas fa-arrow-right ms-1"></i>
                                 </button>
                                 <button type="submit" class="btn btn-success px-5" id="submitBtn" style="display:none;">
-                                    <i class="fas fa-check-circle me-1"></i> Create Type
+                                    <i class="fas fa-check-circle me-1"></i> Create Category
                                 </button>
                             </div>
                         </div>

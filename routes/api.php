@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\{ApplyJobController,
     CategoryController,
     ClinicalPublicationController,
     ContactUsController,
+    CountryController,
     CustomPageController,
     DiseaseTypeController,
     EventController,
@@ -33,7 +34,8 @@ use App\Http\Controllers\Api\{ApplyJobController,
     SubscribeController,
     TenantController,
     TestimonialController,
-    TypeOfferController};
+    TypeOfferController
+};
 
 use App\Http\Middleware\{ApiKeyMiddleware, ForceJsonResponseMiddleware, IdentifyTenant};
 use Illuminate\Support\Facades\Route;
@@ -172,6 +174,13 @@ Route::middleware([ForceJsonResponseMiddleware::class, ApiKeyMiddleware::class, 
         Route::get('/patients-educations-features', [PatientEducationController::class, 'getPatientsEducationsFeatures']); #--------- Get Patients Educations Features ---------#
         Route::get('/patient-education/{slug}', [PatientEducationController::class, 'getPatient']); #--------- Get Patient Education By Slug ---------#
         Route::get('/patients-educations-by-disease-type/{id}', [PatientEducationController::class, 'getPatientsByDiseaseType']); #--------- Get Patients Educations By Disease Type Id ---------#
+
+        #------------------- Countries && States && Cities -------------------#
+        Route::controller(CountryController::class)->group(function () {
+            Route::get('/countries', 'getCountries'); // Get all active countries
+            Route::get('/states/{countryId}', 'getStatesByCountryId'); // Get all active states by country ID
+            Route::get('/cities/{stateId}', 'getCitiesByStateId'); // Get all active cities by state ID
+        });
 
         #---------------------------- Auth Routes ---------------------------#
         Route::middleware('auth:sanctum')->group(function () {

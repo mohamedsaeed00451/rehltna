@@ -6,8 +6,10 @@ use App\Http\Controllers\Dashboard\{AiController,
     CareerController,
     CareerTypeController,
     CategoryController,
+    CityController,
     ClinicalPublicationController,
     ContactUsController,
+    CountryController,
     CouponController,
     CustomPageController,
     DashboardController,
@@ -36,10 +38,12 @@ use App\Http\Controllers\Dashboard\{AiController,
     ResidencyUsersController,
     SettingController,
     SliderController,
+    StateController,
     SubscribeController,
     TenantController,
     TestimonialController,
-    TypeOfferController};
+    TypeOfferController
+};
 
 use App\Http\Controllers\Sitemap\SitemapController;
 use App\Http\Middleware\AdminOnly;
@@ -150,6 +154,13 @@ Route::group([
         Route::post('orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.update.status'); #-------- Orders Change Status ---------#
         Route::get('/pages/preview/{id}', [CustomPageController::class, 'preview'])->name('custom-pages.preview'); #-------- Custom Page Preview ---------#
 
+        Route::resource('countries', CountryController::class); #------------ countries => get -> create -> update -> delete -------------#
+        Route::post('countries/change-status/{id}', [CountryController::class, 'countryChangeStatus'])->name('countries.change.status'); #-------- countries Change Status ---------#
+        Route::resource('states', StateController::class); #------------ states => get -> create -> update -> delete -------------#
+        Route::post('states/change-status/{id}', [StateController::class, 'stateChangeStatus'])->name('states.change.status'); #-------- states Change Status ---------#
+        Route::resource('cities', CityController::class); #------------ cities => get -> create -> update -> delete -------------#
+        Route::post('cities/change-status/{id}', [CityController::class, 'cityChangeStatus'])->name('cities.change.status'); #-------- cities Change Status ---------#
+
         Route::resource('/events', EventController::class);  #------------ Events => get -> create -> update -> delete -------------#
         Route::post('/events-change-status/{id}', [EventController::class, 'eventsChangeStatus'])->name('events.change.status'); #-------- Events Change Status ---------#
         Route::post('/events-change-is-feature/{id}', [EventController::class, 'eventsChangeIsFeature'])->name('events.change.is_feature'); #-------- Events Change Is Feature ---------#
@@ -187,7 +198,7 @@ Route::group([
 
         Route::post('payment-links/create-from-user/{id}', [PaymentLinkController::class, 'storeFromRegisterUser'])->name('payment-links.storeFromRegister');
 
-        Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function() {
+        Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function () {
             Route::get('/', [GalleryController::class, 'index'])->name('index');
             Route::post('/upload', [GalleryController::class, 'storeGallery'])->name('store');
             Route::delete('/{id}', [GalleryController::class, 'destroy'])->name('destroy');

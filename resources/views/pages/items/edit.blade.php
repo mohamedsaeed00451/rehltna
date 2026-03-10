@@ -190,26 +190,6 @@
             overflow: visible !important;
         }
 
-        /* Packages */
-        .package-item {
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-            margin-bottom: 20px;
-        }
-
-        .package-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .package-header {
-            background: #f8f9fa;
-            padding: 12px 20px;
-            border-bottom: 1px solid #e9ecef;
-        }
     </style>
 @endsection
 
@@ -219,7 +199,7 @@
         <div class="my-auto">
             <div class="d-flex align-items-center">
                 <a href="{{ route('dashboard') }}" class="content-title mb-0 my-auto text-dark hover-primary">Home</a>
-                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/ Edit Course</span>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/ Edit Trip</span>
             </div>
         </div>
     </div>
@@ -243,10 +223,6 @@
                 <div class="step-item" data-step="4">
                     <div class="step-circle"><i class="fas fa-search"></i></div>
                     <div class="step-label">SEO</div>
-                </div>
-                <div class="step-item" data-step="5">
-                    <div class="step-circle"><i class="fas fa-box-open"></i></div>
-                    <div class="step-label">Packages</div>
                 </div>
             </div>
 
@@ -359,7 +335,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6 mb-4">
+                                <div class="col-md-12 mb-4">
                                     <h6 class="text-dark fw-bold mb-3 border-bottom pb-2">Gallery</h6>
                                     <div class="bg-light p-4 rounded border border-dashed text-center">
                                         <button class="btn btn-outline-primary mb-3 open-gallery" type="button"
@@ -382,31 +358,6 @@
                                                         <img src="{{ asset($gallery->image) }}"
                                                              class="w-100 h-100 rounded" style="object-fit:cover">
                                                     @endif
-                                                    <button type="button" class="remove-btn btn btn-danger btn-sm p-0"
-                                                            onclick="$(this).parent().remove()">×
-                                                    </button>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <h6 class="text-dark fw-bold mb-3 border-bottom pb-2">Speakers</h6>
-                                    <div class="bg-light p-4 rounded border border-dashed text-center">
-                                        <button class="btn btn-outline-info mb-3 open-gallery" type="button"
-                                                data-input="speakers_gallery" data-preview="speakers_container"
-                                                data-multi="true"><i class="fas fa-user-plus me-1"></i> Add Speakers
-                                        </button>
-                                        <div id="speakers_container"
-                                             class="d-flex flex-wrap justify-content-center gap-2">
-                                            @foreach($item->speakersGalleries as $gallery)
-                                                <div
-                                                    class="d-inline-block position-relative shadow-sm border rounded bg-white"
-                                                    style="width: 100px; height: 100px;">
-                                                    <input type="hidden" name="speakers_gallery[]"
-                                                           value="{{ asset($gallery->image) }}">
-                                                    <img src="{{ asset($gallery->image) }}" class="w-100 h-100 rounded"
-                                                         style="object-fit:cover">
                                                     <button type="button" class="remove-btn btn btn-danger btn-sm p-0"
                                                             onclick="$(this).parent().remove()">×
                                                     </button>
@@ -500,85 +451,6 @@
                             @endforeach
                         </div>
 
-                        <div class="step-content" id="step-5">
-                            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                                <h5 class="text-primary fw-bold mb-0">Step 5: Packages</h5>
-                                <button type="button" class="btn btn-success btn-sm shadow-sm" id="add-package"><i
-                                        class="fas fa-plus me-1"></i> Add Package
-                                </button>
-                            </div>
-                            <div id="packages-container" class="row">
-                                @foreach($item->packages as $index => $package)
-                                    <div class="col-md-12 package-item mb-4 bg-white" data-index="{{ $index }}">
-                                        <div class="package-header d-flex justify-content-between align-items-center">
-                                            <span class="badge bg-primary">Package #{{ $index + 1 }}</span>
-                                            <input type="hidden" name="packages[{{ $index }}][id]"
-                                                   value="{{ $package->id }}">
-                                            <button type="button" class="btn btn-outline-danger btn-sm remove-package">
-                                                <i class="fas fa-trash"></i></button>
-                                        </div>
-                                        <div class="p-4">
-                                            <div class="row">
-                                                @foreach(get_active_langs() as $lang)
-                                                    <div class="{{ colClass() }} mb-3"><label
-                                                            class="form-label small text-muted">Title
-                                                            ({{ strtoupper($lang) }})</label><input type="text"
-                                                                                                    name="packages[{{ $index }}][title_{{ $lang }}]"
-                                                                                                    class="form-control"
-                                                                                                    value="{{ $package->{'title_'.$lang} }}"
-                                                                                                    required></div>
-                                                @endforeach
-                                                <div class="col-md-3 mb-3"><label class="form-label small text-muted">Price</label><input
-                                                        type="number" name="packages[{{ $index }}][price]"
-                                                        class="form-control" value="{{ $package->price }}" required>
-                                                </div>
-                                                <div class="col-md-3 mb-3"><label class="form-label small text-muted">Status</label><select
-                                                        name="packages[{{ $index }}][status]" class="form-select">
-                                                        <option value="1" {{$package->status==1?'selected':''}}>Active
-                                                        </option>
-                                                        <option value="0" {{$package->status==0?'selected':''}}>
-                                                            Inactive
-                                                        </option>
-                                                    </select></div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label class="form-label small text-muted">Attachment</label>
-                                                    <div class="media-selector-group">
-                                                        <input type="text" id="pkg_att_{{ $index }}"
-                                                               name="packages[{{ $index }}][attachment]"
-                                                               value="{{ $package->attachment ? asset($package->attachment) : '' }}"
-                                                               readonly placeholder="Select..."
-                                                               onclick="$('#btn_pkg_{{ $index }}').click()">
-                                                        <button id="btn_pkg_{{ $index }}"
-                                                                class="btn btn-primary btn-choose open-gallery"
-                                                                type="button" data-input="pkg_att_{{ $index }}"
-                                                                data-preview="preview_pkg_att_{{ $index }}">Choose
-                                                        </button>
-                                                    </div>
-                                                    <div id="preview_pkg_att_{{ $index }}">@if($package->attachment)
-                                                            <div class="media-preview-card"><img
-                                                                    src="{{ asset($package->attachment) }}" width="100">
-                                                            </div>
-                                                        @endif</div>
-                                                </div>
-                                                <div class="col-12">
-                                                    <hr class="my-2">
-                                                </div>
-                                                @foreach(get_active_langs() as $lang)
-                                                    <div class="{{ colClass() }} mb-3"><label
-                                                            class="form-label small text-muted">Features
-                                                            ({{ strtoupper($lang) }})</label><textarea
-                                                            name="packages[{{ $index }}][features_{{ $lang }}]"
-                                                            id="pkg_feat_{{ $index }}_{{ $lang }}"
-                                                            class="form-control package-summernote">{!! $package->{'features_'.$lang} !!}</textarea>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-
                         <div class="d-flex justify-content-between mt-5 pt-3 border-top">
                             <button type="button" class="btn btn-secondary px-4" id="prevBtn" style="display:none;"
                                     onclick="nextPrev(-1)"><i class="fas fa-arrow-left me-1"></i> Previous
@@ -587,7 +459,7 @@
                                 <button type="button" class="btn btn-primary px-4" id="nextBtn" onclick="nextPrev(1)">
                                     Next <i class="fas fa-arrow-right ms-1"></i></button>
                                 <button type="submit" class="btn btn-success px-5" id="submitBtn" style="display:none;">
-                                    <i class="fas fa-save"></i> Update Course
+                                    <i class="fas fa-save"></i> Update Trip
                                 </button>
                             </div>
                         </div>
@@ -735,50 +607,6 @@
                 `;
                 $(`#${targetPreviewId}`).append(itemHtml);
             };
-
-            // --- Packages Logic ---
-            let pkgIdx = {{ $item->packages->count() }}; // Start with existing count
-            const columnClass = "{{ colClass() }}";
-
-            // Init Existing Package Summernotes
-            $('.package-summernote').summernote({height: 100});
-
-            $('#add-package').on('click', function () {
-                let html = `
-                <div class="col-md-12 package-item bg-white" data-index="${pkgIdx}">
-                    <div class="package-header d-flex justify-content-between align-items-center">
-                        <span class="badge bg-primary">Package #${pkgIdx + 1}</span>
-                        <button type="button" class="btn btn-outline-danger btn-sm remove-package"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <div class="p-4">
-                        <div class="row">
-                            ${activeLangs.map(l => `<div class="${columnClass} mb-3"><label class="form-label small text-muted">Title (${l.toUpperCase()})</label><input type="text" name="packages[${pkgIdx}][title_${l}]" class="form-control" required></div>`).join('')}
-                            <div class="col-md-3 mb-3"><label class="form-label small text-muted">Price</label><input type="number" name="packages[${pkgIdx}][price]" class="form-control" required></div>
-                            <div class="col-md-3 mb-3"><label class="form-label small text-muted">Status</label><select name="packages[${pkgIdx}][status]" class="form-select"><option value="1">Active</option><option value="0">Inactive</option></select></div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label small text-muted">Attachment</label>
-                                <div class="media-selector-group">
-                                    <input type="text" id="pkg_att_${pkgIdx}" name="packages[${pkgIdx}][attachment]" readonly placeholder="Select..." onclick="$('#btn_pkg_${pkgIdx}').click()">
-                                    <button id="btn_pkg_${pkgIdx}" class="btn btn-primary btn-choose open-gallery" type="button" data-input="pkg_att_${pkgIdx}" data-preview="preview_pkg_att_${pkgIdx}">Choose</button>
-                                </div>
-                                <div id="preview_pkg_att_${pkgIdx}"></div>
-                            </div>
-                            <div class="col-12"><hr class="my-2"></div>
-                            ${activeLangs.map(l => `<div class="${columnClass} mb-3"><label class="form-label small text-muted">Features (${l.toUpperCase()})</label><textarea name="packages[${pkgIdx}][features_${l}]" id="pkg_new_${pkgIdx}_${l}" class="form-control package-summernote"></textarea></div>`).join('')}
-                        </div>
-                    </div>
-                </div>`;
-
-                $('#packages-container').append(html);
-                activeLangs.forEach(l => {
-                    $(`#pkg_new_${pkgIdx}_${l}`).summernote({height: 100});
-                });
-                pkgIdx++;
-            });
-
-            $(document).on('click', '.remove-package', function () {
-                if (confirm("Remove this package?")) $(this).closest('.package-item').remove();
-            });
 
         });
     </script>

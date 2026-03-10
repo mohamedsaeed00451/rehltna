@@ -180,7 +180,7 @@
 
     <div class="breadcrumb-header justify-content-between mb-4">
         <div class="my-auto">
-            <h4 class="content-title mb-0 my-auto text-dark">Edit Item Type</h4>
+            <h4 class="content-title mb-0 my-auto text-dark">Edit Category</h4>
         </div>
     </div>
 
@@ -347,7 +347,7 @@
                                     Next <i class="fas fa-arrow-right ms-1"></i>
                                 </button>
                                 <button type="submit" class="btn btn-success px-5" id="submitBtn" style="display:none;">
-                                    <i class="fas fa-save me-1"></i> Update Type
+                                    <i class="fas fa-save me-1"></i> Update Category
                                 </button>
                             </div>
                         </div>

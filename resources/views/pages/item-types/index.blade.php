@@ -167,7 +167,7 @@
     <div class="breadcrumb-header justify-content-between mb-4 mt-3">
         <div class="my-auto">
             <h4 class="content-title mb-0 fw-bold" style="color: #1e293b; letter-spacing: -0.8px; font-size: 1.7rem;">
-                Item Types Hub
+                Categories Hub
             </h4>
             <p class="text-muted mb-0 small fw-medium">Dashboard / <span
                     class="text-primary">Classification Management</span></p>
@@ -180,30 +180,30 @@
             <p class="mb-0 opacity-75 fw-medium">Manage and export different types of items in your system.</p>
         </div>
         <div class="d-flex gap-3 align-items-center">
-            <div class="dropdown btn-tools-container">
-                <button class="btn btn-tools dropdown-toggle rounded-pill px-4 shadow-sm" type="button"
-                        data-bs-toggle="dropdown">
-                    <i class="fas fa-file-excel me-2 text-success"></i> Excel Tools
-                </button>
-                <ul class="dropdown-menu shadow-lg border-0 p-2 mt-3" style="border-radius: 18px; min-width: 220px;">
-                    @if(\App\Models\ErrorUploaded::query()->where('type','item_type')->count() > 0)
-                        <li><a class="dropdown-item rounded-3 py-2 text-danger fw-bold"
-                               href="{{ route('item-types.export-excel-error-uploaded') }}"><i
-                                    class="fas fa-exclamation-circle me-2"></i>Export Errors</a></li>
-                    @endif
-                    <li><a class="dropdown-item rounded-3 py-2" href="{{ route('item-types.export-excel-temp') }}"><i
-                                class="fas fa-download me-2 text-warning"></i>Get Template</a></li>
-                    @if($itemTypes->total() > 0)
-                        <li><a class="dropdown-item rounded-3 py-2" href="{{ route('item-types.export-excel') }}"><i
-                                    class="fas fa-file-excel me-2 text-info"></i>Export Full Data</a></li>
-                    @endif
-                    <li>
-                        <hr class="dropdown-divider opacity-50">
-                    </li>
-                    <li><a class="dropdown-item rounded-3 py-2 modal-effect" data-bs-toggle="modal" href="#importExcel"><i
-                                class="fas fa-upload me-2 text-success"></i>Bulk Import</a></li>
-                </ul>
-            </div>
+            {{--            <div class="dropdown btn-tools-container">--}}
+            {{--                <button class="btn btn-tools dropdown-toggle rounded-pill px-4 shadow-sm" type="button"--}}
+            {{--                        data-bs-toggle="dropdown">--}}
+            {{--                    <i class="fas fa-file-excel me-2 text-success"></i> Excel Tools--}}
+            {{--                </button>--}}
+            {{--                <ul class="dropdown-menu shadow-lg border-0 p-2 mt-3" style="border-radius: 18px; min-width: 220px;">--}}
+            {{--                    @if(\App\Models\ErrorUploaded::query()->where('type','item_type')->count() > 0)--}}
+            {{--                        <li><a class="dropdown-item rounded-3 py-2 text-danger fw-bold"--}}
+            {{--                               href="{{ route('item-types.export-excel-error-uploaded') }}"><i--}}
+            {{--                                    class="fas fa-exclamation-circle me-2"></i>Export Errors</a></li>--}}
+            {{--                    @endif--}}
+            {{--                    <li><a class="dropdown-item rounded-3 py-2" href="{{ route('item-types.export-excel-temp') }}"><i--}}
+            {{--                                class="fas fa-download me-2 text-warning"></i>Get Template</a></li>--}}
+            {{--                    @if($itemTypes->total() > 0)--}}
+            {{--                        <li><a class="dropdown-item rounded-3 py-2" href="{{ route('item-types.export-excel') }}"><i--}}
+            {{--                                    class="fas fa-file-excel me-2 text-info"></i>Export Full Data</a></li>--}}
+            {{--                    @endif--}}
+            {{--                    <li>--}}
+            {{--                        <hr class="dropdown-divider opacity-50">--}}
+            {{--                    </li>--}}
+            {{--                    <li><a class="dropdown-item rounded-3 py-2 modal-effect" data-bs-toggle="modal" href="#importExcel"><i--}}
+            {{--                                class="fas fa-upload me-2 text-success"></i>Bulk Import</a></li>--}}
+            {{--                </ul>--}}
+            {{--            </div>--}}
 
             <a href="{{ route('item-types.create') }}"
                class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold border-0 d-flex align-items-center"

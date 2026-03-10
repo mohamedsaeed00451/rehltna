@@ -7,12 +7,10 @@ use App\Exports\ItemsTempExport;
 use App\Http\Controllers\Controller;
 use App\Jobs\ImportItemsJob;
 use App\Models\Item;
-use App\Models\ItemPackage;
 use App\Models\ItemType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -49,7 +47,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'speakers_gallery', 'packages'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery'];
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
             }
@@ -78,36 +76,6 @@ class ItemController extends Controller
                 $item->galleries()->delete();
                 foreach ($request->input('gallery') as $imagePath) {
                     $item->galleries()->create(['image' => $this->cleanPath($imagePath)]);
-                }
-            }
-
-            if ($request->has('speakers_gallery')) {
-                $item->speakersGalleries()->delete();
-                foreach ($request->input('speakers_gallery') as $imagePath) {
-                    $item->speakersGalleries()->create([
-                        'image' => $this->cleanPath($imagePath),
-                        'type' => 'speakers'
-                    ]);
-                }
-            }
-
-            if ($request->has('packages')) {
-                foreach ($request->packages as $pkgData) {
-                    $package = new ItemPackage();
-                    $package->item_id = $item->id;
-                    $package->price = $pkgData['price'] ?? 0;
-                    $package->status = $pkgData['status'] ?? 0;
-
-                    foreach ($activeLangs as $lang) {
-                        $package->{"title_$lang"} = $pkgData["title_$lang"] ?? null;
-                        $package->{"features_$lang"} = $pkgData["features_$lang"] ?? null;
-                    }
-
-                    if (!empty($pkgData['attachment'])) {
-                        $package->attachment = $this->cleanPath($pkgData['attachment']);
-                    }
-
-                    $package->save();
                 }
             }
 
@@ -147,7 +115,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'speakers_gallery', 'packages'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery'];
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
             }
@@ -178,47 +146,9 @@ class ItemController extends Controller
                 $item->galleries()->delete();
             }
 
-            if ($request->has('speakers_gallery')) {
-                $item->speakersGalleries()->delete();
-                foreach ($request->input('speakers_gallery') as $imagePath) {
-                    $item->speakersGalleries()->create([
-                        'image' => $this->cleanPath($imagePath),
-                        'type' => 'speakers'
-                    ]);
-                }
-            } elseif ($request->has('speakers_cleared')) {
-                $item->speakersGalleries()->delete();
-            }
-
             $item->fill($data);
             $item->setAttribute('order', $request->get('order'));
             $item->save();
-
-            if ($request->has('packages')) {
-                $existingIds = collect($request->packages)->pluck('id')->filter()->toArray();
-                $item->packages()->whereNotIn('id', $existingIds)->delete();
-
-                foreach ($request->packages as $pkgData) {
-                    $package = isset($pkgData['id']) ? ItemPackage::find($pkgData['id']) : new ItemPackage();
-                    if (!$package) $package = new ItemPackage();
-
-                    $package->item_id = $item->id;
-                    $package->price = $pkgData['price'] ?? 0;
-                    $package->status = $pkgData['status'] ?? 0;
-
-                    foreach ($activeLangs as $lang) {
-                        $package->{"title_$lang"} = $pkgData["title_$lang"] ?? null;
-                        $package->{"features_$lang"} = $pkgData["features_$lang"] ?? null;
-                    }
-
-                    // Attachment String
-                    if (!empty($pkgData['attachment'])) {
-                        $package->attachment = $this->cleanPath($pkgData['attachment']);
-                    }
-
-                    $package->save();
-                }
-            }
 
             return redirect()->route('items.index')->with('success', 'Item updated successfully.');
 
@@ -237,8 +167,6 @@ class ItemController extends Controller
 
             $item = Item::query()->findOrFail($id);
             $item->galleries()->delete();
-            $item->speakersGalleries()->delete();
-            $item->packages()->delete();
             $item->delete();
 
             return redirect()->route('items.index')->with('success', 'Item deleted successfully.');

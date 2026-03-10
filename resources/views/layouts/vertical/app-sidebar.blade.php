@@ -52,16 +52,16 @@
                    href="#">
                     <div class="d-flex align-items-center">
                         <i class="side-menu__icon fe fe-layers me-2 mb-3"></i>
-                        <span class="side-menu__label tx-15 bold">Courses System</span>
+                        <span class="side-menu__label tx-15 bold">Trips System</span>
                     </div>
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
                     @if(in_array('items', $tenantOptions))
-                        <li><a class="slide-item" href="{{ route('item-types.index') }}"><span>Types</span></a></li>
+                        <li><a class="slide-item" href="{{ route('item-types.index') }}"><span>Categories</span></a></li>
                     @endif
                     @if(in_array('items', $tenantOptions))
-                        <li><a class="slide-item" href="{{ route('items.index') }}"><span>Courses</span></a></li>
+                        <li><a class="slide-item" href="{{ route('items.index') }}"><span>Trips</span></a></li>
                     @endif
                     @if(in_array('events_galleries', $tenantOptions))
                         <li><a class="slide-item"
@@ -70,7 +70,29 @@
                 </ul>
             </li>
         @endif
-
+        @if(in_array('countries', $tenantOptions) || in_array('states', $tenantOptions) || in_array('cities', $tenantOptions))
+            <li class="slide">
+                <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
+                   href="#">
+                    <div class="d-flex align-items-center">
+                        <i class="side-menu__icon fe fe-map me-2 mb-3"></i>
+                        <span class="side-menu__label tx-15 bold">Location System</span>
+                    </div>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    @if(in_array('countries', $tenantOptions))
+                        <li><a class="slide-item" href="{{ route('countries.index') }}">Countries</a></li>
+                    @endif
+                    @if(in_array('states', $tenantOptions))
+                        <li><a class="slide-item" href="{{ route('states.index') }}">States</a></li>
+                    @endif
+                    @if(in_array('cities', $tenantOptions))
+                        <li><a class="slide-item" href="{{ route('cities.index') }}">Cities</a></li>
+                    @endif
+                </ul>
+            </li>
+        @endif
         @if(in_array('residency_users', $tenantOptions) || in_array('register_users', $tenantOptions) || in_array('contact', $tenantOptions) || in_array('subscribes', $tenantOptions))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"

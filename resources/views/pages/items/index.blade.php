@@ -157,15 +157,15 @@
     <div class="breadcrumb-header justify-content-between mb-4 mt-3">
         <div class="my-auto">
             <h4 class="content-title mb-0 fw-bold" style="color: #1e293b; letter-spacing: -0.8px; font-size: 1.7rem;">
-                Courses Catalog
+                Trips Catalog
             </h4>
-            <p class="text-muted mb-0 small fw-medium">Management / <span class="text-primary">Global Items</span></p>
+            <p class="text-muted mb-0 small fw-medium">Management / <span class="text-primary">Global Trips</span></p>
         </div>
     </div>
 
     <div class="hero-section">
         <div>
-            <h3 class="mb-2 fw-bold" style="letter-spacing: -0.5px;">Premium Course Hub</h3>
+            <h3 class="mb-2 fw-bold" style="letter-spacing: -0.5px;">Premium Trips Hub</h3>
             <p class="mb-0 opacity-75 fw-medium">Customize your catalog visibility and pricing strategy in
                 real-time.</p>
         </div>
@@ -177,26 +177,26 @@
                 </a>
             @endif
 
-            <div class="dropdown btn-tools-container">
-                <button class="btn btn-tools dropdown-toggle rounded-pill px-4 shadow-sm" type="button"
-                        data-bs-toggle="dropdown">
-                    <i class="fas fa-file-excel me-2 text-success"></i> Tools
-                </button>
-                <ul class="dropdown-menu shadow-lg border-0 p-2 mt-3" style="border-radius: 18px; min-width: 200px;">
-                    <li><a class="dropdown-item rounded-3 py-2 fw-600" href="{{ route('items.export-excel-temp') }}"><i
-                                class="fas fa-download me-2 text-warning"></i>Get Excel Template</a></li>
-                    <li>
-                        <hr class="dropdown-divider opacity-50">
-                    </li>
-                    <li><a class="dropdown-item rounded-3 py-2 fw-600 modal-effect" data-bs-toggle="modal"
-                           href="#importExcel"><i class="fas fa-upload me-2 text-success"></i>Bulk Import Data</a></li>
-                </ul>
-            </div>
+            {{--            <div class="dropdown btn-tools-container">--}}
+            {{--                <button class="btn btn-tools dropdown-toggle rounded-pill px-4 shadow-sm" type="button"--}}
+            {{--                        data-bs-toggle="dropdown">--}}
+            {{--                    <i class="fas fa-file-excel me-2 text-success"></i> Tools--}}
+            {{--                </button>--}}
+            {{--                <ul class="dropdown-menu shadow-lg border-0 p-2 mt-3" style="border-radius: 18px; min-width: 200px;">--}}
+            {{--                    <li><a class="dropdown-item rounded-3 py-2 fw-600" href="{{ route('items.export-excel-temp') }}"><i--}}
+            {{--                                class="fas fa-download me-2 text-warning"></i>Get Excel Template</a></li>--}}
+            {{--                    <li>--}}
+            {{--                        <hr class="dropdown-divider opacity-50">--}}
+            {{--                    </li>--}}
+            {{--                    <li><a class="dropdown-item rounded-3 py-2 fw-600 modal-effect" data-bs-toggle="modal"--}}
+            {{--                           href="#importExcel"><i class="fas fa-upload me-2 text-success"></i>Bulk Import Data</a></li>--}}
+            {{--                </ul>--}}
+            {{--            </div>--}}
 
             <a href="{{ route('items.create') }}"
                class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold border-0 d-flex align-items-center"
                style="background: #ffffff; color: #4f46e5; height: 48px;">
-                <i class="fas fa-plus-circle me-2"></i> New Course
+                <i class="fas fa-plus-circle me-2"></i> New Trip
             </a>
         </div>
     </div>
