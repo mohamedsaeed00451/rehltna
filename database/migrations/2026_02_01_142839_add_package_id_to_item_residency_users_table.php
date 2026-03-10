@@ -10,15 +10,27 @@ return new class extends Migration {
      */
     public function up(): void
     {
-
         Schema::disableForeignKeyConstraints();
 
+        try {
+            Schema::table('item_residency_users', function (Blueprint $table) {
+                $table->dropForeign(['residency_user_id']);
+            });
+        } catch (\Throwable $e) {}
+
+        try {
+            Schema::table('item_residency_users', function (Blueprint $table) {
+                $table->dropForeign(['item_id']);
+            });
+        } catch (\Throwable $e) {}
+
+        try {
+            Schema::table('item_residency_users', function (Blueprint $table) {
+                $table->dropUnique(['residency_user_id', 'item_id']);
+            });
+        } catch (\Throwable $e) {}
+
         Schema::table('item_residency_users', function (Blueprint $table) {
-            $table->dropForeign(['residency_user_id']);
-            $table->dropForeign(['item_id']);
-
-            $table->dropUnique(['residency_user_id', 'item_id']);
-
             $table->foreignId('item_package_id')->nullable()->after('item_id')
                 ->constrained('item_packages')->nullOnDelete();
 
@@ -38,10 +50,20 @@ return new class extends Migration {
     {
         Schema::disableForeignKeyConstraints();
 
+        try {
+            Schema::table('item_residency_users', function (Blueprint $table) {
+                $table->dropUnique('user_course_pkg_unique');
+            });
+        } catch (\Throwable $e) {}
+
+        try {
+            Schema::table('item_residency_users', function (Blueprint $table) {
+                $table->dropForeign(['item_package_id']);
+                $table->dropColumn('item_package_id');
+            });
+        } catch (\Throwable $e) {}
+
         Schema::table('item_residency_users', function (Blueprint $table) {
-            $table->dropUnique('user_course_pkg_unique');
-            $table->dropForeign(['item_package_id']);
-            $table->dropColumn('item_package_id');
             $table->unique(['residency_user_id', 'item_id']);
         });
 
