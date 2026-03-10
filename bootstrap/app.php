@@ -21,8 +21,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(SetWebsiteTenantConnection::class);
-        $middleware->web(SetLocale::class);
-
         $middleware->redirectUsersTo(function () {
             return '/admin/dashboard';
         });
