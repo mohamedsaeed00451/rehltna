@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | CAPS Panel</title>
+    <title>Login | {{ env('APP_NAME') }}</title>
     <!-- Favicon -->
     <link rel="icon" href="{{asset('assets/img/seo-img.png')}}" type="image/x-icon"/>
     <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
 
     <!-- Styles -->
     <style>
@@ -23,6 +23,7 @@
             justify-content: center;
             align-items: center;
         }
+
         #title-text {
             line-height: 42px;
             height: 42px;
@@ -44,26 +45,32 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
         }
+
         .login-card:hover {
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
         }
+
         .form-control {
             border-radius: 8px;
             border-color: #d1d5db;
         }
+
         .form-control:focus {
             border-color: #60a5fa;
             box-shadow: 0 0 0 0.2rem rgba(96, 165, 250, 0.25);
         }
+
         .btn-primary {
             background-color: #3b82f6;
             border: none;
             border-radius: 8px;
             transition: background-color 0.3s ease;
         }
+
         .btn-primary:hover {
             background-color: #2563eb;
         }
+
         .field-icon {
             float: right;
             margin-top: -30px;
@@ -102,9 +109,15 @@
         }
 
         @keyframes shine {
-            0% { left: -75%; }
-            50% { left: 100%; }
-            100% { left: -75%; }
+            0% {
+                left: -75%;
+            }
+            50% {
+                left: 100%;
+            }
+            100% {
+                left: -75%;
+            }
         }
 
         .btn-primary:active {
@@ -123,7 +136,7 @@
 <!-- /Loader -->
 <div class="login-card">
     <div class="text-center mb-4">
-        <h2 class="fw-bold text-primary" id="title-text">CAPS Panel</h2>
+        <h2 class="fw-bold text-primary" id="title-text">{{ env('APP_NAME') }} Panel</h2>
         <p class="text-muted" id="subtitle-text">Login To Your Admin Panel !</p>
     </div>
 
@@ -132,7 +145,8 @@
 
         <div class="mb-3">
             <label class="form-label">Email Address</label>
-            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="Enter Your Email" required autofocus>
+            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                   value="{{ old('email') }}" placeholder="Enter Your Email" required autofocus>
             @error('email')
             <div class="text-danger mt-1 small">{{ $message }}</div>
             @enderror
@@ -140,7 +154,9 @@
 
         <div class="mb-3 position-relative">
             <label class="form-label">Password</label>
-            <input id="password-field" type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter Your Password" required>
+            <input id="password-field" type="password" name="password"
+                   class="form-control @error('password') is-invalid @enderror" placeholder="Enter Your Password"
+                   required>
             <span toggle="#password-field" class="fas fa-eye field-icon toggle-password"></span>
             @error('password')
             <div class="text-danger mt-1 small">{{ $message }}</div>
@@ -193,6 +209,7 @@
         const element = document.getElementById(elementId);
         element.textContent = "";
         let i = 0;
+
         function type() {
             if (i < text.length) {
                 element.textContent += text.charAt(i);
@@ -202,11 +219,12 @@
                 setTimeout(callback, 1000);
             }
         }
+
         type();
     }
 
     function loopTyping() {
-        const title = "CAPS Panel";
+        const title = "{{ env('APP_NAME') }} Panel";
         const subtitle = "Login To Your Admin Panel !";
 
         typeWriter("title-text", title, 90, () => {
@@ -219,6 +237,7 @@
             });
         });
     }
+
     window.addEventListener('DOMContentLoaded', loopTyping);
 </script>
 

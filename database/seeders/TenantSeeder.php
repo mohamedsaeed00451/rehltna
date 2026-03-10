@@ -16,9 +16,9 @@ class TenantSeeder extends Seeder
     public function run(): void
     {
         Tenant::query()->updateOrCreate([
-            'name' => 'CAPS',
+            'name' => 'Rehltna',
         ], [
-            'image' => 'caps.webp',
+            'image' => 'rehltna.jpeg',
             'db_host' => config('database.connections.mysql.host'),
             'db_port' => config('database.connections.mysql.port'),
             'db_name' => config('database.connections.mysql.database'),

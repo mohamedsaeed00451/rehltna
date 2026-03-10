@@ -15,10 +15,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::query()->updateOrCreate([
-            'email' => 'admin@caps-panel.com',
+            'email' => 'admin@rehltna-panel.com',
         ], [
-            'name' => 'Admin CAPS Panel',
-            'password' => Hash::make('caps$2026@panel'),
+            'name' => 'Admin Rehltna Panel',
+            'password' => Hash::make('rehltna$2026@panel'),
             'email_verified_at' => now(),
             'role' => 'admin',
             'tenant_id' => Tenant::query()->first()->id,
