@@ -24,12 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(SetLocale::class);
 
         $middleware->redirectUsersTo(function () {
-            if (checkIfAdmin()) {
-                return '/admin/dashboard';
-            }
-            return '/';
+            return '/admin/dashboard';
         });
-        $middleware->redirectGuestsTo('/');
+        $middleware->redirectGuestsTo('/admin');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (ValidationException $e, $request) {
