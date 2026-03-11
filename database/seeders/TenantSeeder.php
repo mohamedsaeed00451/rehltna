@@ -24,7 +24,7 @@ class TenantSeeder extends Seeder
             'db_name' => config('database.connections.mysql.database'),
             'db_username' => config('database.connections.mysql.username'),
             'db_password' => config('database.connections.mysql.password'),
-            'options' => 'home,social_integration,blogs,ai_settings,sitemaps,items,contact,payment_methods,coupons,orders,subscribes,sliders,custom_pages,testimonials,leads,settings,failed_jobs,events_galleries,members,register_users,payment_links,residency_users,images_uploader'
+            'options' => 'home,social_integration,blogs,ai_settings,sitemaps,items,contact,payment_methods,orders,subscribes,sliders,events_galleries,residency_users,register_users,custom_pages,testimonials,images_uploader,settings,countries,states,cities,failed_jobs'
         ]);
     }
 }
