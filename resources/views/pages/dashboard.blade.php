@@ -363,7 +363,7 @@
                     'color' => '#0F9D58',
                 ],
                 'items' => [
-                    'title' => 'Items',
+                    'title' => 'Trips',
                     'route' => 'items.index',
                     'icon'  => 'fas fa-box',
                     'color' => '#FFC107',
@@ -606,7 +606,7 @@
                         <div class="section-header">
                             <h5 class="section-title">
                                 <span style="color: #FFC107;"><i class="fas fa-box"></i></span>
-                                Latest Items
+                                Latest Trips
                             </h5>
                             <a href="{{ route('items.index') }}" class="view-all-link text-warning">View All <i
                                     class="fas fa-arrow-right ms-1"></i></a>
@@ -664,7 +664,7 @@
 
                         @if(in_array('items', $tenantOptions))
                     {
-                        label: 'Items',
+                        label: 'Trips',
                         data: {!! json_encode($itemsPerMonth) !!},
                         backgroundColor: '#FFC107',
                         borderRadius: 10,

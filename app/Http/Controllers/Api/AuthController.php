@@ -25,6 +25,7 @@ class AuthController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
@@ -35,6 +36,7 @@ class AuthController extends Controller
 
         $user = ResidencyUser::query()->create([
             'name' => $data['name'],
+            'phone' => $data['phone'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);

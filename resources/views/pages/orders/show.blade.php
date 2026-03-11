@@ -3,28 +3,100 @@
 @section('styles')
     <style>
         /* Global Background */
-        body { background-color: #f8fafc; }
+        body {
+            background-color: #f8fafc;
+        }
 
         /* Deluxe Card Styling */
-        .custom-card { border: none; border-radius: 24px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03); background: #fff; margin-bottom: 25px; }
-        .card-header { border-bottom: 1px solid #f1f5f9 !important; padding: 20px 25px !important; background: transparent !important; }
-        .card-title { font-weight: 800 !important; color: #1e293b !important; text-transform: uppercase; font-size: 13px !important; letter-spacing: 0.5px; }
+        .custom-card {
+            border: none;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+            background: #fff;
+            margin-bottom: 25px;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #f1f5f9 !important;
+            padding: 20px 25px !important;
+            background: transparent !important;
+        }
+
+        .card-title {
+            font-weight: 800 !important;
+            color: #1e293b !important;
+            text-transform: uppercase;
+            font-size: 13px !important;
+            letter-spacing: 0.5px;
+        }
 
         /* Information Grid */
-        .info-item { margin-bottom: 15px; }
-        .info-label { display: block; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px; }
-        .info-value { display: block; font-weight: 700; color: #1e293b; font-size: 14px; }
+        .info-item {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            display: block;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 14px;
+        }
 
         /* Table Design */
-        .table thead th { background-color: #f8fafc !important; color: #64748b !important; text-transform: uppercase !important; font-size: 11px !important; font-weight: 800 !important; padding: 15px 20px !important; border: none !important; }
-        .table td { padding: 18px 20px; vertical-align: middle; border-top: 1px solid #f1f5f9; }
+        .table thead th {
+            background-color: #f8fafc !important;
+            color: #64748b !important;
+            text-transform: uppercase !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            padding: 15px 20px !important;
+            border: none !important;
+        }
+
+        .table td {
+            padding: 18px 20px;
+            vertical-align: middle;
+            border-top: 1px solid #f1f5f9;
+        }
 
         /* Inputs & Selects - Fix Text Clipping */
-        .form-control, .form-select { border-radius: 12px !important; border: 2px solid #f1f5f9 !important; height: auto !important; padding: 12px 15px !important; font-weight: 600 !important; line-height: 1.5 !important; }
-        .form-control:focus { border-color: #4f46e5 !important; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important; }
+        .form-control, .form-select {
+            border-radius: 12px !important;
+            border: 2px solid #f1f5f9 !important;
+            height: auto !important;
+            padding: 12px 15px !important;
+            font-weight: 600 !important;
+            line-height: 1.5 !important;
+        }
 
-        .btn-update { background: #4f46e5 !important; color: white !important; border-radius: 14px !important; padding: 14px !important; font-weight: 700 !important; border: none !important; transition: 0.3s; }
-        .btn-update:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2); }
+        .form-control:focus {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
+        }
+
+        .btn-update {
+            background: #4f46e5 !important;
+            color: white !important;
+            border-radius: 14px !important;
+            padding: 14px !important;
+            font-weight: 700 !important;
+            border: none !important;
+            transition: 0.3s;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+        }
     </style>
 @endsection
 
@@ -59,30 +131,29 @@
                             @foreach($order->items as $item)
                                 <tr>
                                     <td>
-                                        <div class="info-value">{{ $item->item->title_en ?? 'Item #' . $item->item_id }}</div>
-                                        <small class="text-muted fw-bold">{{ $item->item->itemType->title_en ?? '' }}</small>
-                                        @if($item->item_package_id)
-                                            <div class="mt-1">
-                                                <span class="badge" style="background-color: #eff6ff; color: #3b82f6; border: 1px solid #3b82f640; padding: 5px 10px; border-radius: 8px;">
-                                                    <i class="fas fa-box-open me-1"></i> {{ \App\Models\ItemPackage::find($item->item_package_id)->title_en ?? 'Package' }}
-                                                </span>
-                                            </div>
-                                        @else
-                                            <div class="mt-1"><span class="badge bg-light text-muted border px-2">Standard Access</span></div>
-                                        @endif
+                                        <div
+                                            class="info-value">{{ $item->item->title_en ?? 'Item #' . $item->item_id }}</div>
+                                        <small
+                                            class="text-muted fw-bold">{{ $item->item->itemType->title_en ?? '' }}</small>
                                     </td>
                                     <td class="fw-bold">{{ $item->attendees_count }}</td>
-                                    <td class="text-muted">{{ $item->price_per_unit }} $</td>
-                                    <td class="fw-bold text-dark">{{ $item->total }} $</td>
+                                    <td class="text-muted">{{ $item->price_per_unit }} SAR</td>
+                                    <td class="fw-bold text-dark">{{ $item->total }} SAR</td>
                                 </tr>
                             @endforeach
                             </tbody>
                             <tfoot class="bg-light bg-opacity-50">
-                            <tr><td colspan="3" class="text-end fw-bold py-3">Sub Total</td><td class="py-3 fw-bold">{{ $order->sub_total }} $</td></tr>
-                            <tr><td colspan="3" class="text-end fw-bold text-danger py-2">Discount</td><td class="text-danger py-2">- {{ $order->discount_amount }} $</td></tr>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold py-3">Sub Total</td>
+                                <td class="py-3 fw-bold">{{ $order->sub_total }} SAR</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold text-danger py-2">Discount</td>
+                                <td class="text-danger py-2">- {{ $order->discount_amount }} SAR</td>
+                            </tr>
                             <tr style="background-color: #f5f3ff;">
                                 <td colspan="3" class="text-end fw-extrabold tx-16 py-3 text-primary">Total Amount</td>
-                                <td class="fw-extrabold tx-16 text-primary py-3">{{ $order->total_amount }} $</td>
+                                <td class="fw-extrabold tx-16 text-primary py-3">{{ $order->total_amount }} SAR</td>
                             </tr>
                             </tfoot>
                         </table>
@@ -97,13 +168,12 @@
             <div class="card custom-card">
                 <div class="card-header"><h6 class="card-title mb-0">Customer Profile</h6></div>
                 <div class="card-body">
-                    <div class="info-item"><span class="info-label">Full Name</span><span class="info-value">{{ $order->name }}</span></div>
-                    <div class="info-item"><span class="info-label">Email Address</span><span class="info-value">{{ $order->email }}</span></div>
-                    <div class="info-item"><span class="info-label">Phone Number</span><span class="info-value text-primary">{{ $order->phone }}</span></div>
-                    <div class="row">
-                        <div class="col-6"><span class="info-label">Country</span><span class="info-value">{{ $order->country }}</span></div>
-                        <div class="col-6"><span class="info-label">Specialty</span><span class="info-value text-info">{{ $order->specialty }}</span></div>
-                    </div>
+                    <div class="info-item"><span class="info-label">Full Name</span><span
+                            class="info-value">{{ $order->name }}</span></div>
+                    <div class="info-item"><span class="info-label">Email Address</span><span
+                            class="info-value">{{ $order->email }}</span></div>
+                    <div class="info-item"><span class="info-label">Phone Number</span><span
+                            class="info-value text-primary">{{ $order->phone }}</span></div>
                 </div>
             </div>
 
@@ -115,15 +185,18 @@
                     <div class="mb-4 text-center">
                         @php
                             $methods = [
-                                'creditcard'    => ['bg' => '#f5f3ff', 'color' => '#4f46e5', 'icon' => 'fa-credit-card'],
-                                'instapay'      => ['bg' => '#faf5ff', 'color' => '#9333ea', 'icon' => 'fa-mobile-alt'],
-                                'bank_transfer' => ['bg' => '#f8fafc', 'color' => '#64748b', 'icon' => 'fa-university'],
+                                'tamara'    => ['bg' => 'rgba(79, 70, 229, 0.1)',  'color' => '#4f46e5', 'icon' => 'fa-credit-card'],
+                                'bank_transfer_alrajhi' => ['bg' => 'rgba(147, 51, 234, 0.1)', 'color' => '#9333ea', 'icon' => 'fa-university'],
+                                'bank_transfer_alahli' => ['bg' => 'rgba(100, 116, 139, 0.1)', 'color' => '#64748b', 'icon' => 'fa-university'],
                             ];
                             $m = $methods[$order->payment_method] ?? ['bg' => '#f1f5f9', 'color' => '#1e293b', 'icon' => 'fa-wallet'];
                         @endphp
-                        <div class="p-3 shadow-sm rounded-4" style="background-color: {{ $m['bg'] }} !important; border: 1px solid {{ $m['color'] }}40;">
-                            <i class="fas {{ $m['icon'] }} mb-2" style="color: {{ $m['color'] }}; font-size: 1.5rem;"></i>
-                            <span class="d-block fw-extrabold" style="color: {{ $m['color'] }};">{{ strtoupper($order->payment_method) }}</span>
+                        <div class="p-3 shadow-sm rounded-4"
+                             style="background-color: {{ $m['bg'] }} !important; border: 1px solid {{ $m['color'] }}40;">
+                            <i class="fas {{ $m['icon'] }} mb-2"
+                               style="color: {{ $m['color'] }}; font-size: 1.5rem;"></i>
+                            <span class="d-block fw-extrabold"
+                                  style="color: {{ $m['color'] }};">{{ strtoupper($order->payment_method) }}</span>
                         </div>
                     </div>
 
@@ -137,9 +210,11 @@
                         ];
                         $s = $statusStyles[$order->payment_status] ?? ['bg' => '#f8fafc', 'color' => '#64748b', 'icon' => 'clock'];
                     @endphp
-                    <div class="d-flex justify-content-between align-items-center p-3 rounded-3 mb-4" style="background-color: {{ $s['bg'] }} !important; border: 1px solid {{ $s['color'] }}40;">
+                    <div class="d-flex justify-content-between align-items-center p-3 rounded-3 mb-4"
+                         style="background-color: {{ $s['bg'] }} !important; border: 1px solid {{ $s['color'] }}40;">
                         <span class="fw-bold" style="color: {{ $s['color'] }};">Status:</span>
-                        <span class="fw-extrabold text-uppercase" style="color: {{ $s['color'] }};">{{ $order->payment_status }} <i class="fas fa-{{ $s['icon'] }} ms-1"></i></span>
+                        <span class="fw-extrabold text-uppercase" style="color: {{ $s['color'] }};">{{ $order->payment_status }} <i
+                                class="fas fa-{{ $s['icon'] }} ms-1"></i></span>
                     </div>
 
                     {{-- Proof Image --}}
@@ -148,15 +223,18 @@
                             <span class="info-label text-start">Manual Payment Proof</span>
                             <div class="position-relative mt-2">
                                 <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#receiptModal">
-                                    <img src="{{ asset($order->payment_proof) }}" class="img-fluid rounded-4 border shadow-sm p-1" style="max-height: 180px; width: 100%; object-fit: cover;">
+                                    <img src="{{ asset($order->payment_proof) }}"
+                                         class="img-fluid rounded-4 border shadow-sm p-1"
+                                         style="max-height: 180px; width: 100%; object-fit: cover;">
                                 </a>
                             </div>
                         </div>
                     @endif
 
                     {{-- Update Status Form --}}
-                    @if(($order->payment_method == 'instapay' || $order->payment_method == 'bank_transfer') && $order->payment_status != 'paid')
-                        <form id="updateStatusForm" action="{{ route('orders.update.status', $order->id) }}" method="POST" class="border-top pt-4">
+                    @if(($order->payment_method == 'bank_transfer_alrajhi' || $order->payment_method == 'bank_transfer_alahli') && $order->payment_status != 'paid')
+                        <form id="updateStatusForm" action="{{ route('orders.update.status', $order->id) }}"
+                              method="POST" class="border-top pt-4">
                             @csrf
                             <div class="form-group">
                                 <label class="info-label">Action Required</label>
@@ -194,14 +272,17 @@
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content border-0 shadow-lg" style="border-radius: 28px; overflow: hidden;">
                     <div class="modal-header border-0 bg-light p-4">
-                        <h5 class="modal-title fw-bold text-dark"><i class="las la-receipt me-2 text-primary"></i>Proof Review</h5>
+                        <h5 class="modal-title fw-bold text-dark"><i class="las la-receipt me-2 text-primary"></i>Proof
+                            Review</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body text-center p-4 bg-white">
-                        <img src="{{ asset($order->payment_proof) }}" class="img-fluid rounded-4 shadow-sm" alt="Full Receipt">
+                        <img src="{{ asset($order->payment_proof) }}" class="img-fluid rounded-4 shadow-sm"
+                             alt="Full Receipt">
                     </div>
                     <div class="modal-footer border-0 p-4 pt-0">
-                        <a href="{{ asset($order->payment_proof) }}" target="_blank" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                        <a href="{{ asset($order->payment_proof) }}" target="_blank"
+                           class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
                             <i class="fas fa-external-link-alt me-2"></i> Open Original
                         </a>
                     </div>

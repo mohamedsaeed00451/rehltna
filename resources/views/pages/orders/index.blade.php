@@ -139,12 +139,16 @@
                             <select id="filter_method" class="form-control-deluxe" style="width: 160px;">
                                 <option value="">All Methods</option>
                                 <option
-                                    value="creditcard" {{ request('payment_method') == 'creditcard' ? 'selected' : '' }}>
-                                    Credit Card
+                                    value="tamara" {{ request('payment_method') == 'tamara' ? 'selected' : '' }}>
+                                    Tamara
                                 </option>
                                 <option
-                                    value="instapay" {{ request('payment_method') == 'instapay' ? 'selected' : '' }}>
-                                    InstaPay
+                                    value="bank_transfer_alrajhi" {{ request('payment_method') == 'bank_transfer_alrajhi' ? 'selected' : '' }}>
+                                    Al Rajhi Bank
+                                </option>
+                                <option
+                                    value="bank_transfer_alahli" {{ request('payment_method') == 'bank_transfer_alahli' ? 'selected' : '' }}>
+                                    AlAhli Bank
                                 </option>
                             </select>
 
@@ -179,7 +183,7 @@
                             </div>
                         </div>
 
-                        <div class="flex-grow-1" style="max-width: 300px;">
+                        <div class="flex-grow-2" style="max-width: 300px;">
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-0"
                                       style="border-radius: 12px 0 0 12px;"><i
@@ -195,6 +199,7 @@
                 <div class="card-body p-0" id="orders-table">
                     @include('pages.orders.partials.table', ['orders' => $orders])
                 </div>
+
             </div>
         </div>
     </div>

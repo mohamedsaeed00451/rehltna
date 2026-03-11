@@ -203,8 +203,8 @@ Route::middleware([ForceJsonResponseMiddleware::class, ApiKeyMiddleware::class, 
 Route::middleware(IdentifyTenant::class)->group(function () {
     Route::prefix('v1')->group(function () {
         // Named routes are required for the OrderController redirect logic
-        Route::get('/payment/success', [OrderController::class, 'success'])->name('credit.card.success');
-        Route::get('/payment/cancel', [OrderController::class, 'cancel'])->name('credit.card.cancel');
+        Route::get('/payment/success', [OrderController::class, 'success'])->name('payment.success');
+        Route::get('/payment/cancel', [OrderController::class, 'cancel'])->name('payment.cancel');
     });
 });
 

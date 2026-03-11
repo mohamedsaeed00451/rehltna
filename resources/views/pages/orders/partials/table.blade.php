@@ -5,7 +5,7 @@
             <th class="text-center" width="60">#</th>
             <th>Customer Info</th>
             <th>Total Bill</th>
-            <th>Method</th>
+            <th class="text-center">Method</th>
             <th class="text-center">Proof</th>
             <th class="text-center">Status</th>
             <th>Date</th>
@@ -20,14 +20,13 @@
                     <h6 class="mb-0 fw-bold text-dark">{{ $order->name }}</h6>
                     <span class="text-muted small fw-medium"><i class="las la-phone me-1"></i>{{ $order->phone }}</span>
                 </td>
-                <td><span class="fw-extrabold text-primary">{{ $order->total_amount }} $</span></td>
+                <td><span class="fw-extrabold text-primary">{{ $order->total_amount }} SAR</span></td>
                 <td class="text-center">
                     @php
-
                         $methodStyles = [
-                            'creditcard'    => ['bg' => 'rgba(79, 70, 229, 0.1)',  'color' => '#4f46e5', 'icon' => 'fa-credit-card'],
-                            'instapay'      => ['bg' => 'rgba(147, 51, 234, 0.1)', 'color' => '#9333ea', 'icon' => 'fa-mobile-alt'],
-                            'bank_transfer' => ['bg' => 'rgba(100, 116, 139, 0.1)', 'color' => '#64748b', 'icon' => 'fa-university'],
+                            'tamara'    => ['bg' => 'rgba(79, 70, 229, 0.1)',  'color' => '#4f46e5', 'icon' => 'fa-credit-card'],
+                            'bank_transfer_alrajhi' => ['bg' => 'rgba(147, 51, 234, 0.1)', 'color' => '#9333ea', 'icon' => 'fa-university'],
+                            'bank_transfer_alahli' => ['bg' => 'rgba(100, 116, 139, 0.1)', 'color' => '#64748b', 'icon' => 'fa-university'],
                         ];
                         $mStyle = $methodStyles[$order->payment_method] ?? ['bg' => '#f1f5f9', 'color' => '#1e293b', 'icon' => 'fa-wallet'];
                     @endphp

@@ -101,14 +101,104 @@
 
     <div class="row">
 
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card custom-card h-100 mb-0 border-primary" style="border-top: 4px solid #3b82f6;">
+                <div class="card-header pb-0 border-bottom-0 pt-4 px-4">
+                    <h5 class="card-title mb-1 fw-bold text-dark"><i class="fas fa-link text-primary me-2"></i>Frontend
+                        Redirect
+                        URLs</h5>
+                    <p class="text-muted tx-13 mb-0">Frontend endpoints for payment flow.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ route('update.settings') }}" method="POST" class="h-100 d-flex flex-column">
+                        @csrf
+                        <div class="flex-grow-1 mt-2">
+                            <div class="mb-4">
+                                <label class="section-label text-success"><i class="fas fa-check-circle"></i> Success
+                                    URL</label>
+                                <input type="url" name="payment_success_url" class="form-control shadow-sm bg-light"
+                                       placeholder="https://site.com/checkout/success"
+                                       value="{{ get_setting('payment_success_url') }}">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="section-label text-danger"><i class="fas fa-times-circle"></i> Failed URL</label>
+                                <input type="url" name="payment_failed_url" class="form-control shadow-sm bg-light"
+                                       placeholder="https://site.com/checkout/failed"
+                                       value="{{ get_setting('payment_failed_url') }}">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="section-label text-warning"><i class="fas fa-ban"></i> Cancel URL</label>
+                                <input type="url" name="payment_cancel_url" class="form-control shadow-sm bg-light"
+                                       placeholder="https://site.com/checkout/cancel"
+                                       value="{{ get_setting('payment_cancel_url') }}">
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <button type="submit" class="btn btn-dark btn-block w-100 rounded-3 shadow-sm fw-bold"
+                                    style="height: 48px; letter-spacing: 0.5px;">
+                                <i class="fas fa-save me-1"></i> Save URLs
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card custom-card h-100 mb-0 border-primary" style="border-top: 4px solid #3b82f6;">
+                <div class="card-header pb-0 border-bottom-0 pt-4 px-4">
+                    <h5 class="card-title mb-1 fw-bold text-dark"><i class="fas fa-link text-primary me-2"></i>APP
+                        Redirect
+                        URLs</h5>
+                    <p class="text-muted tx-13 mb-0">App endpoints for payment flow.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ route('update.settings') }}" method="POST" class="h-100 d-flex flex-column">
+                        @csrf
+                        <div class="flex-grow-1 mt-2">
+                            <div class="mb-4">
+                                <label class="section-label text-success"><i class="fas fa-check-circle"></i> Success
+                                    URL</label>
+                                <input type="url" name="payment_success_url_app" class="form-control shadow-sm bg-light"
+                                       placeholder="https://site.com/checkout/success"
+                                       value="{{ get_setting('payment_success_url_app') }}">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="section-label text-danger"><i class="fas fa-times-circle"></i> Failed URL</label>
+                                <input type="url" name="payment_failed_url_app" class="form-control shadow-sm bg-light"
+                                       placeholder="https://site.com/checkout/failed"
+                                       value="{{ get_setting('payment_failed_url_app') }}">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="section-label text-warning"><i class="fas fa-ban"></i> Cancel URL</label>
+                                <input type="url" name="payment_cancel_url_app" class="form-control shadow-sm bg-light"
+                                       placeholder="https://site.com/checkout/cancel"
+                                       value="{{ get_setting('payment_cancel_url_app') }}">
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <button type="submit" class="btn btn-dark btn-block w-100 rounded-3 shadow-sm fw-bold"
+                                    style="height: 48px; letter-spacing: 0.5px;">
+                                <i class="fas fa-save me-1"></i> Save URLs
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         @foreach($paymentMethods as $method)
             <div class="col-xl-4 col-md-6 mb-4">
                 <div class="card custom-card payment-card mb-0">
                     <div class="payment-img-wrapper">
-
-                            <img src="{{ asset($method->banner_en) }}" alt="{{ $method->title_en }}"
-                                 class="payment-img">
-
+                        <img src="{{ asset($method->banner_en) }}" alt="{{ $method->title_en }}"
+                             class="payment-img">
                     </div>
 
                     <div class="card-body d-flex flex-column flex-grow-1 p-4">
@@ -265,51 +355,6 @@
                 </div>
             </div>
         @endforeach
-
-        <div class="col-xl-12 col-md-12 mb-4">
-            <div class="card custom-card h-100 mb-0 border-primary" style="border-top: 4px solid #3b82f6;">
-                <div class="card-header pb-0 border-bottom-0 pt-4 px-4">
-                    <h5 class="card-title mb-1 fw-bold text-dark"><i class="fas fa-link text-primary me-2"></i> Redirect
-                        URLs</h5>
-                    <p class="text-muted tx-13 mb-0">Frontend endpoints for payment flow.</p>
-                </div>
-                <div class="card-body p-4">
-                    <form action="{{ route('update.settings') }}" method="POST" class="h-100 d-flex flex-column">
-                        @csrf
-                        <div class="flex-grow-1 mt-2">
-                            <div class="mb-4">
-                                <label class="section-label text-success"><i class="fas fa-check-circle"></i> Success
-                                    URL</label>
-                                <input type="url" name="payment_success_url" class="form-control shadow-sm bg-light"
-                                       placeholder="https://site.com/checkout/success"
-                                       value="{{ get_setting('payment_success_url') }}">
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="section-label text-danger"><i class="fas fa-times-circle"></i> Failed URL</label>
-                                <input type="url" name="payment_failed_url" class="form-control shadow-sm bg-light"
-                                       placeholder="https://site.com/checkout/failed"
-                                       value="{{ get_setting('payment_failed_url') }}">
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="section-label text-warning"><i class="fas fa-ban"></i> Cancel URL</label>
-                                <input type="url" name="payment_cancel_url" class="form-control shadow-sm bg-light"
-                                       placeholder="https://site.com/checkout/cancel"
-                                       value="{{ get_setting('payment_cancel_url') }}">
-                            </div>
-                        </div>
-
-                        <div class="mt-4 pt-3 border-top">
-                            <button type="submit" class="btn btn-dark btn-block w-100 rounded-3 shadow-sm fw-bold"
-                                    style="height: 48px; letter-spacing: 0.5px;">
-                                <i class="fas fa-save me-1"></i> Save URLs
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 
     </div>
 

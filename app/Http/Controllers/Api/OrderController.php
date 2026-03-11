@@ -8,9 +8,9 @@ use App\Mail\OrderInvoiceMail;
 use App\Mail\OrderUnderReviewMail;
 use App\Models\Coupon;
 use App\Models\Item;
-use App\Models\ItemPackage;
 use App\Models\Order;
 use App\Models\PaymentMethod;
+use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,34 +27,21 @@ class OrderController extends Controller
 
     private function calculateOrderDetails($itemsRequest, $couponCode = null): array
     {
+        $itemIds = collect($itemsRequest)->pluck('item_id')->toArray();
+        $dbItems = Item::query()->whereIn('id', $itemIds)->get()->keyBy('id');
+
         $subTotal = 0;
         $orderItemsData = [];
 
         foreach ($itemsRequest as $reqItem) {
-            $dbItem = Item::query()->find($reqItem['item_id']);
+            $dbItem = $dbItems->get($reqItem['item_id']);
             if (!$dbItem) continue;
-
-            $price = $dbItem->price;
-            $pkgId = $reqItem['item_package_id'] ?? null;
-
-            if ($pkgId) {
-                $package = ItemPackage::query()
-                    ->where('id', $pkgId)
-                    ->where('item_id', $dbItem->id)
-                    ->first();
-                if ($package) {
-                    $price = $package->price;
-                }
-            }
-
-            $itemTotal = $price * $reqItem['attendees'];
+            $itemTotal = $dbItem->price * $reqItem['attendees'];
             $subTotal += $itemTotal;
-
             $orderItemsData[] = [
                 'item_id' => $dbItem->id,
-                'item_package_id' => $pkgId,
                 'attendees_count' => $reqItem['attendees'],
-                'price_per_unit' => $price,
+                'price_per_unit' => $dbItem->price,
                 'total' => $itemTotal,
             ];
         }
@@ -67,7 +54,6 @@ class OrderController extends Controller
             if ($coupon && $coupon->isValid()) {
                 $couponId = $coupon->id;
                 $allowedItemIds = $coupon->items->pluck('id')->toArray();
-
                 if (count($allowedItemIds) > 0) {
                     foreach ($orderItemsData as $data) {
                         if (in_array($data['item_id'], $allowedItemIds)) {
@@ -102,12 +88,19 @@ class OrderController extends Controller
     public function checkout(Request $request): JsonResponse
     {
         $request->validate([
+            'source' => 'required|in:web,app',
             'name' => 'required|string',
             'email' => 'required|email',
             'phone' => 'required',
             'payment_method_code' => [
                 'required',
-                Rule::exists(PaymentMethod::class, 'code'),
+                function ($attribute, $value, $fail) {
+                    if ($value !== 'cash_on_delivery') {
+                        if (!PaymentMethod::where('code', $value)->exists()) {
+                            $fail('The selected payment method is invalid.');
+                        }
+                    }
+                },
             ],
             'coupon_code' => [
                 'nullable',
@@ -118,17 +111,19 @@ class OrderController extends Controller
                 'required',
                 Rule::exists(Item::class, 'id'),
             ],
-            'items.*.item_package_id' => [
-                'nullable',
-                Rule::exists('item_packages', 'id'),
-            ],
             'items.*.attendees' => 'required|integer|min:1',
         ]);
 
-        $paymentMethod = PaymentMethod::query()
-            ->where('code', $request->get('payment_method_code'))
-            ->where('status', 1)
-            ->firstOrFail();
+        $source = $request->get('source');
+        $paymentCode = $request->get('payment_method_code');
+        $paymentMethodModel = null;
+
+        if ($paymentCode !== 'cash_on_delivery') {
+            $paymentMethodModel = PaymentMethod::query()
+                ->where('code', $paymentCode)
+                ->where('status', 1)
+                ->firstOrFail();
+        }
 
         $calculation = $this->calculateOrderDetails($request->get('items'), $request->get('coupon_code'));
 
@@ -141,7 +136,7 @@ class OrderController extends Controller
                 'name' => $request->get('name'),
                 'email' => $request->get('email'),
                 'phone' => $request->get('phone'),
-                'payment_method' => $paymentMethod->code,
+                'payment_method' => $paymentCode,
                 'payment_status' => 'pending',
                 'sub_total' => $calculation['sub_total'],
                 'discount_amount' => $calculation['discount_amount'],
@@ -150,12 +145,20 @@ class OrderController extends Controller
                 'transaction_token' => $securityToken,
             ]);
 
-
             foreach ($calculation['order_items_data'] as $item) {
                 $order->items()->create($item);
             }
 
             DB::commit();
+
+            $paymentBaseUrl = null;
+
+            if ($paymentMethodModel) {
+                $config = $paymentMethodModel->config;
+                $mode = $config['mode'] ?? 'test';
+                $paymentBaseUrl = $config[$mode]['base_url'] ?? null;
+                $secretKey = $config[$mode]['secret_key'] ?? null;
+            }
 
             $responsePayload = [
                 'order_id' => $order->id,
@@ -166,67 +169,132 @@ class OrderController extends Controller
                 'status' => 'pending',
             ];
 
+            if ($paymentCode === 'tamara') {
 
-            if ($paymentMethod->code === 'creditcard') {
+                if (!$paymentMethodModel) throw new \Exception('Payment configuration missing');
+
                 $responsePayload['message'] = 'Redirect to payment gateway';
                 $responsePayload['action'] = 'redirect';
-                $responsePayload['payment_method'] = 'creditcard';
+                $responsePayload['payment_method'] = 'tamara';
 
-                $config = $paymentMethod->config;
-                $mode = $config['mode'] ?? 'test';
-                $paymentBaseUrl = $config[$mode]['url'] ?? null;
-
-                $currencyRate = (float)get_setting('currency_rate', 50);
-                $commissionPct = (float)get_setting('payment_commission_percentage', 3);
-                $fixedAmount = (float)get_setting('payment_fixed_amount', 3);
-                $extraFees = (float)get_setting('payment_extra_fees', 0);
-
-                $amountInEGP = $calculation['final_total'] * $currencyRate;
-
-                $commissionVal = ($amountInEGP * $commissionPct) / 100;
-                $extraFeesVal = ($amountInEGP * $extraFees) / 100;
-                $total_Amount = $commissionVal + $fixedAmount + $extraFeesVal + $amountInEGP;
+                $amount = $calculation['final_total'];
 
                 $callbackParams = [
+                    'source' => $source,
                     'order_id' => $order->id,
                     'transaction_token' => $securityToken,
                     'tenant_id' => $request->header('X-Tenant-ID') ?? $request->get('tenant_id')
                 ];
 
-                $gatewayNote = "Order #" . $order->id;
+                try {
 
-                $data = [
-                    'payment_type' => 'MASTERCARD',
-                    'invoice_id' => $order->id,
-                    'amount' => round($amountInEGP, 2),
-                    'total_amount' => round($total_Amount, 2),
-                    'total_amount_up_amount' => round(ceil($total_Amount), 2),
-                    'commission' => $commissionPct,
-                    'fixed_amount' => $fixedAmount,
-                    'fees' => $extraFees,
-                    'reason' => $gatewayNote,
-                    'type' => 'company_integration',
-                    'succ' => route('credit.card.success', $callbackParams),
-                    'fail' => route('credit.card.cancel', $callbackParams),
-                    'title' => getTenantInfo()->name ?? get_setting('site_name_en')
-                ];
+                    $data = [
+                        'total_amount' =>
+                            [
+                                'amount' => (string)number_format($amount, 2, '.', ''),
+                                'currency' => "SAR",
+                            ],
+                        'shipping_amount' =>
+                            [
+                                'amount' => (string)number_format(0, 2, '.', ''),
+                                'currency' => "SAR",
+                            ],
+                        'tax_amount' =>
+                            [
+                                'amount' => (string)number_format(0, 2, '.', ''),
+                                'currency' => "SAR",
+                            ],
+                        'order_reference_id' => $order->transaction_token,
+                        'order_number' => $order->id,
+                        'discount' =>
+                            [
+                                'name' => "Discount Name",
+                                'amount' =>
+                                    [
+                                        'amount' => $order->discount_amount,
+                                        'currency' => "SAR",
+                                    ],
+                            ],
+                        'consumer' =>
+                            [
+                                'first_name' => $order->name,
+                                'last_name' => $order->name,
+                                'phone_number' => $order->phone,
+                                'email' => $order->email,
+                            ],
+                        'country_code' => "SA",
+                        'description' => 'Order #' . $order->transaction_token . ' from ' . env('APP_NAME', 'Rehltna'),
+                        'merchant_url' =>
+                            [
+                                'success' => route('payment.success', $callbackParams),
+                                'failure' => route('payment.cancel', $callbackParams),
+                                'cancel' => route('payment.cancel', $callbackParams),
+                                'notification' => null,
+                            ],
+                        'payment_type' => 'PAY_BY_INSTALMENTS',
+                        'instalments' => 3,
+                        'billing_address' =>
+                            [
+                                'first_name' => $order->name,
+                                'last_name' => $order->name,
+                                'line1' => 'Address line 1',
+                                'city' => 'city',
+                                'country_code' => 'SA',
+                                'phone_number' => $order->phone,
+                            ],
+                        'shipping_address' =>
+                            [
+                                'first_name' => $order->name,
+                                'last_name' => $order->name,
+                                'line1' => 'Address line 1',
+                                'city' => 'city',
+                                'country_code' => 'SA',
+                                'phone_number' => $order->phone,
+                            ],
+                        'locale' => 'en_US',
+                        'items' => $order->items,
+                    ];
 
-                if ($paymentBaseUrl) {
-                    $gatewayResponse = Http::post($paymentBaseUrl, $data);
-                    if ($gatewayResponse->successful()) {
-                        $responsePayload['transfer_details'] = $gatewayResponse->body();
+                    $client = new Client([
+                        'base_uri' => $paymentBaseUrl,
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $secretKey,
+                            'Content-Type' => 'application/json',
+
+                        ],
+                    ]);
+
+                    $response = $client->post('checkout', [
+                        'json' => $data,
+                    ]);
+
+                    $response_decode = json_decode($response->getBody()->getContents(), true);
+
+                    if (isset($response_decode['checkout_id']) && $response_decode['checkout_id'] != '') {
+                        $responsePayload['transfer_details'] = $response_decode['checkout_url'];
                     } else {
                         $responsePayload['transfer_details'] = "Payment Gateway Error";
                     }
-                } else {
-                    $responsePayload['transfer_details'] = "Payment URL Not Configured";
+
+                } catch (\Exception $e) {
+                    $responsePayload['transfer_details'] = $e->getMessage();
                 }
 
-            } elseif ($paymentMethod->code === 'instapay' || $paymentMethod->code === 'bank_transfer') {
+            } elseif (str_contains($paymentCode, 'bank_transfer')) {
+
+                if (!$paymentMethodModel) throw new \Exception('Payment configuration missing');
+
                 $responsePayload['message'] = 'Please transfer amount and upload receipt';
                 $responsePayload['action'] = 'upload_receipt';
-                $responsePayload['payment_method'] = $paymentMethod->code;
-                $responsePayload['transfer_details'] = $paymentBaseUrl ?? ($paymentMethod->config ?? '');
+                $responsePayload['payment_method'] = $paymentCode;
+                $responsePayload['transfer_details'] = $paymentBaseUrl;
+
+            } elseif ($paymentCode === 'cash_on_delivery') {
+
+                $responsePayload['message'] = 'Order placed successfully. Please wait for confirmation.';
+                $responsePayload['action'] = 'none';
+                $responsePayload['payment_method'] = 'cash_on_delivery';
+                $responsePayload['transfer_details'] = null;
             }
 
             return $this->responseMessage(200, 'Order Created Successfully', $responsePayload);
@@ -249,10 +317,6 @@ class OrderController extends Controller
 
         $order = Order::query()->find($request->get('order_id'));
 
-        if (!$order) {
-            return $this->responseMessage(404, 'Order not found');
-        }
-
         if ($request->get('transaction_token') !== $order->transaction_token)
             return $this->responseMessage(400, 'Not Authorized to Upload Receipt for this order');
 
@@ -262,14 +326,11 @@ class OrderController extends Controller
         if ($order->payment_status === 'reviewing')
             return $this->responseMessage(400, 'This order is already under reviewed. please wait for review');
 
-        if (!in_array($order->payment_method, ['instapay', 'bank_transfer']))
-            return $this->responseMessage(400, 'This payment method does not support receipt upload');
+        if (!str_contains($order->payment_method, 'bank_transfer'))
+            return $this->responseMessage(400, 'This payment method is not bank transfer');
 
         if ($request->hasFile('receipt')) {
-            if ($order->payment_proof) {
-                deleteFiles([$order->payment_proof]);
-            }
-
+            deleteFiles([$order->payment_proof]);
             $path = uploadFile($request->file('receipt'), 'payment-proofs', 'receipt');
             $order->update([
                 'payment_proof' => $path,
@@ -282,7 +343,7 @@ class OrderController extends Controller
                 Log::error('Review Mail Error: ' . $e->getMessage());
             }
 
-            return $this->responseMessage(200, 'Receipt uploaded successfully. Waiting for admin approval.', $order->load('items.item'));
+            return $this->responseMessage(200, 'Receipt uploaded successfully. Waiting for admin approval.', $order->load('items.item.itemType'));
         }
 
         return $this->responseMessage(400, 'No file uploaded');
@@ -300,10 +361,6 @@ class OrderController extends Controller
                 'required',
                 Rule::exists(Item::class, 'id'),
             ],
-            'items.*.item_package_id' => [
-                'nullable',
-                Rule::exists('item_packages', 'id'),
-            ],
             'items.*.attendees' => 'required|integer|min:1',
         ]);
 
@@ -320,12 +377,20 @@ class OrderController extends Controller
 
     public function success(Request $request): RedirectResponse
     {
+        $payment_success_url = get_setting('payment_success_url');
+        $payment_failed_url = get_setting('payment_failed_url');
+        if ($request->get('source') == 'app') {
+            $payment_success_url = get_setting('payment_success_url_app');
+            $payment_failed_url = get_setting('payment_failed_url_app');
+        }
+
         try {
+
             $order = Order::query()->findOrFail($request->get('order_id'));
 
             if ($request->get('transaction_token') !== $order->transaction_token) {
                 return redirect()->away(
-                    get_setting('payment_failed_url') . '?' . http_build_query([
+                    $payment_failed_url . '?' . http_build_query([
                         'order_id' => $order->id
                     ])
                 );
@@ -343,14 +408,14 @@ class OrderController extends Controller
             }
 
             return redirect()->away(
-                get_setting('payment_success_url') . '?' . http_build_query([
+                $payment_success_url . '?' . http_build_query([
                     'order_id' => $order->id
                 ])
             );
 
         } catch (\Exception $e) {
             return redirect()->away(
-                get_setting('payment_failed_url') . '?' . http_build_query([
+                $payment_failed_url . '?' . http_build_query([
                     'order_id' => $request->get('order_id')
                 ])
             );
@@ -359,23 +424,25 @@ class OrderController extends Controller
 
     public function cancel(Request $request): RedirectResponse
     {
+        $payment_cancel_url = get_setting('payment_cancel_url');
+        $payment_failed_url = get_setting('payment_failed_url');
+        if ($request->get('source') == 'app') {
+            $payment_cancel_url = get_setting('payment_cancel_url_app');
+            $payment_failed_url = get_setting('payment_failed_url_app');
+        }
         $order = Order::query()->find($request->get('order_id'));
-        if ($order && $request->get('transaction_token') !== $order->transaction_token) {
+        if ($request->get('transaction_token') !== $order->transaction_token) {
             return redirect()->away(
-                get_setting('payment_failed_url') . '?' . http_build_query([
+                $payment_failed_url . '?' . http_build_query([
                     'order_id' => $order->id
                 ])
             );
         }
-
-        if ($order) {
-            $order->update([
-                'payment_status' => 'canceled'
-            ]);
-        }
-
+        $order->update([
+            'payment_status' => 'canceled'
+        ]);
         return redirect()->away(
-            get_setting('payment_cancel_url') . '?' . http_build_query([
+            $payment_cancel_url . '?' . http_build_query([
                 'order_id' => $request->get('order_id')
             ])
         );
@@ -383,7 +450,8 @@ class OrderController extends Controller
 
     public function getOrderById($id): JsonResponse
     {
-        $order = Order::query()->with(['items.item', 'items.itemPackage'])->findOrFail($id);
+        $order = Order::query()->with('items.item.itemType', 'items.item.itineraries.city')->findOrFail($id);
         return $this->responseMessage(200, 'Order Found', $order);
     }
+
 }
