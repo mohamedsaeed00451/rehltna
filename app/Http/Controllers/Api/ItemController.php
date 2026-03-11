@@ -15,7 +15,7 @@ class ItemController extends Controller
 
     public function getItems(Request $request): JsonResponse
     {
-        $query = Item::query()->where('status', 1)->with('galleries', 'itemType', 'assignedCoupons', 'packages');
+        $query = Item::query()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city');
         if ($request->get('search')) {
             $query = $query->where(function ($query) use ($request) {
                 $query->where('title_en', 'like', '%' . $request->get('search') . '%')
@@ -37,7 +37,7 @@ class ItemController extends Controller
 
     public function getItem($slug): JsonResponse
     {
-        $Item = Item::query()->with('galleries', 'itemType', 'assignedCoupons', 'packages')->where(function ($query) use ($slug) {
+        $Item = Item::query()->with('galleries', 'itemType', 'itineraries.city')->where(function ($query) use ($slug) {
             $query->where('slug_en', $slug)
                 ->orWhere('slug_ar', $slug)
                 ->orWhere('slug_fr', $slug)
@@ -55,7 +55,7 @@ class ItemController extends Controller
         if (!$itemType)
             return $this->responseMessage(404, 'not found');
 
-        $items = $itemType->items()->with('galleries', 'itemType', 'assignedCoupons', 'packages')->orderByDesc('id')->paginate(10);
+        $items = $itemType->items()->with('galleries', 'itemType', 'itineraries.city')->orderByDesc('id')->paginate(10);
         $data = [
             'itemType' => $itemType,
             'items_count' => $items->total(),
@@ -68,7 +68,7 @@ class ItemController extends Controller
     public function getItemsFeatures(Request $request): JsonResponse
     {
         $number = $request->get('number') ?? 3;
-        $itemsFeatures = Item::query()->with('galleries', 'itemType', 'assignedCoupons', 'packages')->orderByDesc('id')->where('status', 1)->where('is_feature', 1)->take($number)->get();
+        $itemsFeatures = Item::query()->with('galleries', 'itemType', 'itineraries.city')->orderByDesc('id')->where('status', 1)->where('is_feature', 1)->take($number)->get();
         return $this->responseMessage(200, 'success', $itemsFeatures);
     }
 
