@@ -6,6 +6,7 @@ use App\Exports\ItemsErrorUploadedExport;
 use App\Exports\ItemsTempExport;
 use App\Http\Controllers\Controller;
 use App\Jobs\ImportItemsJob;
+use App\Models\City;
 use App\Models\Item;
 use App\Models\ItemType;
 use Illuminate\Http\JsonResponse;
@@ -35,7 +36,8 @@ class ItemController extends Controller
     public function create(): view
     {
         $itemTypes = ItemType::all();
-        return view('pages.items.create', compact('itemTypes'));
+        $cities = City::all();
+        return view('pages.items.create', compact('itemTypes', 'cities'));
     }
 
     /**
@@ -47,7 +49,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights'];
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
             }
@@ -79,6 +81,24 @@ class ItemController extends Controller
                 }
             }
 
+            if ($request->has('itinerary_city_id')) {
+                $cityIds = $request->input('itinerary_city_id');
+                $starts = $request->input('itinerary_start');
+                $ends = $request->input('itinerary_end');
+                $nights = $request->input('itinerary_nights');
+
+                foreach ($cityIds as $index => $cityId) {
+                    if (!empty($cityId) && !empty($starts[$index])) {
+                        $item->itineraries()->create([
+                            'city_id' => $cityId,
+                            'start_date' => $starts[$index],
+                            'end_date' => $ends[$index],
+                            'nights' => $nights[$index] ?? 0,
+                        ]);
+                    }
+                }
+            }
+
             return redirect()->route('items.index')->with('success', 'Item created successfully.');
 
         } catch (\Exception $e) {
@@ -86,6 +106,7 @@ class ItemController extends Controller
             return redirect()->back()->with('error', 'Oops! Something went wrong');
         }
     }
+
     /**
      * Display the specified resource.
      */
@@ -101,7 +122,8 @@ class ItemController extends Controller
     {
         $item = Item::query()->findOrFail(decrypt($id));
         $itemTypes = ItemType::all();
-        return view('pages.items.edit', compact('item', 'itemTypes'));
+        $cities = City::all();
+        return view('pages.items.edit', compact('item', 'itemTypes', 'cities'));
     }
 
     /**
@@ -115,7 +137,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights'];
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
             }
@@ -144,6 +166,27 @@ class ItemController extends Controller
                 }
             } elseif ($request->has('gallery_cleared')) {
                 $item->galleries()->delete();
+            }
+
+            if ($request->has('itinerary_city_id')) {
+                $item->itineraries()->delete();
+                $cityIds = $request->input('itinerary_city_id');
+                $starts = $request->input('itinerary_start');
+                $ends = $request->input('itinerary_end');
+                $nights = $request->input('itinerary_nights');
+
+                foreach ($cityIds as $index => $cityId) {
+                    if (!empty($cityId) && !empty($starts[$index])) {
+                        $item->itineraries()->create([
+                            'city_id' => $cityId,
+                            'start_date' => $starts[$index],
+                            'end_date' => $ends[$index],
+                            'nights' => $nights[$index] ?? 0,
+                        ]);
+                    }
+                }
+            } else {
+                $item->itineraries()->delete();
             }
 
             $item->fill($data);

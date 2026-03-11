@@ -18,100 +18,106 @@ class PaymentMethodSeeder extends Seeder
 
         $methods = [
             [
-                // Bank Transfer
-                'title_en' => 'Bank Transfer',
-                'title_ar' => 'تحويل بنكي',
-                'title_fr' => 'Virement Bancaire',
-                'title_de' => 'Banküberweisung',
+                'title_en' => 'Bank Transfer - AlAhli Bank',
+                'title_ar' => 'تحويل بنكي - البنك الأهلي',
+                'title_fr' => 'Virement Bancaire - AlAhli',
+                'title_de' => 'Banküberweisung - AlAhli',
 
-                'slug_en' => 'bank-transfer',
-                'slug_ar' => 'تحويل-بنكي',
-                'slug_fr' => 'virement-bancaire',
-                'slug_de' => 'bank-uberweisung',
+                'slug_en' => 'bank-transfer-alahli',
+                'slug_ar' => 'تحويل-بنكي-الاهلي',
+                'slug_fr' => 'virement-bancaire-alahli',
+                'slug_de' => 'bank-uberweisung-alahli',
 
-                'code' => 'bank_transfer',
+                'code' => 'bank_transfer_alahli',
                 'status' => 1,
 
-                'banner_en' => 'payment-methods/bank.png',
-                'banner_ar' => 'payment-methods/bank.png',
-                'banner_fr' => 'payment-methods/bank.png',
-                'banner_de' => 'payment-methods/bank.png',
+                'banner_en' => 'payment-methods/alahli.jpeg',
+                'banner_ar' => 'payment-methods/alahli.jpeg',
+                'banner_fr' => 'payment-methods/alahli.jpeg',
+                'banner_de' => 'payment-methods/alahli.jpeg',
 
                 'config' => [
-                    'bank_name' => 'test bank name',
-                    'account_name' => 'test account name',
-                    'account_number' => '12345678901234',
-                    'iban' => 'EG120002000123456789012345',
-                    'swift_code' => 'NBEGXCX',
-                    'bank_address' => 'test bank address',
-                    'instructions' => 'please upload proof !',
+                    'bank_name' => 'البنك الاهلي التجاري',
+                    'account_name' => 'مؤسسة رحلتنا لتنظيم الرحلات',
+                    'account_number' => '15463733000108',
+                    'iban' => 'SA8910000015463733000108',
+                    'swift_code' => '',
+                    'bank_address' => 'المملكة العربية السعودية',
+                    'instructions' => 'الرجاء إرفاق إيصال التحويل بعد إتمام العملية.',
                 ],
             ],
             [
-                // Credit Card
-                'title_en' => 'Credit Card',
-                'title_ar' => 'بطاقة ائتمان',
-                'title_fr' => 'Carte de Crédit',
-                'title_de' => 'Kreditkarte',
+                'title_en' => 'Bank Transfer - Al Rajhi Bank',
+                'title_ar' => 'تحويل بنكي - بنك الراجحي',
+                'title_fr' => 'Virement Bancaire - Al Rajhi',
+                'title_de' => 'Banküberweisung - Al Rajhi',
 
-                'slug_en' => 'credit-card',
-                'slug_ar' => 'بطاقة-ائتمان',
-                'slug_fr' => 'carte-de-credit',
-                'slug_de' => 'kreditkarte',
+                'slug_en' => 'bank-transfer-alrajhi',
+                'slug_ar' => 'تحويل-بنكي-الراجحي',
+                'slug_fr' => 'virement-bancaire-alrajhi',
+                'slug_de' => 'bank-uberweisung-alrajhi',
 
-                'code' => 'creditcard',
+                'code' => 'bank_transfer_alrajhi',
                 'status' => 1,
 
-                'banner_en' => 'payment-methods/credit-card.png',
-                'banner_ar' => 'payment-methods/credit-card.png',
-                'banner_fr' => 'payment-methods/credit-card.png',
-                'banner_de' => 'payment-methods/credit-card.png',
+                'banner_en' => 'payment-methods/alrajhi.jpg',
+                'banner_ar' => 'payment-methods/alrajhi.jpg',
+                'banner_fr' => 'payment-methods/alrajhi.jpg',
+                'banner_de' => 'payment-methods/alrajhi.jpg',
+
+                'config' => [
+                    'bank_name' => 'بنك الراجحى',
+                    'account_name' => 'مؤسسة رحلتنا لتنظيم الرحلات',
+                    'account_number' => '551608010056607',
+                    'iban' => 'SA8680000551608010056607',
+                    'swift_code' => '',
+                    'bank_address' => 'المملكة العربية السعودية',
+                    'instructions' => 'الرجاء إرفاق إيصال التحويل بعد إتمام العملية.',
+                ],
+            ],
+            [
+                'title_en' => 'Tamara',
+                'title_ar' => 'تمارا',
+                'title_fr' => 'Tamara',
+                'title_de' => 'Tamara',
+
+                'slug_en' => 'tamara',
+                'slug_ar' => 'تمارا',
+                'slug_fr' => 'tamara',
+                'slug_de' => 'tamara',
+
+                'code' => 'tamara',
+                'status' => 1,
+
+                'banner_en' => 'payment-methods/tamara.jpeg',
+                'banner_ar' => 'payment-methods/tamara.jpeg',
+                'banner_fr' => 'payment-methods/tamara.jpeg',
+                'banner_de' => 'payment-methods/tamara.jpeg',
 
                 'config' => [
                     'live' => [
-                        'url' => 'https://live.wemisc.net/api/payment',
+                        'base_url' => 'https://api-tamara.co',
+                        'secret_key' => 'live_secret_key',
+                        'public_key' => 'live_public_key',
                     ],
                     'test' => [
-                        'url' => 'https://test.wemisc.net/api/payment',
+                        'base_url' => 'https://api-sandbox.tamara.co',
+                        'secret_key' => 'sk_test_0190e4e4-432b-0f64-4717-30d5d415747f',
+                        'public_key' => 'pk_test_0190e4e4-432b-0f64-4717-30d5109dbe3d',
                     ],
                     'mode' => 'test',
                 ],
             ],
-            // [
-            //    'title_en' => 'InstaPay',
-            //    'title_ar' => 'إنستا باى',
-            //    'title_fr' => 'InstaPay',
-            //    'title_de' => 'InstaPay',
-            //    'slug_en' => 'instapay',
-            //    'slug_ar' => 'إنستاباى',
-            //    'slug_fr' => 'instapay',
-            //    'slug_de' => 'instapay',
-            //    'code' => 'instapay',
-            //    'status' => 1,
-            //    'banner_en' => 'payment-methods/instapay.webp',
-            //    'banner_ar' => 'payment-methods/instapay.webp',
-            //    'banner_fr' => 'payment-methods/instapay.webp',
-            //    'banner_de' => 'payment-methods/instapay.webp',
-            //    'config' => [
-            //        'live' => [
-            //            'url' => 'https://ipn.eg/S/mo7amedsa3ed00451/instapay/1RJvNt',
-            //        ],
-            //        'test' => [
-            //            'url' => 'https://ipn.eg/S/mo7amedsa3ed00451/instapay/1RJvNt',
-            //        ],
-            //        'mode' => 'test',
-            //    ],
-            // ],
         ];
 
-        $codes = collect($methods)->pluck('code')->toArray();
-        PaymentMethod::query()->whereNotIn('code', $codes)->delete();
+        try {
+            PaymentMethod::query()->withTrashed()->forceDelete();
+        } catch (\Exception $e) {
+            PaymentMethod::query()->delete();
+        }
 
         foreach ($methods as $method) {
-            PaymentMethod::query()->updateOrCreate(
-                ['code' => $method['code']],
-                $method
-            );
+            PaymentMethod::query()->create($method);
         }
 
         $this->command->info('Payment methods seeded successfully with FR and DE!');

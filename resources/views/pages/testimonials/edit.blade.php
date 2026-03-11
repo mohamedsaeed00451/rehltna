@@ -150,7 +150,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
                                     <option value="1" {{ $testimonial->status == 1 ? 'selected' : '' }}>Active
@@ -158,6 +158,22 @@
                                     </option>
                                     <option value="0" {{ $testimonial->status == 0 ? 'selected' : '' }}>Inactive
                                         (Hidden)
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Rating (Stars) <span class="text-danger">*</span></label>
+                                <select name="stars" class="form-select" required>
+                                    <option value="5" {{ ($testimonial->stars ?? 5) == 5 ? 'selected' : '' }}>⭐⭐⭐⭐⭐ - 5
+                                        Stars
+                                    </option>
+                                    <option value="4" {{ $testimonial->stars == 4 ? 'selected' : '' }}>⭐⭐⭐⭐ - 4 Stars
+                                    </option>
+                                    <option value="3" {{ $testimonial->stars == 3 ? 'selected' : '' }}>⭐⭐⭐ - 3 Stars
+                                    </option>
+                                    <option value="2" {{ $testimonial->stars == 2 ? 'selected' : '' }}>⭐⭐ - 2 Stars
+                                    </option>
+                                    <option value="1" {{ $testimonial->stars == 1 ? 'selected' : '' }}>⭐ - 1 Star
                                     </option>
                                 </select>
                             </div>

@@ -104,6 +104,28 @@
             border-radius: 14px;
             font-weight: 800;
             border: 1px solid #d1fae5;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* New Data Badges */
+        .points-badge {
+            background: #fffbeb;
+            color: #d97706;
+            padding: 8px 16px;
+            border-radius: 14px;
+            font-weight: 800;
+            border: 1px solid #fde68a;
+        }
+
+        .season-badge {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            border: 1px solid #e2e8f0;
         }
 
         /* Action Buttons */
@@ -170,29 +192,6 @@
                 real-time.</p>
         </div>
         <div class="d-flex gap-3 align-items-center">
-{{--            @if(\App\Models\ErrorUploaded::query()->where('type','item')->count() > 0)--}}
-{{--                <a href="{{ route('items.export-excel-error-uploaded') }}"--}}
-{{--                   class="btn btn-danger rounded-pill px-4 shadow-sm fw-bold">--}}
-{{--                    <i class="fas fa-bug me-2"></i> Error Logs--}}
-{{--                </a>--}}
-{{--            @endif--}}
-
-            {{--            <div class="dropdown btn-tools-container">--}}
-            {{--                <button class="btn btn-tools dropdown-toggle rounded-pill px-4 shadow-sm" type="button"--}}
-            {{--                        data-bs-toggle="dropdown">--}}
-            {{--                    <i class="fas fa-file-excel me-2 text-success"></i> Tools--}}
-            {{--                </button>--}}
-            {{--                <ul class="dropdown-menu shadow-lg border-0 p-2 mt-3" style="border-radius: 18px; min-width: 200px;">--}}
-            {{--                    <li><a class="dropdown-item rounded-3 py-2 fw-600" href="{{ route('items.export-excel-temp') }}"><i--}}
-            {{--                                class="fas fa-download me-2 text-warning"></i>Get Excel Template</a></li>--}}
-            {{--                    <li>--}}
-            {{--                        <hr class="dropdown-divider opacity-50">--}}
-            {{--                    </li>--}}
-            {{--                    <li><a class="dropdown-item rounded-3 py-2 fw-600 modal-effect" data-bs-toggle="modal"--}}
-            {{--                           href="#importExcel"><i class="fas fa-upload me-2 text-success"></i>Bulk Import Data</a></li>--}}
-            {{--                </ul>--}}
-            {{--            </div>--}}
-
             <a href="{{ route('items.create') }}"
                class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold border-0 d-flex align-items-center"
                style="background: #ffffff; color: #4f46e5; height: 48px;">
@@ -213,7 +212,10 @@
                                 @foreach(get_active_langs() as $lang)
                                     <th>Title <span class="lang-tag">{{ strtoupper($lang) }}</span></th>
                                 @endforeach
-                                <th>Price</th>
+                                <th>Season</th>
+                                <th>Duration</th>
+                                <th>Price <span class="lang-tag">SAR</span></th>
+                                <th>Points</th>
                                 <th class="text-center">Order</th>
                                 <th class="text-center">Featured</th>
                                 <th class="text-center">Visibility</th>
@@ -225,33 +227,77 @@
                                 <tr>
                                     <td class="text-center fw-bold text-muted">#{{ $loop->iteration }}</td>
 
-                                    @foreach(get_active_langs() as $lang)
+                                    @foreach(get_active_langs() as $index => $lang)
                                         <td>
                                             <div class="fw-bold text-dark"
                                                  style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                 {{ $item->{'title_'.$lang} }}
                                             </div>
+                                            @if($index === 0)
+                                                <div class="mt-2 d-flex gap-2">
+                                                    @if($item->whatsapp)
+                                                        <i class="fab fa-whatsapp text-success"
+                                                           title="WhatsApp: {{ $item->whatsapp }}"
+                                                           data-bs-toggle="tooltip"></i>
+                                                    @endif
+                                                    @if($item->quick_contact)
+                                                        <i class="fas fa-phone-alt text-primary"
+                                                           title="Call: {{ $item->quick_contact }}"
+                                                           data-bs-toggle="tooltip"></i>
+                                                    @endif
+                                                    @if($item->contact_us)
+                                                        <i class="fas fa-headset text-info"
+                                                           title="Contact Info: {{ $item->contact_us }}"
+                                                           data-bs-toggle="tooltip"></i>
+                                                    @endif
+                                                </div>
+                                            @endif
                                         </td>
                                     @endforeach
 
-                                    <td><span class="price-badge">{{ number_format($item->price, 0) }} $</span></td>
+                                    <td>
+                                        @if($item->season)
+                                            <span class="season-badge">{{ $item->season }}</span>
+                                        @else
+                                            <span class="text-muted small">-</span>
+                                        @endif
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold" style="color: #334155; font-size: 13px;">
+                                                <i class="fas fa-map-marker-alt me-1 text-danger"></i> {{ $item->itineraries->count() }} Cities
+                                            </span>
+                                            <span class="text-muted mt-1" style="font-size: 11px;">
+                                                <i class="fas fa-moon me-1 text-primary"></i> {{ $item->itineraries->sum('nights') }} Nights
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <td><span class="price-badge">{{ number_format($item->price, 0) }}</span></td>
+
+                                    <td>
+                                        <span class="points-badge">
+                                            <i class="fas fa-coins me-1"></i> {{ $item->earned_points ?? 0 }}
+                                        </span>
+                                    </td>
 
                                     <td class="text-center">
                                         <div class="order-indicator mx-auto">{{ $item->order ?? 0}}</div>
                                     </td>
-
                                     <td class="text-center">
                                         <div
                                             class="toggle-is-feature-btn main-toggle mx-auto {{ $item->is_feature == 1 ? 'main-toggle-success on' : 'main-toggle-danger of' }}"
-                                            data-id="{{ $item->id }}">
+                                            data-id="{{ $item->id }}"
+                                            data-is_feature="{{ $item->is_feature }}">
                                             <span></span>
                                         </div>
                                     </td>
-
                                     <td class="text-center">
                                         <div
                                             class="toggle-status-btn main-toggle mx-auto {{ $item->status == 1 ? 'main-toggle-success on' : 'main-toggle-danger of' }}"
-                                            data-id="{{ $item->id }}">
+                                            data-id="{{ $item->id }}"
+                                            data-status="{{ $item->status }}">
                                             <span></span>
                                         </div>
                                     </td>

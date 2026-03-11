@@ -226,6 +226,10 @@
                     <div class="step-circle"><i class="fas fa-search"></i></div>
                     <div class="step-label">SEO</div>
                 </div>
+                <div class="step-item" data-step="5">
+                    <div class="step-circle"><i class="fas fa-route"></i></div>
+                    <div class="step-label">Journey Details</div>
+                </div>
             </div>
 
             <div class="card border-0 shadow-sm rounded-3">
@@ -404,6 +408,159 @@
                             @endforeach
                         </div>
 
+                        <div class="step-content" id="step-5">
+                            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 5: Journey Details &
+                                Contact</h5>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Season <span class="text-danger">*</span></label>
+                                    <input type="text" name="season" class="form-control" placeholder="e.g. Summer 2026"
+                                           value="{{ $item->season ?? old('season') }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Earned Points <span class="text-danger">*</span></label>
+                                    <input type="number" name="earned_points" class="form-control"
+                                           placeholder="Points user gets"
+                                           value="{{ $item->earned_points ?? old('earned_points', 0) }}" required>
+                                </div>
+                            </div>
+
+                            <h6 class="text-dark fw-bold mb-3">Contact Information</h6>
+                            <div class="row mb-4">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label"><i class="fab fa-whatsapp text-success"></i> WhatsApp
+                                        Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="whatsapp" class="form-control" placeholder="+201xxxxxxxxx"
+                                           value="{{ $item->whatsapp ?? old('whatsapp') }}" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label"><i class="fas fa-phone-alt text-primary"></i> Quick
+                                        Contact <span class="text-danger">*</span></label>
+                                    <input type="text" name="quick_contact" class="form-control"
+                                           placeholder="Short number or mobile"
+                                           value="{{ $item->quick_contact ?? old('quick_contact') }}" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label"><i class="fas fa-headset text-info"></i> Contact Us
+                                        URL/Number <span class="text-danger">*</span></label>
+                                    <input type="text" name="contact_us" class="form-control" placeholder="Link or info"
+                                           value="{{ $item->contact_us ?? old('contact_us') }}" required>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <hr class="my-4 border-light">
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="text-dark fw-bold mb-0">Itinerary (Cities & Dates)</h6>
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                        onclick="addItineraryRow()">
+                                    <i class="fas fa-plus me-1"></i> Add City
+                                </button>
+                            </div>
+
+                            <div id="itinerary-repeater">
+                                @if(isset($item) && $item->itineraries->count() > 0)
+                                    @foreach($item->itineraries as $itin)
+                                        <div class="row itinerary-row mb-3 align-items-end p-3 rounded"
+                                             style="background-color: #f4f6f9; border: 1px solid #e1e5ef;">
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label text-dark fw-bold">City <span
+                                                        class="text-danger">*</span></label>
+                                                <select name="itinerary_city_id[]"
+                                                        class="form-select bg-white shadow-sm"
+                                                        style="border-color: #ced4da;" required>
+                                                    <option value="">-- Select City --</option>
+                                                    @foreach($cities as $city)
+                                                        <option
+                                                            value="{{ $city->id }}" {{ $itin->city_id == $city->id ? 'selected' : '' }}>
+                                                            {{ transDB($city, 'title') }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label text-dark fw-bold">Start Date <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="date" name="itinerary_start[]"
+                                                       class="form-control start-date bg-white shadow-sm"
+                                                       style="border-color: #ced4da;" onchange="calculateNights(this)"
+                                                       value="{{ $itin->start_date }}" required>
+                                            </div>
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label text-dark fw-bold">End Date <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="date" name="itinerary_end[]"
+                                                       class="form-control end-date bg-white shadow-sm"
+                                                       style="border-color: #ced4da;" onchange="calculateNights(this)"
+                                                       value="{{ $itin->end_date }}" required>
+                                            </div>
+                                            <div class="col-md-2 mb-2 mb-md-0">
+                                                <label class="form-label text-dark fw-bold">Nights</label>
+                                                <input type="number" name="itinerary_nights[]"
+                                                       class="form-control nights-input"
+                                                       style="background-color: #e9ecef; border-color: #ced4da; cursor: not-allowed;"
+                                                       value="{{ $itin->nights }}" readonly>
+                                            </div>
+                                            <div class="col-md-1 mb-2 mb-md-0 text-center">
+                                                <button type="button" class="btn btn-danger remove-row w-100 shadow-sm"
+                                                        style="height: 46px; border-radius: 8px;" title="Remove">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="row itinerary-row mb-3 align-items-end p-3 rounded"
+                                         style="background-color: #f4f6f9; border: 1px solid #e1e5ef;">
+                                        <div class="col-md-3 mb-2 mb-md-0">
+                                            <label class="form-label text-dark fw-bold">City <span
+                                                    class="text-danger">*</span></label>
+                                            <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm"
+                                                    style="border-color: #ced4da;" required>
+                                                <option value="">-- Select City --</option>
+                                                @foreach($cities as $city)
+                                                    <option
+                                                        value="{{ $city->id }}">{{ transDB($city, 'title') }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 mb-2 mb-md-0">
+                                            <label class="form-label text-dark fw-bold">Start Date <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="date" name="itinerary_start[]"
+                                                   class="form-control start-date bg-white shadow-sm"
+                                                   style="border-color: #ced4da;" onchange="calculateNights(this)"
+                                                   required>
+                                        </div>
+                                        <div class="col-md-3 mb-2 mb-md-0">
+                                            <label class="form-label text-dark fw-bold">End Date <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="date" name="itinerary_end[]"
+                                                   class="form-control end-date bg-white shadow-sm"
+                                                   style="border-color: #ced4da;" onchange="calculateNights(this)"
+                                                   required>
+                                        </div>
+                                        <div class="col-md-2 mb-2 mb-md-0">
+                                            <label class="form-label text-dark fw-bold">Nights</label>
+                                            <input type="number" name="itinerary_nights[]"
+                                                   class="form-control nights-input"
+                                                   style="background-color: #e9ecef; border-color: #ced4da; cursor: not-allowed;"
+                                                   readonly>
+                                        </div>
+                                        <div class="col-md-1 mb-2 mb-md-0 text-center">
+                                            <button type="button" class="btn btn-danger remove-row w-100 shadow-sm"
+                                                    style="height: 46px; border-radius: 8px;" title="Remove">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-between mt-5 pt-3 border-top">
                             <button type="button" class="btn btn-secondary px-4" id="prevBtn" style="display:none;"
                                     onclick="nextPrev(-1)"><i class="fas fa-arrow-left me-1"></i> Previous
@@ -549,6 +706,71 @@
                 let itemHtml = `<div class="d-inline-block position-relative shadow-sm border rounded bg-white me-2 mb-2" style="width: 100px; height: 100px;"><input type="hidden" name="${inputName}" value="${url}">${previewContent}<button type="button" class="remove-btn btn btn-danger btn-sm p-0 d-flex justify-content-center align-items-center" onclick="$(this).parent().remove()">×</button></div>`;
                 $(`#${targetPreviewId}`).append(itemHtml);
             };
+
+            // --- Itinerary Repeater Logic ---
+            window.calculateNights = function (element) {
+                let row = element.closest('.itinerary-row');
+                let start = row.querySelector('.start-date').value;
+                let end = row.querySelector('.end-date').value;
+                let nightsInput = row.querySelector('.nights-input');
+
+                if (start && end) {
+                    let date1 = new Date(start);
+                    let date2 = new Date(end);
+                    if (date2 > date1) {
+                        let diffTime = Math.abs(date2 - date1);
+                        let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        nightsInput.value = diffDays - 1;
+                    } else {
+                        nightsInput.value = 0;
+                    }
+                } else {
+                    nightsInput.value = '';
+                }
+            }
+
+            window.addItineraryRow = function () {
+                let cityOptions = '<option value="">-- Select City --</option>';
+                @foreach($cities as $city)
+                    cityOptions += '<option value="{{ $city->id }}">{{ transDB($city, 'title') }}</option>';
+                @endforeach
+
+                let rowHtml = `
+                    <div class="row itinerary-row mb-3 align-items-end p-3 rounded" style="background-color: #f4f6f9; border: 1px solid #e1e5ef; animation: fadeIn 0.3s;">
+                        <div class="col-md-3 mb-2 mb-md-0">
+                            <label class="form-label text-dark fw-bold">City</label>
+                            <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm" style="border-color: #ced4da;" required>
+                                ${cityOptions}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2 mb-md-0">
+                            <label class="form-label text-dark fw-bold">Start Date</label>
+                            <input type="date" name="itinerary_start[]" class="form-control start-date bg-white shadow-sm" style="border-color: #ced4da;" onchange="calculateNights(this)" required>
+                        </div>
+                        <div class="col-md-3 mb-2 mb-md-0">
+                            <label class="form-label text-dark fw-bold">End Date</label>
+                            <input type="date" name="itinerary_end[]" class="form-control end-date bg-white shadow-sm" style="border-color: #ced4da;" onchange="calculateNights(this)" required>
+                        </div>
+                        <div class="col-md-2 mb-2 mb-md-0">
+                            <label class="form-label text-dark fw-bold">Nights</label>
+                            <input type="number" name="itinerary_nights[]" class="form-control nights-input" style="background-color: #e9ecef; border-color: #ced4da; cursor: not-allowed;" readonly>
+                        </div>
+                        <div class="col-md-1 mb-2 mb-md-0 text-center">
+                            <button type="button" class="btn btn-danger remove-row w-100 shadow-sm" style="height: 46px; border-radius: 8px;" title="Remove">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('itinerary-repeater').insertAdjacentHTML('beforeend', rowHtml);
+            }
+            $(document).on('click', '.remove-row', function () {
+                if ($('.itinerary-row').length > 1) {
+                    $(this).closest('.itinerary-row').remove();
+                } else {
+                    $(this).closest('.itinerary-row').find('input').val('');
+                }
+            });
 
         });
     </script>

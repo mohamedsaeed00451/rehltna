@@ -30,9 +30,9 @@ class Item extends Model
         return $this->morphMany(Gallery::class, 'galleryable')->where('type', 'general');
     }
 
-    public function speakersGalleries(): MorphMany
+    public function itineraries(): HasMany
     {
-        return $this->morphMany(Gallery::class, 'galleryable')->where('type', 'speakers');
+        return $this->hasMany(ItemItinerary::class);
     }
 
     public function students(): BelongsToMany

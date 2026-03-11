@@ -157,10 +157,10 @@
                                     data-bs-target="#v-pills-social" type="button" role="tab">
                                 <i class="las la-share-alt"></i> Social Links
                             </button>
-                            <button class="nav-link" id="v-pills-payment-tab" data-bs-toggle="pill"
-                                    data-bs-target="#v-pills-payment" type="button" role="tab">
-                                <i class="las la-credit-card"></i> Payment & Fees
-                            </button>
+{{--                            <button class="nav-link" id="v-pills-payment-tab" data-bs-toggle="pill"--}}
+{{--                                    data-bs-target="#v-pills-payment" type="button" role="tab">--}}
+{{--                                <i class="las la-credit-card"></i> Payment & Fees--}}
+{{--                            </button>--}}
                         </div>
                     </div>
                 </div>
@@ -180,7 +180,8 @@
                                 <div class="mb-4">
                                     <label class="form-label fw-bold mb-3">Active Languages</label>
                                     @php
-                                        $available_langs = ['ar' => 'Arabic', 'en' => 'English', 'fr' => 'French', 'de' => 'German'];
+//                                        $available_langs = ['ar' => 'Arabic', 'en' => 'English', 'fr' => 'French', 'de' => 'German'];
+                                        $available_langs = ['ar' => 'Arabic', 'en' => 'English'];
                                         $saved_langs = decode_setting('active_langs');
                                         if(empty($saved_langs)) $saved_langs = get_active_langs();
                                     @endphp
@@ -190,7 +191,7 @@
                                     <div class="row g-3">
                                         @foreach($available_langs as $code => $label)
                                             @php $isChecked = in_array($code, $saved_langs); @endphp
-                                            <div class="col-md-3 col-6">
+                                            <div class="col-md-6 col-6">
                                                 <label class="w-100 lang-check-wrapper" style="cursor: pointer;">
                                                     <input type="checkbox" name="active_langs[]" value="{{ $code }}"
                                                            class="d-none lang-input" {{ $isChecked ? 'checked' : '' }}>

@@ -138,11 +138,21 @@
                                 <div id="preview_image"></div>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
                                     <option value="1" selected>Active (Visible)</option>
                                     <option value="0">Inactive (Hidden)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Rating (Stars) <span class="text-danger">*</span></label>
+                                <select name="stars" class="form-select" required>
+                                    <option value="5" selected>⭐⭐⭐⭐⭐ - 5 Stars</option>
+                                    <option value="4">⭐⭐⭐⭐ - 4 Stars</option>
+                                    <option value="3">⭐⭐⭐ - 3 Stars</option>
+                                    <option value="2">⭐⭐ - 2 Stars</option>
+                                    <option value="1">⭐ - 1 Star</option>
                                 </select>
                             </div>
                         </div>
