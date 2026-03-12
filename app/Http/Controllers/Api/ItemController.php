@@ -15,7 +15,7 @@ class ItemController extends Controller
 
     public function getItems(Request $request): JsonResponse
     {
-        $query = Item::query()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city');
+        $query = Item::query()->with('galleries', 'itemType', 'itineraries.city');
         if ($request->get('search')) {
             $query = $query->where(function ($query) use ($request) {
                 $query->where('title_en', 'like', '%' . $request->get('search') . '%')

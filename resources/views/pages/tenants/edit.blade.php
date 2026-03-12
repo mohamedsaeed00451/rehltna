@@ -135,6 +135,7 @@
                 'countries' => 'Countries',
                 'states' => 'States',
                 'cities' => 'Cities',
+                'packages' => 'Packages',
                 'failed_jobs' => 'Failed Jobs',
             ] as $value => $label)
                 <div class="col-md-4">

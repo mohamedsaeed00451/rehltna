@@ -7,9 +7,7 @@
             </th>
             <th>Name & Details</th>
             <th>Contact</th>
-            <th>Location</th>
-            <th>Specialty</th>
-            <th class="text-center">Items</th>
+            <th class="text-center">Trips</th>
             <th class="text-center">Orders</th>
             <th class="text-center px-4">Actions</th>
         </tr>
@@ -28,14 +26,6 @@
                 </td>
                 <td>
                     <span class="fw-bold" style="color: #4f46e5;"><i class="las la-phone me-1"></i>{{ $residencyUser->phone }}</span>
-                </td>
-                <td>
-                    <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 8px;">
-                        <i class="las la-globe me-1"></i>{{ $residencyUser->country }}
-                    </span>
-                </td>
-                <td>
-                    <span class="fw-bold text-info" style="font-size: 0.85rem;">{{ $residencyUser->specialty }}</span>
                 </td>
                 <td class="text-center">
                     <span class="count-badge" style="background: #f0fdf4; color: #10b981; border-color: #10b98130;">

@@ -249,40 +249,40 @@
                                     </div>
                                 </div>
 
-                                <hr class="my-4">
-                                <h5 class="section-title">About Us Page Videos</h5>
-                                <div class="alert alert-danger border-0 shadow-sm">
-                                    <i class="las la-exclamation-triangle me-1"></i>
-                                    <strong>Important:</strong> These fields accept <strong>YouTube</strong> links only.
-                                    <br>
-                                    <small>Example: <em>https://www.youtube.com/watch?v=dQw4w9WgXcQ</em> OR <em>https://youtu.be/dQw4w9WgXcQ</em></small>
-                                </div>
+{{--                                <hr class="my-4">--}}
+{{--                                <h5 class="section-title">About Us Page Videos</h5>--}}
+{{--                                <div class="alert alert-danger border-0 shadow-sm">--}}
+{{--                                    <i class="las la-exclamation-triangle me-1"></i>--}}
+{{--                                    <strong>Important:</strong> These fields accept <strong>YouTube</strong> links only.--}}
+{{--                                    <br>--}}
+{{--                                    <small>Example: <em>https://www.youtube.com/watch?v=dQw4w9WgXcQ</em> OR <em>https://youtu.be/dQw4w9WgXcQ</em></small>--}}
+{{--                                </div>--}}
 
-                                <div class="row">
-                                    {{-- Mission Video --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold">Mission Video URL</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text text-danger"><i class="lab la-youtube fs-4"></i></span>
-                                            <input type="url" name="mission_video_url"
-                                                   value="{{ get_setting('mission_video_url') }}"
-                                                   class="form-control"
-                                                   placeholder="Paste Mission YouTube link here...">
-                                        </div>
-                                    </div>
+{{--                                <div class="row">--}}
+{{--                                    --}}{{-- Mission Video --}}
+{{--                                    <div class="col-md-6 mb-3">--}}
+{{--                                        <label class="form-label fw-bold">Mission Video URL</label>--}}
+{{--                                        <div class="input-group">--}}
+{{--                                            <span class="input-group-text text-danger"><i class="lab la-youtube fs-4"></i></span>--}}
+{{--                                            <input type="url" name="mission_video_url"--}}
+{{--                                                   value="{{ get_setting('mission_video_url') }}"--}}
+{{--                                                   class="form-control"--}}
+{{--                                                   placeholder="Paste Mission YouTube link here...">--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
 
-                                    {{-- Vision Video --}}
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold">Vision Video URL</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text text-danger"><i class="lab la-youtube fs-4"></i></span>
-                                            <input type="url" name="vision_video_url"
-                                                   value="{{ get_setting('vision_video_url') }}"
-                                                   class="form-control"
-                                                   placeholder="Paste Vision YouTube link here...">
-                                        </div>
-                                    </div>
-                                </div>
+{{--                                    --}}{{-- Vision Video --}}
+{{--                                    <div class="col-md-6 mb-3">--}}
+{{--                                        <label class="form-label fw-bold">Vision Video URL</label>--}}
+{{--                                        <div class="input-group">--}}
+{{--                                            <span class="input-group-text text-danger"><i class="lab la-youtube fs-4"></i></span>--}}
+{{--                                            <input type="url" name="vision_video_url"--}}
+{{--                                                   value="{{ get_setting('vision_video_url') }}"--}}
+{{--                                                   class="form-control"--}}
+{{--                                                   placeholder="Paste Vision YouTube link here...">--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
                             </div>
 
                             {{-- 2. Contact Tab --}}

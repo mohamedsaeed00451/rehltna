@@ -11,7 +11,6 @@ class PaymentMethodResource extends JsonResource
     {
         $config = $this->config ?? [];
         $mode = $config['mode'] ?? 'test';
-        $targetUrl = $config[$mode]['url'] ?? null;
         return [
             'id' => $this->id,
             'title_ar' => $this->title_ar,
@@ -20,7 +19,7 @@ class PaymentMethodResource extends JsonResource
             'status' => $this->status,
             'banner_ar' => $this->banner_ar,
             'banner_en' => $this->banner_en,
-            'payment_url' => $targetUrl,
+            'config' => $config,
             'mode' => $mode,
         ];
     }

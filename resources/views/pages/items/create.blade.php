@@ -196,6 +196,9 @@
         }
 
     </style>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-hijri-datepicker@1.0.2/dist/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+
 @endsection
 
 @section('content')
@@ -345,23 +348,53 @@
                         <div class="step-content" id="step-4">
                             <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 4: Logistics & SEO</h5>
 
-                            <div class="row mb-4">
-                                <div class="col-md-3 mb-3">
+                            {{-- Price & Map Row --}}
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Price <span class="text-danger">*</span></label>
-                                    <div class="input-group"><span class="input-group-text">$</span><input type="number"
-                                                                                                           name="price"
-                                                                                                           class="form-control"
-                                                                                                           required>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light fw-bold">SAR</span>
+                                        <input type="number" name="price" class="form-control" required>
                                     </div>
                                 </div>
-                                <div class="col-md-3 mb-3"><label class="form-label">Start Date <span
-                                            class="text-danger">*</span></label><input type="date" name="start_date"
-                                                                                       class="form-control" required>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Map Link <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i
+                                                class="fas fa-map-marker-alt text-danger"></i></span>
+                                        <input type="text" name="map" class="form-control" required>
+                                    </div>
                                 </div>
-                                <div class="col-md-3 mb-3"><label class="form-label">End Date <span class="text-danger">*</span></label><input
-                                        type="date" name="end_date" class="form-control" required></div>
-                                <div class="col-md-3 mb-3"><label class="form-label">Map Link <span class="text-danger">*</span></label><input
-                                        type="text" name="map" class="form-control" required></div>
+                            </div>
+
+                            {{-- Dates Row --}}
+                            <div class="row mb-4 p-3 bg-light rounded-3 border">
+                                <h6 class="fw-bold mb-3 text-dark"><i class="fas fa-calendar-alt me-2 text-primary"></i>
+                                    Schedule & Dates</h6>
+
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Start Date (Gregorian) <span class="text-danger">*</span></label>
+                                    <input type="date" name="start_date" class="form-control" required>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">End Date (Gregorian) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="date" name="end_date" class="form-control" required>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Start Date (Hijri)</label>
+                                    <input type="text" name="start_date_hijri" class="form-control hijri-date-input"
+                                           placeholder="1446-01-01" dir="ltr">
+                                </div>
+
+                                <div class="col-md-3 mb-0">
+                                    <label class="form-label">End Date (Hijri)</label>
+                                    <input type="text" name="end_date_hijri" class="form-control hijri-date-input"
+                                           placeholder="1446-01-10" dir="ltr">
+                                </div>
                             </div>
 
                             <div class="col-12">
@@ -407,7 +440,6 @@
                                 </div>
                             @endforeach
                         </div>
-
                         <div class="step-content" id="step-5">
                             <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 5: Journey Details &
                                 Contact</h5>
@@ -586,6 +618,31 @@
 
 @section('scripts')
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.2/moment-hijri.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-hijri-datepicker@1.0.2/dist/js/bootstrap-hijri-datetimepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".hijri-date-input").hijriDatePicker({
+                hijri: true,
+                showSwitcher: false,
+                hijriFormat: "iYYYY-iMM-iDD",
+                locale: "ar-sa",
+                showClear: true,
+                showTodayButton: true,
+                showClose: true,
+                icons: {
+                    previous: '<i class="fas fa-chevron-left"></i>',
+                    next: '<i class="fas fa-chevron-right"></i>',
+                    up: '<i class="fas fa-chevron-up"></i>',
+                    down: '<i class="fas fa-chevron-down"></i>',
+                    today: '<i class="fas fa-calendar-day me-1"></i> today',
+                    clear: '<i class="fas fa-trash me-1"></i> clear',
+                    close: '<i class="fas fa-times me-1"></i> close'
+                }
+            });
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 

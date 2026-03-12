@@ -104,6 +104,10 @@
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
+                    @if(in_array('packages', $tenantOptions))
+                        <li><a class="slide-item" href="{{ route('packages.index') }}"><span>Packages</span></a>
+                        </li>
+                    @endif
                     @if(in_array('residency_users', $tenantOptions))
                         <li><a class="slide-item" href="{{ route('residency-users.index') }}"><span>Users</span></a>
                         </li>

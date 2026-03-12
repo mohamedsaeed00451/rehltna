@@ -34,7 +34,8 @@ use App\Http\Controllers\Api\{ApplyJobController,
     SubscribeController,
     TenantController,
     TestimonialController,
-    TypeOfferController
+    TypeOfferController,
+    UserController
 };
 
 use App\Http\Middleware\{ApiKeyMiddleware, ForceJsonResponseMiddleware, IdentifyTenant};
@@ -53,6 +54,9 @@ Route::middleware([ForceJsonResponseMiddleware::class, ApiKeyMiddleware::class])
 Route::middleware([ForceJsonResponseMiddleware::class, ApiKeyMiddleware::class, IdentifyTenant::class])->group(function () {
 
     Route::prefix('v1')->group(function () {
+
+        #--------------------------- Users Info { Name & Phone } ---------------------------#
+        Route::get('/users-info', [UserController::class, 'index']);
 
         #--------------------------- Auth ---------------------------#
         Route::post('register', [AuthController::class, 'register']);   #--------- Register ---------#

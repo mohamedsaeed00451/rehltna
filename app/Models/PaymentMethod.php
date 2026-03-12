@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PaymentMethod extends Model
 {
     use softDeletes;
+
     protected $guarded = [];
 
     protected $connection = 'tenant';

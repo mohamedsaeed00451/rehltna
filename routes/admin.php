@@ -27,6 +27,7 @@ use App\Http\Controllers\Dashboard\{AiController,
     NewsController,
     OfferController,
     OrderController,
+    PackageController,
     PatientEducationController,
     PaymentLinkController,
     PaymentMethodController,
@@ -195,6 +196,8 @@ Route::group([
         Route::post('/residency-users/bulk-delete', [ResidencyUsersController::class, 'bulkDelete'])->name('residency-users.bulk-delete'); #-------- Bulk Delete Residency Users ---------#
 
         Route::post('payment-links/create-from-user/{id}', [PaymentLinkController::class, 'storeFromRegisterUser'])->name('payment-links.storeFromRegister');
+
+        Route::resource('packages', PackageController::class);
 
         Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function () {
             Route::get('/', [GalleryController::class, 'index'])->name('index');
