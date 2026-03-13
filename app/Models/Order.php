@@ -32,9 +32,9 @@ class Order extends Model
         return $this->hasOne(PaymentLink::class);
     }
 
-    public function user(): HasOne
+    public function user(): BelongsTo
     {
-        return $this->hasOne(ResidencyUser::class, 'residency_user_id');
+        return $this->belongsTo(ResidencyUser::class, 'residency_user_id');
     }
 
     public function getPaymentProofAttribute($value): null|string

@@ -47,31 +47,31 @@
         }
 
         /* Colors based on index */
-        .col-md-4:nth-child(1n) .pkg-header {
+        .col-md-3:nth-child(1n) .pkg-header {
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
 
         /* Basic/Silver */
-        .col-md-4:nth-child(2n) .pkg-header {
+        .col-md-3:nth-child(2n) .pkg-header {
             background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
         }
 
         /* Gold */
-        .col-md-4:nth-child(3n) .pkg-header {
+        .col-md-3:nth-child(3n) .pkg-header {
             background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
         }
 
         /* Platinum */
 
-        .col-md-4:nth-child(1n) .pkg-icon-box i {
+        .col-md-3:nth-child(1n) .pkg-icon-box i {
             color: #64748b;
         }
 
-        .col-md-4:nth-child(2n) .pkg-icon-box i {
+        .col-md-3:nth-child(2n) .pkg-icon-box i {
             color: #d97706;
         }
 
-        .col-md-4:nth-child(3n) .pkg-icon-box i {
+        .col-md-3:nth-child(3n) .pkg-icon-box i {
             color: #7e22ce;
         }
 
@@ -248,7 +248,7 @@
 
     <div class="row" style="margin-top: 40px;">
         @forelse($packages as $package)
-            <div class="col-md-4 mb-5">
+            <div class="col-md-3 mb-5">
                 <div class="package-card">
 
                     {{-- Package Header (Gradient + Icon) --}}
@@ -309,16 +309,22 @@
                     </div>
 
                     {{-- Package Actions --}}
-                    <div class="pkg-actions">
-                        <a href="{{ route('packages.edit', encrypt($package->id)) }}" class="btn-pkg btn-pkg-edit">
-                            <i class="las la-pen me-2 fs-5"></i> Edit
-                        </a>
+                    <div class="pkg-actions justify-content-center">
+                        @if($package->name_en === 'Silver' || $package->price == 0)
+                            <div class="w-100 text-center py-2 text-muted fw-bold d-flex align-items-center justify-content-center" style="background-color: #f1f5f9; border-radius: 12px; font-size: 0.95rem;">
+                                <i class="fas fa-lock me-2"></i> Default Package (System Reserved)
+                            </div>
+                        @else
+                            <a href="{{ route('packages.edit', encrypt($package->id)) }}" class="btn-pkg btn-pkg-edit">
+                                <i class="las la-pen me-2 fs-5"></i> Edit
+                            </a>
 
-                        <button type="button" class="btn-pkg btn-pkg-delete delete-btn"
-                                data-route="{{ route('packages.destroy', $package->id) }}"
-                                data-bs-toggle="modal" href="#" data-bs-target="#deleteModal">
-                            <i class="las la-trash me-2 fs-5"></i> Delete
-                        </button>
+                            <button type="button" class="btn-pkg btn-pkg-delete delete-btn"
+                                    data-route="{{ route('packages.destroy', $package->id) }}"
+                                    data-bs-toggle="modal" href="#" data-bs-target="#deleteModal">
+                                <i class="las la-trash me-2 fs-5"></i> Delete
+                            </button>
+                        @endif
                     </div>
 
                 </div>

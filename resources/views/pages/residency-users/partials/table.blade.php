@@ -6,7 +6,7 @@
                 <input id="loopId" type="checkbox" class="form-check-input" onclick="toggle(this)">
             </th>
             <th>Name & Details</th>
-            <th>Contact</th>
+            <th>Contact & Package</th>
             <th class="text-center">Trips</th>
             <th class="text-center">Orders</th>
             <th class="text-center px-4">Actions</th>
@@ -17,7 +17,8 @@
             <tr>
                 <td class="text-center fw-bold">
                     <div class="d-flex flex-column align-items-center">
-                        <input type="checkbox" name="ids[]" value="{{ $residencyUser->id }}" class="form-check-input mb-1">
+                        <input type="checkbox" name="ids[]" value="{{ $residencyUser->id }}"
+                               class="form-check-input mb-1">
                     </div>
                 </td>
                 <td>
@@ -25,7 +26,13 @@
                     <span class="text-muted small fw-medium">{{ $residencyUser->email }}</span>
                 </td>
                 <td>
-                    <span class="fw-bold" style="color: #4f46e5;"><i class="las la-phone me-1"></i>{{ $residencyUser->phone }}</span>
+                    <span class="fw-bold d-block mb-1" style="color: #4f46e5;"><i class="las la-phone me-1"></i>{{ $residencyUser->phone }}</span>
+                    @if($residencyUser->package)
+                        <span class="badge bg-light text-dark border"><i
+                                class="{{ $residencyUser->package->icon }} text-warning me-1"></i> {{ $residencyUser->package->name_en }}</span>
+                    @else
+                        <span class="badge bg-light text-muted border">No Package</span>
+                    @endif
                 </td>
                 <td class="text-center">
                     <span class="count-badge" style="background: #f0fdf4; color: #10b981; border-color: #10b98130;">
@@ -38,7 +45,17 @@
                     </span>
                 </td>
                 <td class="text-center px-4">
-                    <div class="d-flex justify-content-center">
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="button" class="btn-action shadow-sm edit-pkg-btn"
+                                style="color: #10b981;"
+                                data-bs-toggle="modal"
+                                data-bs-target="#changePackageModal"
+                                data-userid="{{ $residencyUser->id }}"
+                                data-username="{{ $residencyUser->name }}"
+                                data-pkgid="{{ $residencyUser->package_id }}">
+                            <i class="las la-exchange-alt fs-18"></i>
+                        </button>
+
                         <a class="btn-action btn-delete-action delete-btn shadow-sm"
                            data-route="{{ route('residency-users.destroy',$residencyUser->id) }}"
                            data-bs-toggle="modal" href="#" data-bs-target="#deleteModal">

@@ -81,38 +81,59 @@ class OrderController extends Controller
             }
 
             if ($request->get('payment_status') === 'paid') {
+                try {
+                    $order->load(['items.item', 'user.package']);
 
-                $user = ResidencyUser::query()->where('email', $order->email)->first();
+                    $user = $order->user;
 
-                if ($user) {
-                    foreach ($order->items as $orderItem) {
+                    if ($user) {
 
-                        $existing = DB::table('item_residency_users')
-                            ->where('residency_user_id', $user->id)
-                            ->where('item_id', $orderItem->item_id)
-                            ->where('item_package_id', $orderItem->item_package_id)
-                            ->first();
+                        $basePoints = 0;
 
-                        if ($existing) {
+                        foreach ($order->items as $orderItem) {
 
-                            DB::table('item_residency_users')
-                                ->where('id', $existing->id)
-                                ->update([
-                                    'attendees' => (int)$existing->attendees + (int)$orderItem->attendees_count,
-                                    'updated_at' => now()
+                            if ($orderItem->item && $orderItem->item->earned_points) {
+                                $basePoints += $orderItem->item->earned_points;
+                            }
+
+                            $existing = DB::table('item_residency_users')
+                                ->where('residency_user_id', $user->id)
+                                ->where('item_id', $orderItem->item_id)
+                                ->first();
+
+                            if ($existing) {
+
+                                DB::table('item_residency_users')
+                                    ->where('id', $existing->id)
+                                    ->update([
+                                        'attendees' => (int)$existing->attendees + (int)$orderItem->attendees_count,
+                                        'updated_at' => now()
+                                    ]);
+
+                            } else {
+
+                                DB::table('item_residency_users')->insert([
+                                    'residency_user_id' => $user->id,
+                                    'item_id' => $orderItem->item_id,
+                                    'attendees' => $orderItem->attendees_count,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
                                 ]);
-                        } else {
 
-                            DB::table('item_residency_users')->insert([
-                                'residency_user_id' => $user->id,
-                                'item_id'           => $orderItem->item_id,
-                                'item_package_id'   => $orderItem->item_package_id,
-                                'attendees'         => $orderItem->attendees_count,
-                                'created_at'        => now(),
-                                'updated_at'        => now(),
-                            ]);
+                            }
                         }
+
+                        if ($basePoints > 0) {
+                            $multiplier = $user->package ? $user->package->points_multiplier : 1.00;
+                            $finalPoints = $basePoints * $multiplier;
+                            $user->increment('earned_points', $finalPoints);
+                            $user->increment('available_points', $finalPoints);
+                        }
+
                     }
+
+                } catch (\Exception $e) {
+                    Log::error('Points Calculation Error: ' . $e->getMessage());
                 }
 
                 try {

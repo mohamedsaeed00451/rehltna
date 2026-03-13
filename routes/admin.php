@@ -226,11 +226,12 @@ Route::group([
         Route::get('/residency-users', [ResidencyUsersController::class, 'index'])->name('residency-users.index'); #-------- get Residency Users ---------#
         Route::delete('/residency-users/destroy/{id}', [ResidencyUsersController::class, 'destroy'])->name('residency-users.destroy'); #-------- Delete Residency Users ---------#
         Route::post('/residency-users/bulk-delete', [ResidencyUsersController::class, 'bulkDelete'])->name('residency-users.bulk-delete'); #-------- Bulk Delete Residency Users ---------#
+        Route::post('residency-users/{id}/change-package', [ResidencyUsersController::class, 'changePackage'])->name('residency-users.change-package');
 
         Route::post('payment-links/create-from-user/{id}', [PaymentLinkController::class, 'storeFromRegisterUser'])->name('payment-links.storeFromRegister');
 
         Route::resource('packages', PackageController::class);
-
+        
         Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function () {
             Route::get('/', [GalleryController::class, 'index'])->name('index');
             Route::post('/upload', [GalleryController::class, 'storeGallery'])->name('store');

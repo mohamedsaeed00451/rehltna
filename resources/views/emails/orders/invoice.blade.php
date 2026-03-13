@@ -9,17 +9,80 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; direction: {{ $dir }}; text-align: {{ $alignLeft }}; }
-        .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-        .details { margin-bottom: 20px; }
-        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: {{ $alignLeft }}; }
-        .table th { background-color: #f4f4f4; }
-        .text-right { text-align: {{ $alignRight }}; }
-        .total { text-align: {{ $alignRight }}; margin-top: 10px; font-size: 16px; font-weight: bold; color: #243C56; }
-        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
-        .badge { display: inline-block; padding: 4px 8px; font-size: 12px; font-weight: bold; color: #fff; background-color: #28a745; border-radius: 4px; }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            direction: {{ $dir }};
+            text-align: {{ $alignLeft }};
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .details {
+            margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: {{ $alignLeft }};
+        }
+
+        .table th {
+            background-color: #f4f4f4;
+        }
+
+        .text-right {
+            text-align: {{ $alignRight }};
+        }
+
+        .total {
+            text-align: {{ $alignRight }};
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #243C56;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745;
+            border-radius: 4px;
+        }
     </style>
     <title>{{ __('invoice.title') }}</title>
 </head>
@@ -41,8 +104,9 @@
         <table class="table">
             <thead>
             <tr>
-                <th>{{ __('invoice.col_course') }}</th>
-                <th>{{ __('invoice.col_attendance') }}</th>
+                <th>Trip</th>
+                {{--                <th>{{ __('invoice.col_course') }}</th>--}}
+                {{--                <th>{{ __('invoice.col_attendance') }}</th>--}}
                 <th>{{ __('invoice.col_price') }}</th>
                 <th>{{ __('invoice.col_total') }}</th>
             </tr>
@@ -50,12 +114,11 @@
             <tbody>
             @foreach($order->items as $item)
                 @php
-                    // محاولة جلب الاسم حسب اللغة أو العودة للإنجليزية
                     $itemName = $item->item->{'title_' . $lang} ?? $item->item->title_en ?? 'Item #' . $item->item_id;
                 @endphp
                 <tr>
                     <td>{{ $itemName }}</td>
-                    <td>{{ $item->attendees_count }}</td>
+                    {{--                    <td>{{ $item->attendees_count }}</td>--}}
                     <td>{{ number_format($item->price_per_unit, 2) }}</td>
                     <td>{{ number_format($item->total, 2) }}</td>
                 </tr>
@@ -75,7 +138,8 @@
             <tr>
                 <td>
                     <strong>{{ __('invoice.custom_payment') }}</strong><br>
-                    <small style="color: #777;">{{ __('invoice.payment_ref') }}: {{ $order->transaction_token ?? $order->id }}</small>
+                    <small style="color: #777;">{{ __('invoice.payment_ref') }}
+                        : {{ $order->transaction_token ?? $order->id }}</small>
                 </td>
                 <td class="text-right">{{ number_format($order->total_amount, 2) }}</td>
             </tr>

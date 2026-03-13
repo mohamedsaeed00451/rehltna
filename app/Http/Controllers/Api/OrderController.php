@@ -10,11 +10,14 @@ use App\Models\Coupon;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\PaymentMethod;
+use App\Models\ResidencyUser;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -144,6 +147,23 @@ class OrderController extends Controller
                 'total_amount' => $calculation['final_total'],
                 'transaction_token' => $securityToken,
             ]);
+
+            $user = ResidencyUser::withTrashed()->where('email', $request->get('email'))->first();
+
+            if ($user) {
+                if ($user->trashed()) {
+                    $user->restore();
+                }
+            } else {
+                $user = ResidencyUser::query()->create([
+                    'email' => $request->get('email'),
+                    'name' => $request->get('name'),
+                    'phone' => $request->get('phone'),
+                    'password' => Hash::make(12345678),
+                ]);
+            }
+
+            $user->orders()->save($order);
 
             foreach ($calculation['order_items_data'] as $item) {
                 $order->items()->create($item);
@@ -385,7 +405,6 @@ class OrderController extends Controller
         }
 
         try {
-
             $order = Order::query()->findOrFail($request->get('order_id'));
 
             if ($request->get('transaction_token') !== $order->transaction_token) {
@@ -396,15 +415,66 @@ class OrderController extends Controller
                 );
             }
 
-            $order->update([
-                'payment_status' => 'paid'
-            ]);
+            if ($order->payment_status !== 'paid') {
 
-            try {
-                $order->load('items.item');
-                Mail::to($order->email)->send(new OrderInvoiceMail($order));
-            } catch (\Exception $e) {
-                Log::error('Payment Success Mail Error: ' . $e->getMessage());
+                $order->update([
+                    'payment_status' => 'paid'
+                ]);
+
+                try {
+
+                    $order->load(['items.item', 'user.package']);
+
+                    $user = $order->user;
+
+                    if ($user) {
+                        $basePoints = 0;
+
+                        foreach ($order->items as $orderItem) {
+
+                            if ($orderItem->item && $orderItem->item->earned_points) {
+                                $basePoints += $orderItem->item->earned_points;
+                            }
+
+                            $existing = DB::table('item_residency_users')
+                                ->where('residency_user_id', $user->id)
+                                ->where('item_id', $orderItem->item_id)
+                                ->first();
+
+                            if ($existing) {
+                                DB::table('item_residency_users')
+                                    ->where('id', $existing->id)
+                                    ->update([
+                                        'attendees' => (int)$existing->attendees + (int)$orderItem->attendees_count,
+                                        'updated_at' => now()
+                                    ]);
+                            } else {
+                                DB::table('item_residency_users')->insert([
+                                    'residency_user_id' => $user->id,
+                                    'item_id' => $orderItem->item_id,
+                                    'attendees' => $orderItem->attendees_count,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                            }
+                        }
+
+                        if ($basePoints > 0) {
+                            $multiplier = $user->package ? $user->package->points_multiplier : 1.00;
+                            $finalPoints = $basePoints * $multiplier;
+                            $user->increment('earned_points', $finalPoints);
+                            $user->increment('available_points', $finalPoints);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Points Calculation Error: ' . $e->getMessage());
+                }
+
+                try {
+                    Mail::to($order->email)->send(new OrderInvoiceMail($order));
+                } catch (\Exception $e) {
+                    Log::error('Payment Success Mail Error: ' . $e->getMessage());
+                }
             }
 
             return redirect()->away(

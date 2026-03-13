@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ResponseTrait;
+use App\Models\Package;
 use App\Models\PasswordResetCode;
 use App\Models\ResidencyUser;
 use Carbon\Carbon;
@@ -23,29 +24,48 @@ class AuthController extends Controller
             return $this->responseMessage(403, 'Spam detected.');
         }
 
-        $data = $request->validate([
+        $trashedUser = ResidencyUser::onlyTrashed()->where('email', $request->email)->first();
+
+        $rules = [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique(ResidencyUser::class, 'email'),
-            ],
-            'password' => 'required|string|confirmed|min:8', // needs password_confirmation
-        ]);
+            'password' => 'required|string|confirmed|min:8',
+            'email' => ['required', 'email'],
+        ];
 
-        $user = ResidencyUser::query()->create([
-            'name' => $data['name'],
-            'phone' => $data['phone'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        if (!$trashedUser) {
+            $rules['email'][] = Rule::unique(ResidencyUser::class, 'email');
+        }
+
+        $data = $request->validate($rules);
+
+        $silverPackage = Package::where('name_en', 'Silver')->first();
+        $packageId = $silverPackage ? $silverPackage->id : null;
+
+        if ($trashedUser) {
+            $trashedUser->restore();
+            $trashedUser->update([
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'password' => Hash::make($data['password']),
+                'package_id' => $packageId,
+            ]);
+            $user = $trashedUser;
+        } else {
+            $user = ResidencyUser::query()->create([
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'package_id' => $packageId,
+            ]);
+        }
 
         $token = $user->createToken('api-token')->plainTextToken;
         $user->acssess_token = $token;
         $user->token_type = 'Bearer';
 
-        return $this->responseMessage(201, 'Registered', $user);
+        return $this->responseMessage(201, 'Registered successfully', $user->load('package'));
     }
 
     public function login(Request $request): JsonResponse
@@ -67,7 +87,7 @@ class AuthController extends Controller
         $user->acssess_token = $token;
         $user->token_type = 'Bearer';
 
-        return $this->responseMessage(200, 'Logged Successfully', $user);
+        return $this->responseMessage(200, 'Logged Successfully', $user->load('package'));
 
     }
 
@@ -143,7 +163,8 @@ class AuthController extends Controller
 
     public function profile(): JsonResponse
     {
-        return $this->responseMessage(200, 'Profile', auth()->user());
+        $user = auth()->user();
+        return $this->responseMessage(200, 'Profile', $user->load('package', 'orders', 'items'));
     }
 
 }

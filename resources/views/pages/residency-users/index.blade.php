@@ -138,13 +138,26 @@
         <div class="col-xl-12">
             <div class="card custom-card">
                 <div class="card-header pb-0 border-bottom-0 p-4">
-                    <div class="flex-grow-1">
-                        <div class="input-group" style="max-width: 400px;">
-                            <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;"><i
-                                    class="fas fa-search text-muted"></i></span>
-                            <input autofocus type="text" id="search" class="form-control-deluxe border-start-0"
-                                   style="border-radius: 0 12px 12px 0 !important;"
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="input-group flex-grow-1" style="max-width: 400px;">
+                            <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input autofocus type="text" id="search" class="form-control-deluxe border-start-0 w-auto"
+                                   style="border-radius: 0 12px 12px 0 !important; flex: 1;"
                                    placeholder="Search by name, email, phone..." value="{{ request('search') }}">
+                        </div>
+
+                        <div style="min-width: 200px;">
+                            <select id="package-filter" class="form-select form-control-deluxe">
+                                <option value="all">All Packages</option>
+                                @foreach($packages as $pkg)
+                                    <option
+                                        value="{{ $pkg->id }}" {{ request('package_id') == $pkg->id ? 'selected' : '' }}>
+                                        {{ $pkg->name_en }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -160,9 +173,49 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <p class="text-muted small mb-0 fw-bold">Showing {{ $residencyUsers->count() }}
                             of {{ $residencyUsers->total() }} entries</p>
-                        {!! $residencyUsers->appends(['search' => request('search')]) !!}
+                        {!! $residencyUsers->appends(['search' => request('search'), 'package_id' => request('package_id')]) !!}
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="changePackageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0"
+                 style="border-radius: 20px; overflow: visible; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div class="modal-header bg-light border-0 p-4">
+                    <h5 class="modal-title fw-bold text-dark"><i class="las la-exchange-alt text-primary me-2"></i>
+                        Change User Package</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="changePackageForm" method="POST">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <p class="mb-3">Select a new subscription package for <strong id="modalUserName"
+                                                                                      class="text-primary"></strong>.
+                        </p>
+
+                        <div class="form-group mb-0">
+                            <label class="form-label fw-bold text-muted mb-2">Available Packages</label>
+                            <select name="package_id" id="modalPackageSelect"
+                                    class="form-select form-control-deluxe w-100" required>
+                                <option value="" disabled>-- Select Package --</option>
+                                @foreach($packages as $pkg)
+                                    <option value="{{ $pkg->id }}">
+                                        {{ $pkg->name_en }} - ${{ number_format($pkg->price, 0) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -173,17 +226,50 @@
 
 @section('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            confirmDelete();
+        });
+    </script>
+    <script>
+        $(document).on('click', '.edit-pkg-btn', function () {
+            let userId = $(this).data('userid');
+            let userName = $(this).data('username');
+            let currentPkgId = $(this).data('pkgid');
+
+            $('#modalUserName').text(userName);
+
+            $('#modalPackageSelect').val(currentPkgId);
+
+            let updateUrl = "{{ route('residency-users.change-package', ':id') }}";
+            updateUrl = updateUrl.replace(':id', userId);
+            $('#changePackageForm').attr('action', updateUrl);
+        });
+
         $(document).ready(function () {
-            $('#search').on('keyup', function () {
-                let search = $(this).val();
+
+            function fetchFilteredData() {
+                let search = $('#search').val();
+                let package_id = $('#package-filter').val();
+
                 $.ajax({
                     url: "{{ route('residency-users.index') }}",
-                    data: {search: search},
+                    data: {
+                        search: search,
+                        package_id: package_id
+                    },
                     success: function (data) {
                         $('#residency-table').html(data);
                         if (typeof confirmDelete === 'function') confirmDelete();
                     }
                 });
+            }
+
+            $('#search').on('keyup', function () {
+                fetchFilteredData();
+            });
+
+            $('#package-filter').on('change', function () {
+                fetchFilteredData();
             });
 
             window.toggle = function (source) {
@@ -191,8 +277,6 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
-            confirmDelete();
-        });
     </script>
+
 @endsection
