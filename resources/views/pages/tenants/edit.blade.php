@@ -135,6 +135,8 @@
                 'countries' => 'Countries',
                 'states' => 'States',
                 'cities' => 'Cities',
+                'notifications' => 'Notifications',
+                'notification_templates' => 'Templates',
                 'packages' => 'Packages',
                 'failed_jobs' => 'Failed Jobs',
             ] as $value => $label)

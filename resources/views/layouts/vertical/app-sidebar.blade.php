@@ -58,7 +58,8 @@
                 </a>
                 <ul class="slide-menu">
                     @if(in_array('items', $tenantOptions))
-                        <li><a class="slide-item" href="{{ route('item-types.index') }}"><span>Categories</span></a></li>
+                        <li><a class="slide-item" href="{{ route('item-types.index') }}"><span>Categories</span></a>
+                        </li>
                     @endif
                     @if(in_array('items', $tenantOptions))
                         <li><a class="slide-item" href="{{ route('items.index') }}"><span>Trips</span></a></li>
@@ -93,7 +94,8 @@
                 </ul>
             </li>
         @endif
-        @if(in_array('residency_users', $tenantOptions) || in_array('register_users', $tenantOptions) || in_array('contact', $tenantOptions) || in_array('subscribes', $tenantOptions))
+
+        @if(in_array('residency_users', $tenantOptions) || in_array('register_users', $tenantOptions) || in_array('contact', $tenantOptions) || in_array('subscribes', $tenantOptions) || in_array('packages', $tenantOptions))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -122,6 +124,31 @@
                     @endif
                     @if(in_array('subscribes', $tenantOptions))
                         <li><a class="slide-item" href="{{ route('subscribes.index') }}"><span>Subscribes</span></a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+        @endif
+
+        @if(in_array('notifications', $tenantOptions))
+            <li class="slide">
+                <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
+                   href="#">
+                    <div class="d-flex align-items-center">
+                        <i class="side-menu__icon fe fe-navigation me-2 mb-3"></i>
+                        <span class="side-menu__label tx-15 bold">Notifications</span>
+                    </div>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    @if(in_array('notifications', $tenantOptions))
+                        <li><a class="slide-item"
+                               href="{{ route('notifications.index') }}"><span>Send Notifications</span></a>
+                        </li>
+                    @endif
+                    @if(in_array('notification_templates', $tenantOptions))
+                        <li><a class="slide-item"
+                               href="{{ route('notification-templates.index') }}"><span>Templates</span></a>
                         </li>
                     @endif
                 </ul>

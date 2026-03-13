@@ -4,12 +4,11 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\Messaging\Notification;
 
 class FcmService
 {
     /**
-     * * @param string $token
+     * @param string $token
      * @param string $title
      * @param string $body
      * @param array $data
@@ -18,11 +17,18 @@ class FcmService
     {
         try {
             $messaging = app('firebase.messaging');
-            $notification = Notification::create($title, $body);
-            $message = CloudMessage::withTarget('token', $token)
-                ->withNotification($notification)
-                ->withData($data);
+            $stringData = array_map('strval', $data);
+            $message = CloudMessage::fromArray([
+                'token' => $token,
+                'notification' => [
+                    'title' => $title,
+                    'body' => $body,
+                ],
+                'data' => $stringData,
+            ]);
+
             $messaging->send($message);
+
             return true;
         } catch (\Exception $e) {
             Log::error('FCM Send Error: ' . $e->getMessage());

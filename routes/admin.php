@@ -25,6 +25,8 @@ use App\Http\Controllers\Dashboard\{AiController,
     LoginController,
     MembersController,
     NewsController,
+    NotificationController,
+    NotificationTemplateController,
     OfferController,
     OrderController,
     PackageController,
@@ -43,8 +45,7 @@ use App\Http\Controllers\Dashboard\{AiController,
     SubscribeController,
     TenantController,
     TestimonialController,
-    TypeOfferController
-};
+    TypeOfferController};
 
 use App\Http\Controllers\Sitemap\SitemapController;
 use App\Http\Middleware\AdminOnly;
@@ -230,8 +231,16 @@ Route::group([
 
         Route::post('payment-links/create-from-user/{id}', [PaymentLinkController::class, 'storeFromRegisterUser'])->name('payment-links.storeFromRegister');
 
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/send', [NotificationController::class, 'send'])->name('notifications.send');
+
         Route::resource('packages', PackageController::class);
-        
+
+        Route::get('/notification-templates', [NotificationTemplateController::class, 'index'])->name('notification-templates.index');
+        Route::post('/notification-templates', [NotificationTemplateController::class, 'store'])->name('notification-templates.store');
+        Route::delete('/notification-templates/{id}', [NotificationTemplateController::class, 'destroy'])->name('notification-templates.destroy');
+        Route::put('/notification-templates/{id}', [NotificationTemplateController::class, 'update'])->name('notification-templates.update');
+
         Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function () {
             Route::get('/', [GalleryController::class, 'index'])->name('index');
             Route::post('/upload', [GalleryController::class, 'storeGallery'])->name('store');
