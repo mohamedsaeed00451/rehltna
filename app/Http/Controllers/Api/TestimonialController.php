@@ -26,7 +26,7 @@ class TestimonialController extends Controller
 
         $data = $request->validate([
             'name' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'email' => 'required|email',
             'testimonial' => 'required|string|max:255',
         ]);

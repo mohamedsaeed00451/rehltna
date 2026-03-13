@@ -167,4 +167,18 @@ class AuthController extends Controller
         return $this->responseMessage(200, 'Profile', $user->load('package', 'orders', 'items'));
     }
 
+    public function updateFcmToken(Request $request): JsonResponse
+    {
+        $request->validate([
+            'fcm_token' => 'required|string',
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'fcm_token' => $request->get('fcm_token'),
+        ]);
+
+        return $this->responseMessage(200, 'FCM Token updated successfully');
+    }
+
 }
