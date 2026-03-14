@@ -93,16 +93,6 @@
             border-color: #4f46e5 !important;
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
         }
-
-        /* Status Badges - Outline Style */
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
     </style>
 @endsection
 
@@ -122,8 +112,7 @@
             <p class="mb-0 opacity-75 fw-medium">Track transactions, verify payments, and manage customer
                 fulfillment.</p>
         </div>
-        <div
-            style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 15px 25px; text-align: center;">
+        <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 15px 25px; text-align: center;">
             <small class="d-block opacity-75 fw-bold text-uppercase" style="letter-spacing: 1px;">Current View</small>
             <h4 class="mb-0 fw-bold text-white">{{ $orders->total() }} Orders</h4>
         </div>
@@ -136,19 +125,31 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
                         <div class="d-flex gap-2 flex-wrap">
-                            <select id="filter_method" class="form-control-deluxe" style="width: 160px;">
+                            <select id="filter_method" class="form-control-deluxe" style="width: 180px;">
                                 <option value="">All Methods</option>
-                                <option
-                                    value="tamara" {{ request('payment_method') == 'tamara' ? 'selected' : '' }}>
+                                <option value="tamara" {{ request('payment_method') == 'tamara' ? 'selected' : '' }}>
                                     Tamara
                                 </option>
-                                <option
-                                    value="bank_transfer_alrajhi" {{ request('payment_method') == 'bank_transfer_alrajhi' ? 'selected' : '' }}>
+                                <option value="moyasar" {{ request('payment_method') == 'moyasar' ? 'selected' : '' }}>
+                                    Moyasar / Cards
+                                </option>
+                                <option value="apple_pay" {{ request('payment_method') == 'apple_pay' ? 'selected' : '' }}>
+                                    Apple Pay
+                                </option>
+                                <option value="bank_transfer_alrajhi" {{ request('payment_method') == 'bank_transfer_alrajhi' ? 'selected' : '' }}>
                                     Al Rajhi Bank
                                 </option>
-                                <option
-                                    value="bank_transfer_alahli" {{ request('payment_method') == 'bank_transfer_alahli' ? 'selected' : '' }}>
+                                <option value="bank_transfer_alahli" {{ request('payment_method') == 'bank_transfer_alahli' ? 'selected' : '' }}>
                                     AlAhli Bank
+                                </option>
+                                <option value="wallet_vodafone" {{ request('payment_method') == 'wallet_vodafone' ? 'selected' : '' }}>
+                                    Vodafone Cash
+                                </option>
+                                <option value="instapay" {{ request('payment_method') == 'instapay' ? 'selected' : '' }}>
+                                    InstaPay
+                                </option>
+                                <option value="cash_on_delivery" {{ request('payment_method') == 'cash_on_delivery' ? 'selected' : '' }}>
+                                    Cash on Delivery
                                 </option>
                             </select>
 
@@ -159,16 +160,13 @@
                                 <option value="pending" {{ request('payment_status') == 'pending' ? 'selected' : '' }}>
                                     Pending
                                 </option>
-                                <option
-                                    value="reviewing" {{ request('payment_status') == 'reviewing' ? 'selected' : '' }}>
+                                <option value="reviewing" {{ request('payment_status') == 'reviewing' ? 'selected' : '' }}>
                                     Reviewing
                                 </option>
-                                <option
-                                    value="rejected" {{ request('payment_status') == 'rejected' ? 'selected' : '' }}>
+                                <option value="rejected" {{ request('payment_status') == 'rejected' ? 'selected' : '' }}>
                                     Rejected
                                 </option>
-                                <option
-                                    value="canceled" {{ request('payment_status') == 'canceled' ? 'selected' : '' }}>
+                                <option value="canceled" {{ request('payment_status') == 'canceled' ? 'selected' : '' }}>
                                     Canceled
                                 </option>
                             </select>
@@ -176,7 +174,7 @@
                             <div class="input-group" style="width: 250px;">
                                 <span class="input-group-text bg-light border-0"
                                       style="border-radius: 12px 0 0 12px;"><i
-                                        class="fas fa-calendar-alt text-muted"></i></span>
+                                            class="fas fa-calendar-alt text-muted"></i></span>
                                 <input type="text" id="date_range" class="form-control-deluxe border-start-0"
                                        style="border-radius: 0 12px 12px 0 !important;" placeholder="Select Date Range"
                                        readonly>
@@ -187,7 +185,7 @@
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-0"
                                       style="border-radius: 12px 0 0 12px;"><i
-                                        class="fas fa-search text-muted"></i></span>
+                                            class="fas fa-search text-muted"></i></span>
                                 <input type="text" id="search" class="form-control-deluxe border-start-0"
                                        style="border-radius: 0 12px 12px 0 !important;"
                                        placeholder="Search customers..." value="{{ request('search') }}">
@@ -197,7 +195,7 @@
                 </div>
 
                 <div class="card-body p-0" id="orders-table">
-                    @include('pages.orders.partials.table', ['orders' => $orders])
+                    @include('pages.orders.partials.table',['orders'=> $orders])
                 </div>
 
             </div>
@@ -242,7 +240,7 @@
             flatpickr("#date_range", {
                 mode: "range",
                 dateFormat: "Y-m-d",
-                onClose: function (selectedDates, dateStr, instance) {
+                onClose: function () {
                     fetchOrders();
                 }
             });
@@ -261,6 +259,8 @@
                     endDate = dates.length > 1 ? dates[1] : startDate;
                 }
 
+                $('#orders-table').css('opacity', '0.5');
+
                 $.ajax({
                     url: "{{ route('orders.index') }}",
                     data: {
@@ -272,7 +272,11 @@
                     },
                     success: function (data) {
                         $('#orders-table').html(data);
-                        if (typeof confirmDelete === 'function') confirmDelete();
+                        $('#orders-table').css('opacity', '1');
+                    },
+                    error: function() {
+                        $('#orders-table').css('opacity', '1');
+                        console.log('Error fetching orders');
                     }
                 });
             }
@@ -280,6 +284,8 @@
             $('#search').on('keyup', fetchOrders);
             $('#filter_method').on('change', fetchOrders);
             $('#filter_status').on('change', fetchOrders);
+
+            $('#search').on('search', fetchOrders);
         });
     </script>
 @endsection

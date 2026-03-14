@@ -78,7 +78,7 @@
             line-height: 1.5 !important;
         }
 
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             border-color: #4f46e5 !important;
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
         }
@@ -160,24 +160,32 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        {{-- Right Side: Customer & Payment --}}
-        <div class="col-lg-4">
-            {{-- Customer Details Card --}}
+            {{-- Customer Details Card (Moved inside left column for balance) --}}
             <div class="card custom-card">
                 <div class="card-header"><h6 class="card-title mb-0">Customer Profile</h6></div>
                 <div class="card-body">
-                    <div class="info-item"><span class="info-label">Full Name</span><span
-                            class="info-value">{{ $order->name }}</span></div>
-                    <div class="info-item"><span class="info-label">Email Address</span><span
-                            class="info-value">{{ $order->email }}</span></div>
-                    <div class="info-item"><span class="info-label">Phone Number</span><span
-                            class="info-value text-primary">{{ $order->phone }}</span></div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="info-item"><span class="info-label">Full Name</span><span
+                                    class="info-value">{{ $order->name }}</span></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-item"><span class="info-label">Email Address</span><span
+                                    class="info-value">{{ $order->email }}</span></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-item"><span class="info-label">Phone Number</span><span
+                                    class="info-value text-primary">{{ $order->phone }}</span></div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            {{-- Payment Settlement Card --}}
+        {{-- Right Side: Payment Settlement --}}
+        <div class="col-lg-4">
+
             <div class="card custom-card">
                 <div class="card-header"><h6 class="card-title mb-0">Payment Settlement</h6></div>
                 <div class="card-body">
@@ -186,17 +194,33 @@
                         @php
                             $methods = [
                                 'tamara'    => ['bg' => 'rgba(79, 70, 229, 0.1)',  'color' => '#4f46e5', 'icon' => 'fa-credit-card'],
+                                'moyasar'   => ['bg' => 'rgba(16, 185, 129, 0.1)', 'color' => '#10b981', 'icon' => 'fa-credit-card'],
+                                'apple_pay' => ['bg' => 'rgba(0, 0, 0, 0.1)',      'color' => '#000000', 'icon' => 'fab fa-apple'],
+                                'instapay'  => ['bg' => 'rgba(236, 72, 153, 0.1)', 'color' => '#ec4899', 'icon' => 'fa-bolt'],
+                                'wallet_vodafone' => ['bg' => 'rgba(239, 68, 68, 0.1)', 'color' => '#ef4444', 'icon' => 'fa-mobile-alt'],
+                                'wallet_etisalat' => ['bg' => 'rgba(16, 185, 129, 0.1)', 'color' => '#10b981', 'icon' => 'fa-mobile-alt'],
+                                'wallet_orange' => ['bg' => 'rgba(249, 115, 22, 0.1)', 'color' => '#f97316', 'icon' => 'fa-mobile-alt'],
+                                'wallet_we' => ['bg' => 'rgba(139, 92, 246, 0.1)', 'color' => '#8b5cf6', 'icon' => 'fa-mobile-alt'],
                                 'bank_transfer_alrajhi' => ['bg' => 'rgba(147, 51, 234, 0.1)', 'color' => '#9333ea', 'icon' => 'fa-university'],
                                 'bank_transfer_alahli' => ['bg' => 'rgba(100, 116, 139, 0.1)', 'color' => '#64748b', 'icon' => 'fa-university'],
+                                'cash_on_delivery' => ['bg' => 'rgba(245, 158, 11, 0.1)', 'color' => '#f59e0b', 'icon' => 'fa-money-bill-wave'],
                             ];
-                            $m = $methods[$order->payment_method] ?? ['bg' => '#f1f5f9', 'color' => '#1e293b', 'icon' => 'fa-wallet'];
+
+                            // Fallback for wallets
+                            if (!isset($methods[$order->payment_method]) && str_contains($order->payment_method, 'wallet')) {
+                                $m = ['bg' => 'rgba(59, 130, 246, 0.1)', 'color' => '#3b82f6', 'icon' => 'fa-mobile-alt'];
+                            } else {
+                                $m = $methods[$order->payment_method] ?? ['bg' => '#f1f5f9', 'color' => '#1e293b', 'icon' => 'fa-wallet'];
+                            }
+
+                            $methodName = str_replace('_', ' ', $order->payment_method);
                         @endphp
                         <div class="p-3 shadow-sm rounded-4"
                              style="background-color: {{ $m['bg'] }} !important; border: 1px solid {{ $m['color'] }}40;">
-                            <i class="fas {{ $m['icon'] }} mb-2"
+                            <i class="{{ str_contains($m['icon'], 'fab') ? '' : 'fas' }} {{ $m['icon'] }} mb-2"
                                style="color: {{ $m['color'] }}; font-size: 1.5rem;"></i>
                             <span class="d-block fw-extrabold"
-                                  style="color: {{ $m['color'] }};">{{ strtoupper($order->payment_method) }}</span>
+                                  style="color: {{ $m['color'] }};">{{ strtoupper($methodName) }}</span>
                         </div>
                     </div>
 
@@ -219,20 +243,26 @@
 
                     {{-- Proof Image --}}
                     @if($order->payment_proof)
-                        <div class="mb-4 text-center">
+                        <div class="mb-4 text-center border-top pt-3">
                             <span class="info-label text-start">Manual Payment Proof</span>
                             <div class="position-relative mt-2">
                                 <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#receiptModal">
                                     <img src="{{ asset($order->payment_proof) }}"
                                          class="img-fluid rounded-4 border shadow-sm p-1"
-                                         style="max-height: 180px; width: 100%; object-fit: cover;">
+                                         style="max-height: 180px; width: 100%; object-fit: cover; transition: transform 0.3s;"
+                                         onmouseover="this.style.transform='scale(1.02)'"
+                                         onmouseout="this.style.transform='scale(1)'">
                                 </a>
                             </div>
                         </div>
                     @endif
 
-                    {{-- Update Status Form --}}
-                    @if(($order->payment_method == 'bank_transfer_alrajhi' || $order->payment_method == 'bank_transfer_alahli') && $order->payment_status != 'paid')
+                    {{-- Update Status Form (Only for manual methods) --}}
+                    @php
+                        $isManualMethod = str_contains($order->payment_method, 'bank_transfer') || str_contains($order->payment_method, 'wallet') || $order->payment_method === 'instapay';
+                    @endphp
+
+                    @if($isManualMethod && $order->payment_status != 'paid')
                         <form id="updateStatusForm" action="{{ route('orders.update.status', $order->id) }}"
                               method="POST" class="border-top pt-4">
                             @csrf
@@ -248,9 +278,10 @@
                                 <i class="fas fa-save me-2"></i> Confirm Changes
                             </button>
                         </form>
-                    @else
+                    @elseif(!$isManualMethod)
                         <div class="alert alert-light border-0 text-center small text-muted">
-                            <i class="fas fa-info-circle me-1"></i> Automated gateway status.
+                            <i class="fas fa-info-circle me-1"></i> Automated gateway status. Manual approval is not
+                            required.
                         </div>
                     @endif
                 </div>
@@ -266,7 +297,7 @@
         </div>
     </div>
 
-    {{-- Modal & Scripts (No changes here) --}}
+    {{-- Modal & Scripts --}}
     @if($order->payment_proof)
         <div class="modal fade" id="receiptModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-lg">
