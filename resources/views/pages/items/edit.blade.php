@@ -224,12 +224,12 @@
                     <div class="step-label">Media</div>
                 </div>
                 <div class="step-item" data-step="4">
-                    <div class="step-circle"><i class="fas fa-search"></i></div>
-                    <div class="step-label">SEO</div>
-                </div>
-                <div class="step-item" data-step="5">
                     <div class="step-circle"><i class="fas fa-route"></i></div>
                     <div class="step-label">Journey Details</div>
+                </div>
+                <div class="step-item" data-step="5">
+                    <div class="step-circle"><i class="fas fa-search"></i></div>
+                    <div class="step-label">SEO</div>
                 </div>
             </div>
 
@@ -384,7 +384,8 @@
                         </div>
 
                         <div class="step-content" id="step-4">
-                            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 4: Logistics & SEO</h5>
+                            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 4: Journey Details &
+                                Contact</h5>
 
                             {{-- Price & Map Row --}}
                             <div class="row mb-3">
@@ -463,56 +464,6 @@
                             <div class="col-12">
                                 <hr class="my-4 border-light">
                             </div>
-
-                            <h6 class="text-dark fw-bold mb-3">SEO Configuration</h6>
-
-                            <div class="mb-4">
-                                <label class="form-label">Meta Image</label>
-                                <div class="media-selector-group">
-                                    <input type="text" id="meta_img" name="meta_img"
-                                           value="{{ $item->meta_img ? asset($item->meta_img) : '' }}" readonly
-                                           placeholder="Select meta image..." onclick="$('#btn_meta').click()">
-                                    <button id="btn_meta" class="btn btn-dark btn-choose open-gallery" type="button"
-                                            data-input="meta_img" data-preview="preview_meta_img">Choose
-                                    </button>
-                                </div>
-                                <div id="preview_meta_img">
-                                    @if($item->meta_img)
-                                        <div class="media-preview-card"><img src="{{ asset($item->meta_img) }}"
-                                                                             width="150"></div>
-                                    @endif
-                                </div>
-                            </div>
-
-                            @foreach(get_active_langs() as $lang)
-                                <div class="card bg-light border-0 mb-3">
-                                    <div class="card-body">
-                                        <h6 class="text-dark fw-bold mb-3 border-bottom pb-2">SEO
-                                            ({{ strtoupper($lang) }})</h6>
-                                        <div class="row">
-                                            <div class="col-md-12 mb-3">
-                                                <label class="form-label">Meta Title</label>
-                                                <input type="text" name="meta_title_{{ $lang }}" class="form-control"
-                                                       value="{{ old('meta_title_'.$lang, $item->{'meta_title_'.$lang}) }}">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Meta Description</label>
-                                                <textarea name="meta_description_{{ $lang }}" class="form-control"
-                                                          rows="3">{{ old('meta_description_'.$lang, $item->{'meta_description_'.$lang}) }}</textarea>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">Meta Keywords</label>
-                                                <textarea name="meta_keywords_{{ $lang }}" class="form-control"
-                                                          rows="3">{{ old('meta_keywords_'.$lang, $item->{'meta_keywords_'.$lang}) }}</textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        <div class="step-content" id="step-5">
-                            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 5: Journey Details &
-                                Contact</h5>
 
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-3">
@@ -661,6 +612,55 @@
                                     </div>
                                 @endif
                             </div>
+                        </div>
+
+                        <div class="step-content" id="step-5">
+
+                            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 5:  SEO Configuration</h5>
+
+                            <div class="mb-4">
+                                <label class="form-label">Meta Image</label>
+                                <div class="media-selector-group">
+                                    <input type="text" id="meta_img" name="meta_img"
+                                           value="{{ $item->meta_img ? asset($item->meta_img) : '' }}" readonly
+                                           placeholder="Select meta image..." onclick="$('#btn_meta').click()">
+                                    <button id="btn_meta" class="btn btn-dark btn-choose open-gallery" type="button"
+                                            data-input="meta_img" data-preview="preview_meta_img">Choose
+                                    </button>
+                                </div>
+                                <div id="preview_meta_img">
+                                    @if($item->meta_img)
+                                        <div class="media-preview-card"><img src="{{ asset($item->meta_img) }}"
+                                                                             width="150"></div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            @foreach(get_active_langs() as $lang)
+                                <div class="card bg-light border-0 mb-3">
+                                    <div class="card-body">
+                                        <h6 class="text-dark fw-bold mb-3 border-bottom pb-2">SEO
+                                            ({{ strtoupper($lang) }})</h6>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label class="form-label">Meta Title</label>
+                                                <input type="text" name="meta_title_{{ $lang }}" class="form-control"
+                                                       value="{{ old('meta_title_'.$lang, $item->{'meta_title_'.$lang}) }}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Meta Description</label>
+                                                <textarea name="meta_description_{{ $lang }}" class="form-control"
+                                                          rows="3">{{ old('meta_description_'.$lang, $item->{'meta_description_'.$lang}) }}</textarea>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Meta Keywords</label>
+                                                <textarea name="meta_keywords_{{ $lang }}" class="form-control"
+                                                          rows="3">{{ old('meta_keywords_'.$lang, $item->{'meta_keywords_'.$lang}) }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
 
                         <div class="d-flex justify-content-between mt-5 pt-3 border-top">

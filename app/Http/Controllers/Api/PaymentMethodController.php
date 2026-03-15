@@ -22,7 +22,7 @@ class PaymentMethodController extends Controller
             if ($method->code === 'moyasar') {
 
                 $config = $method->config ?? [];
-                $mode = $config['mode'] ?? 'test';
+                $mode = $config['mode'] ?? 'live';
                 $publishableKey = $config[$mode]['publishable_key'] ?? '';
 
                 $finalPaymentMethods[] = [
@@ -82,7 +82,7 @@ class PaymentMethodController extends Controller
             } else {
 
                 $config = $method->config ?? [];
-                $mode = $config['mode'] ?? 'test';
+                $mode = $config['mode'] ?? 'live';
 
                 if ($method->code === 'tamara') {
                     $config = [

@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(TenantSeeder::class);
         $this->call(PackageSeeder::class);
+        $this->call(NotificationTemplateSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(PaymentMethodSeeder::class);
     }

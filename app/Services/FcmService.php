@@ -12,8 +12,9 @@ class FcmService
      * @param string $title
      * @param string $body
      * @param array $data
+     * @return bool
      */
-    public static function send($token, $title, $body, $data = [])
+    public static function send(string $token, string $title, string $body, array $data = []): bool
     {
         try {
             $messaging = app('firebase.messaging');

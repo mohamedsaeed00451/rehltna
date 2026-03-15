@@ -126,6 +126,7 @@ Route::group([
         Route::post('/items-change-status/{id}', [ItemController::class, 'itemsChangeStatus'])->name('items.change.status'); #-------- Items Change Status ---------#
         Route::post('/items-change-is-feature/{id}', [ItemController::class, 'itemsChangeIsFeature'])->name('items.change.is_feature'); #-------- Items Change Is Feature ---------#
         Route::post('items/change-out-of-stock/{id}', [ItemController::class, 'changeOutOfStock'])->name('items.change.out_of_stock');
+        Route::post('items/{id}/send-notification', [ItemController::class, 'sendCustomNotification'])->name('items.send_notification');
 
         Route::get('/contact-us', [ContactUsController::class, 'index'])->name('contact-us.index'); #-------- get Contact Us ---------#
         Route::delete('/contact-us/destroy/{id}', [ContactUsController::class, 'destroy'])->name('contact-us.destroy'); #-------- Delete Contact Us ---------#

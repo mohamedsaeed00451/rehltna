@@ -171,7 +171,56 @@
         .main-toggle {
             cursor: pointer;
         }
+
+        .btn-notification:hover {
+            color: #d97706;
+            border-color: #fde68a;
+            background: #fffbeb;
+        }
+
+        .template-card {
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0 !important;
+            position: relative;
+        }
+
+        .template-card:hover {
+            background-color: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
+        .template-card.active {
+            border-color: #f59e0b !important;
+            background-color: #fffbeb;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+        }
+
+        .template-card.active::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #f59e0b;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .template-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .template-list-container::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+
     </style>
+
 @endsection
 
 @section('content')
@@ -342,6 +391,14 @@
 
                                     <td class="text-center px-4">
                                         <div class="d-flex justify-content-center gap-2">
+                                            <a class="btn-action btn-notification open-notification-modal"
+                                               data-id="{{ $item->id }}"
+                                               data-title-en="{{ $item->title_en }}"
+                                               data-title-ar="{{ $item->title_ar }}"
+                                               href="javascript:void(0);"
+                                               title="Send Notification">
+                                                <i class="las la-bell fs-18"></i>
+                                            </a>
                                             <a class="btn-action btn-edit-course"
                                                href="{{ route('items.edit', encrypt($item->id)) }}"
                                                title="Edit Item">
@@ -372,13 +429,102 @@
 
             @include('pages.models.confirm-delete')
             @include('pages.items.models.import-excel')
+            @include('pages.items.models.notification')
 
         </div>
     </div>
 @endsection
 
 @section('scripts')
+
     <script>
+
+        $(document).on('click', '.open-notification-modal', function () {
+            let id = $(this).data('id');
+            let titleEn = $(this).data('title-en') || '';
+            let titleAr = $(this).data('title-ar') || '';
+
+            let displayHeader = titleEn ? titleEn : titleAr;
+            if (displayHeader.length > 40) {
+                displayHeader = displayHeader.substring(0, 40) + '...';
+            }
+
+            $('#notify_item_id').val(id);
+            $('#notify_item_title').text(displayHeader).attr('title', displayHeader);
+
+            $('#selected_template_id').val('');
+            $('.template-card').removeClass('active');
+            $('#sendNotificationBtn').prop('disabled', true);
+
+            const arabicRegex = /[\u0600-\u06FF]/;
+
+            $('.template-card').each(function() {
+                let originalTitle = $(this).find('.original-title').text();
+                let originalBody = $(this).find('.original-body').text();
+
+                let nameToUse = titleEn;
+                if (arabicRegex.test(originalTitle) || arabicRegex.test(originalBody)) {
+                    nameToUse = titleAr ? titleAr : titleEn;
+                } else {
+                    nameToUse = titleEn ? titleEn : titleAr;
+                }
+
+                let newTitle = originalTitle.replace(/{trip_name}/g, nameToUse);
+                let newBody = originalBody.replace(/{trip_name}/g, nameToUse);
+
+                if (arabicRegex.test(originalTitle)) {
+                    $(this).attr('dir', 'rtl').addClass('text-end');
+                    $(this).find('.template-display-title').text(newTitle);
+                    $(this).find('.template-display-body').text(newBody);
+                } else {
+                    $(this).attr('dir', 'ltr').removeClass('text-end');
+                    $(this).find('.template-display-title').text(newTitle);
+                    $(this).find('.template-display-body').text(newBody);
+                }
+            });
+
+            $('#notificationModal').modal('show');
+        });
+
+        $(document).on('click', '.template-card', function() {
+            $('.template-card').removeClass('active');
+            $(this).addClass('active');
+
+            $('#selected_template_id').val($(this).data('id'));
+            $('#sendNotificationBtn').prop('disabled', false);
+        });
+
+        $('#sendNotificationBtn').on('click', function () {
+            let itemId = $('#notify_item_id').val();
+            let templateId = $('#selected_template_id').val();
+            let btn = $(this);
+
+            if (!templateId) {
+                toastr.error('Please select a template first!');
+                return;
+            }
+
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Sending...');
+
+            $.ajax({
+                url: "{{ route('items.send_notification', ':id') }}".replace(':id', itemId),
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    template_id: templateId
+                },
+                success: function (response) {
+                    $('#notificationModal').modal('hide');
+                    toastr.success(response.message);
+                    btn.html('<i class="fas fa-paper-plane me-1"></i> Send Now');
+                },
+                error: function (xhr) {
+                    toastr.error('Error sending notification.');
+                    btn.prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i> Send Now');
+                }
+            });
+        });
+
         // Status toggle
         $(document).on('click', '.toggle-status-btn', function () {
             let button = $(this);

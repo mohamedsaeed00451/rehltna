@@ -6,9 +6,12 @@ use App\Exports\ItemsErrorUploadedExport;
 use App\Exports\ItemsTempExport;
 use App\Http\Controllers\Controller;
 use App\Jobs\ImportItemsJob;
+use App\Jobs\SendPushNotificationJob;
 use App\Models\City;
 use App\Models\Item;
 use App\Models\ItemType;
+use App\Models\NotificationTemplate;
+use App\Models\ResidencyUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,7 +30,8 @@ class ItemController extends Controller
     public function index(): view
     {
         $items = Item::query()->orderByDesc('id')->paginate(10);
-        return view('pages.items.index', compact('items'));
+        $templates = NotificationTemplate::all();
+        return view('pages.items.index', compact('items', 'templates'));
     }
 
     /**
@@ -55,6 +59,10 @@ class ItemController extends Controller
             }
 
             $data = $request->except($fieldsToExclude);
+
+            if (empty($data['discount'])) {
+                $data['discount'] = 0;
+            }
 
             foreach ($activeLangs as $lang) {
                 if ($request->filled('banner_' . $lang)) {
@@ -97,6 +105,36 @@ class ItemController extends Controller
                         ]);
                     }
                 }
+            }
+
+            try {
+                $template = NotificationTemplate::inRandomOrder()->first();
+                if ($template) {
+
+                    $isArabic = preg_match('/[\x{0600}-\x{06FF}]/u', $template->title . $template->body);
+
+                    if ($isArabic) {
+                        $tripName = $item->title_ar ?? $item->title_en ?? 'Our Trip';
+                    } else {
+                        $tripName = $item->title_en ?? $item->title_ar ?? 'Our Trip';
+                    }
+
+                    $title = str_replace('{trip_name}', $tripName, $template->title);
+                    $body = str_replace('{trip_name}', $tripName, $template->body);
+
+                    $tokens = ResidencyUser::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
+
+                    foreach ($tokens as $token) {
+                        SendPushNotificationJob::dispatch(
+                            $token,
+                            $title,
+                            $body,
+                            ['type' => 'new_trip', 'trip_id' => (string)$item->id]
+                        );
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error("Error sending push notification for new trip: " . $e->getMessage());
             }
 
             return redirect()->route('items.index')->with('success', 'Item created successfully.');
@@ -143,6 +181,10 @@ class ItemController extends Controller
             }
 
             $data = $request->except($fieldsToExclude);
+
+            if (empty($data['discount'])) {
+                $data['discount'] = 0;
+            }
 
             foreach ($activeLangs as $lang) {
                 if ($request->filled('banner_' . $lang)) {
@@ -246,6 +288,27 @@ class ItemController extends Controller
         } else {
             $item->is_feature = 1;
             $item->featured_at = now();
+
+            try {
+
+                $tripName = $item->title_en ?? $item->title_ar ?? 'Our Trip';
+                $title = "🌟 Special Offer Alert!";
+                $body = "Don't miss out! {$tripName} is now on a special offer for the next 7 days.";
+
+                $tokens = ResidencyUser::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
+
+                foreach ($tokens as $token) {
+                    SendPushNotificationJob::dispatch(
+                        $token,
+                        $title,
+                        $body,
+                        ['type' => 'special_offer', 'trip_id' => (string)$item->id]
+                    );
+                }
+
+            } catch (\Exception $e) {
+                Log::error("Error sending push notification for special offer: " . $e->getMessage());
+            }
         }
 
         $item->save();
@@ -262,6 +325,41 @@ class ItemController extends Controller
         return response()->json(['out_of_stock' => $item->out_of_stock]);
     }
 
+    public function sendCustomNotification(Request $request, $id): JsonResponse
+    {
+        try {
+            $item = Item::query()->findOrFail($id);
+            $template = NotificationTemplate::findOrFail($request->template_id);
+
+            $isArabic = preg_match('/[\x{0600}-\x{06FF}]/u', $template->title . $template->body);
+
+            if ($isArabic) {
+                $tripName = $item->title_ar ?? $item->title_en ?? 'Our Trip';
+            } else {
+                $tripName = $item->title_en ?? $item->title_ar ?? 'Our Trip';
+            }
+
+            $title = str_replace('{trip_name}', $tripName, $template->title);
+            $body = str_replace('{trip_name}', $tripName, $template->body);
+
+            $tokens = ResidencyUser::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
+
+            foreach ($tokens as $token) {
+                SendPushNotificationJob::dispatch(
+                    $token,
+                    $title,
+                    $body,
+                    ['type' => 'custom_alert', 'trip_id' => (string)$item->id]
+                );
+            }
+
+            return response()->json(['message' => 'Notifications are being sent in the background!']);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Something went wrong: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function exportItemsTempExcel(): BinaryFileResponse
     {
         return Excel::download(new ItemsTempExport, 'itemsTemp.xlsx');
@@ -271,7 +369,6 @@ class ItemController extends Controller
     {
         return view('pages.items.upload');
     }
-
 
     public function import(Request $request)
     {
