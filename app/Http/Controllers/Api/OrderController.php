@@ -37,12 +37,16 @@ class OrderController extends Controller
         foreach ($itemsRequest as $reqItem) {
             $dbItem = $dbItems->get($reqItem['item_id']);
             if (!$dbItem) continue;
-            $itemTotal = $dbItem->price * $reqItem['attendees'];
+
+            $actualItemPrice = $dbItem->price_after_discount;
+
+            $itemTotal = $actualItemPrice * $reqItem['attendees'];
             $subTotal += $itemTotal;
+
             $orderItemsData[] = [
                 'item_id' => $dbItem->id,
                 'attendees_count' => $reqItem['attendees'],
-                'price_per_unit' => $dbItem->price,
+                'price_per_unit' => $actualItemPrice,
                 'total' => $itemTotal,
             ];
         }
@@ -55,6 +59,7 @@ class OrderController extends Controller
             if ($coupon && $coupon->isValid()) {
                 $couponId = $coupon->id;
                 $allowedItemIds = $coupon->items->pluck('id')->toArray();
+
                 if (count($allowedItemIds) > 0) {
                     foreach ($orderItemsData as $data) {
                         if (in_array($data['item_id'], $allowedItemIds)) {

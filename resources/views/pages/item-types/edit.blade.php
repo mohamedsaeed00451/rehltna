@@ -252,6 +252,24 @@
                                         @endfor
                                     </select>
                                 </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Parent Category (Optional)</label>
+                                    <select name="parent_id" class="form-select">
+                                        <option value="">-- No Parent (Main Category) --</option>
+                                        @foreach($parents as $parent)
+                                            <option value="{{ $parent->id }}" {{ $itemType->parent_id == $parent->id ? 'selected' : '' }}>
+                                                {{ $parent->title_en ?? $parent->title_ar }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">WhatsApp Number / Link (Optional)</label>
+                                    <input type="text" name="whatsapp" class="form-control" value="{{ old('whatsapp', $itemType->whatsapp) }}" placeholder="e.g. +2010... or https://wa.me/...">
+                                </div>
+
                             </div>
                         </div>
 

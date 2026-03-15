@@ -33,7 +33,8 @@ class ItemTypeController extends Controller
      */
     public function create(): view
     {
-        return view('pages.item-types.create');
+        $parents = ItemType::query()->whereNull('parent_id')->get();
+        return view('pages.item-types.create', compact('parents'));
     }
 
     /**
@@ -51,6 +52,10 @@ class ItemTypeController extends Controller
             }
 
             $data = $request->except($exclude);
+
+            if (empty($data['parent_id'])) {
+                $data['parent_id'] = null;
+            }
 
             foreach ($activeLangs as $lang) {
                 if ($request->filled('banner_' . $lang)) {
@@ -79,7 +84,8 @@ class ItemTypeController extends Controller
     public function edit($id): view
     {
         $itemType = ItemType::query()->findOrFail(decrypt($id));
-        return view('pages.item-types.edit', compact('itemType'));
+        $parents = ItemType::query()->whereNull('parent_id')->where('id', '!=', $itemType->id)->get();
+        return view('pages.item-types.edit', compact('itemType', 'parents'));
     }
 
     /**
@@ -98,6 +104,10 @@ class ItemTypeController extends Controller
             }
 
             $data = $request->except($exclude);
+
+            if (empty($data['parent_id'])) {
+                $data['parent_id'] = null;
+            }
 
             foreach ($activeLangs as $lang) {
                 if ($request->filled('banner_' . $lang)) {

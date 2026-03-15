@@ -139,7 +139,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="fw-bold small mb-1">Message Body</label>
-                            <textarea name="body" class="form-control" rows="4" style="border-radius: 10px;"
+                            <textarea name="body" class="form-control" rows="9" style="border-radius: 10px;"
                                       placeholder="e.g. Hurry up and book your spot for {trip_name} before it's too late!"
                                       required></textarea>
                         </div>

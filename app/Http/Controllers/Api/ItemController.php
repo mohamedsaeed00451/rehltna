@@ -15,7 +15,7 @@ class ItemController extends Controller
 
     public function getItems(Request $request): JsonResponse
     {
-        $query = Item::query()->with('galleries', 'itemType', 'itineraries.city');
+        $query = Item::query()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city');
         if ($request->get('search')) {
             $query = $query->where(function ($query) use ($request) {
                 $query->where('title_en', 'like', '%' . $request->get('search') . '%')
@@ -55,7 +55,7 @@ class ItemController extends Controller
         if (!$itemType)
             return $this->responseMessage(404, 'not found');
 
-        $items = $itemType->items()->with('galleries', 'itemType', 'itineraries.city')->orderByDesc('id')->paginate(10);
+        $items = $itemType->items()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city')->orderByDesc('id')->paginate(10);
         $data = [
             'itemType' => $itemType,
             'items_count' => $items->total(),
@@ -65,10 +65,9 @@ class ItemController extends Controller
         return $this->responseMessage(200, 'success', $data);
     }
 
-    public function getItemsFeatures(Request $request): JsonResponse
+    public function getItemsFeatures(): JsonResponse
     {
-        $number = $request->get('number') ?? 3;
-        $itemsFeatures = Item::query()->with('galleries', 'itemType', 'itineraries.city')->orderByDesc('id')->where('status', 1)->where('is_feature', 1)->take($number)->get();
+        $itemsFeatures = Item::query()->with('galleries', 'itemType', 'itineraries.city')->orderByDesc('id')->where('status', 1)->where('is_feature', 1)->get();
         return $this->responseMessage(200, 'success', $itemsFeatures);
     }
 

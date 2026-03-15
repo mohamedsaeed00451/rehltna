@@ -388,16 +388,38 @@
 
                             {{-- Price & Map Row --}}
                             <div class="row mb-3">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Price <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light fw-bold">SAR</span>
                                         <input type="number" name="price" class="form-control"
-                                               value="{{ $item->price }}" required>
+                                               value="{{ $item->price }}" required step="0.01" min="0">
                                     </div>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Discount</label>
+                                    <input type="number" name="discount" class="form-control" value="{{ $item->discount }}" step="0.01" min="0">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Discount Type</label>
+                                    <select name="discount_type" class="form-select">
+                                        <option value="amount" {{ $item->discount_type == 'amount' ? 'selected' : '' }}>Amount (SAR)</option>
+                                        <option value="percent" {{ $item->discount_type == 'percent' ? 'selected' : '' }}>Percentage (%)</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Stock Status</label>
+                                    <select name="out_of_stock" class="form-select">
+                                        <option value="0" {{ $item->out_of_stock == 0 ? 'selected' : '' }}>In Stock</option>
+                                        <option value="1" {{ $item->out_of_stock == 1 ? 'selected' : '' }}>Out of Stock</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12 mb-3">
                                     <label class="form-label">Map Link <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light"><i
@@ -407,7 +429,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             {{-- Dates Row (Gregorian & Hijri) --}}
                             <div class="row mb-4 p-3 bg-light rounded-3 border">
                                 <h6 class="fw-bold mb-3 text-dark"><i class="fas fa-calendar-alt me-2 text-primary"></i>

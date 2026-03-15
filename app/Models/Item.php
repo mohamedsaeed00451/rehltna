@@ -42,15 +42,52 @@ class Item extends Model
             ->withTimestamps();
     }
 
-    protected $appends = ['coupons'];
+    protected $appends = ['coupons','price_after_discount', 'is_active_feature'];
 
     protected $hidden = ['assignedCoupons'];
+
+    protected $casts = [
+        'featured_at' => 'datetime',
+    ];
+
+    public function getPriceAfterDiscountAttribute()
+    {
+        $price = $this->price ?? 0;
+        $discount = $this->discount ?? 0;
+
+        if ($discount <= 0 || $this->is_active_feature == 0) {
+            return $price;
+        }
+
+        if ($this->discount_type === 'percent') {
+            $discountAmount = ($price * $discount) / 100;
+            return max(0, $price - $discountAmount);
+        }
+
+        return max(0, $price - $discount);
+    }
+
+    public function getIsActiveFeatureAttribute(): int
+    {
+        if ($this->is_feature != 1 || !$this->featured_at) {
+            return 0;
+        }
+
+        $featuredDate = Carbon::parse($this->featured_at);
+        $daysPassed = $featuredDate->diffInDays(now());
+
+        if ($daysPassed > 7) {
+            $this->update(['is_feature' => 0, 'featured_at' => null]);
+            return 0;
+        }
+
+        return 1;
+    }
 
     public function assignedCoupons(): BelongsToMany
     {
         return $this->belongsToMany(Coupon::class, 'coupon_items');
     }
-
     public function getCouponsAttribute()
     {
         $validSpecificCoupons = $this->assignedCoupons->filter(function ($coupon) {

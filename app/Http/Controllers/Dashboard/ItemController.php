@@ -239,14 +239,27 @@ class ItemController extends Controller
     public function itemsChangeIsFeature($id): JsonResponse
     {
         $item = Item::query()->findOrFail($id);
+
         if ($item->is_feature == 1) {
             $item->is_feature = 0;
-            $item->save();
+            $item->featured_at = null;
         } else {
             $item->is_feature = 1;
-            $item->save();
+            $item->featured_at = now();
         }
+
+        $item->save();
+
         return response()->json(['is_feature' => $item->is_feature]);
+    }
+
+    public function changeOutOfStock($id): JsonResponse
+    {
+        $item = Item::query()->findOrFail($id);
+        $item->out_of_stock = $item->out_of_stock == 1 ? 0 : 1;
+        $item->save();
+
+        return response()->json(['out_of_stock' => $item->out_of_stock]);
     }
 
     public function exportItemsTempExcel(): BinaryFileResponse

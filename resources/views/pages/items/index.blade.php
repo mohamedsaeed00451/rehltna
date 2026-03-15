@@ -212,12 +212,13 @@
                                 @foreach(get_active_langs() as $lang)
                                     <th>Title <span class="lang-tag">{{ strtoupper($lang) }}</span></th>
                                 @endforeach
-                                <th>Season</th>
-                                <th>Duration</th>
-                                <th>Price <span class="lang-tag">SAR</span></th>
-                                <th>Points</th>
+                                <th class="text-center">Season</th>
+                                <th class="text-center">Duration</th>
+                                <th class="text-center">Price</th>
+                                <th class="text-center">Points</th>
                                 <th class="text-center">Order</th>
-                                <th class="text-center">Featured</th>
+                                <th class="text-center">Special Offer</th>
+                                <th class="text-center">Out of Stock</th>
                                 <th class="text-center">Visibility</th>
                                 <th class="text-center px-4">Actions</th>
                             </tr>
@@ -255,7 +256,7 @@
                                         </td>
                                     @endforeach
 
-                                    <td>
+                                    <td class="text-center">
                                         @if($item->season)
                                             <span class="season-badge">{{ $item->season }}</span>
                                         @else
@@ -263,21 +264,38 @@
                                         @endif
                                     </td>
 
-                                    <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-bold" style="color: #334155; font-size: 13px;">
-                                                <i class="fas fa-map-marker-alt me-1 text-danger"></i> {{ $item->itineraries->count() }} Cities
-                                            </span>
+                                    <td class="text-center">
+                                        <div class="d-flex flex-column align-items-center">
+                        <span class="fw-bold" style="color: #334155; font-size: 13px;">
+                            <i class="fas fa-map-marker-alt me-1 text-danger"></i> {{ $item->itineraries->count() }} Cities
+                        </span>
                                             <span class="text-muted mt-1" style="font-size: 11px;">
-                                                <i class="fas fa-moon me-1 text-primary"></i> {{ $item->itineraries->sum('nights') }} Nights
-                                            </span>
+                            <i class="fas fa-moon me-1 text-primary"></i> {{ $item->itineraries->sum('nights') }} Nights
+                        </span>
                                         </div>
                                     </td>
 
-                                    <td><span class="price-badge">{{ number_format($item->price, 0) }}</span></td>
+                                    <td class="text-center price-cell" id="price-cell-{{ $item->id }}"
+                                        data-price="{{ $item->price }}"
+                                        data-discount="{{ $item->discount }}"
+                                        data-discount-type="{{ $item->discount_type }}">
+                                        @if($item->price_after_discount < $item->price)
+                                            <div class="d-flex flex-column align-items-center">
+                                                <span class="price-badge mb-1">{{ number_format($item->price_after_discount, 0) }} SAR</span>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="text-decoration-line-through text-muted" style="font-size: 11px;">{{ number_format($item->price, 0) }}</span>
+                                                    <span class="badge bg-danger" style="font-size: 9px; padding: 3px 5px;">
+                                                        -{{ $item->discount }}{{ $item->discount_type == 'percent' ? '%' : ' SAR' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <span class="price-badge">{{ number_format($item->price, 0) }} SAR</span>
+                                        @endif
+                                    </td>
 
-                                    <td>
-                                        <span class="points-badge">
+                                    <td class="text-center">
+                                        <span class="points-badge d-inline-block">
                                             <i class="fas fa-coins me-1"></i> {{ $item->earned_points ?? 0 }}
                                         </span>
                                     </td>
@@ -285,14 +303,34 @@
                                     <td class="text-center">
                                         <div class="order-indicator mx-auto">{{ $item->order ?? 0}}</div>
                                     </td>
+
                                     <td class="text-center">
                                         <div
                                             class="toggle-is-feature-btn main-toggle mx-auto {{ $item->is_feature == 1 ? 'main-toggle-success on' : 'main-toggle-danger of' }}"
                                             data-id="{{ $item->id }}"
-                                            data-is_feature="{{ $item->is_feature }}">
+                                            data-is_feature="{{ $item->is_feature }}"
+                                            title="{{ $item->featured_at ? 'Featured on: ' . \Carbon\Carbon::parse($item->featured_at)->format('Y-m-d') : '' }}"
+                                            data-bs-toggle="tooltip">
                                             <span></span>
                                         </div>
+                                        @if($item->is_feature == 1 && $item->featured_at)
+                                            <div class="small text-success mt-1 fw-bold" style="font-size: 10px;">(7 Days Offer)</div>
+                                        @endif
                                     </td>
+
+                                    <td class="text-center">
+                                        <div
+                                            class="toggle-out-of-stock-btn main-toggle mx-auto {{ $item->out_of_stock == 1 ? 'main-toggle-danger on' : 'main-toggle-success of' }}"
+                                            data-id="{{ $item->id }}"
+                                            data-out_of_stock="{{ $item->out_of_stock }}"
+                                            title="{{ $item->out_of_stock == 1 ? 'Out of Stock' : 'In Stock' }}">
+                                            <span></span>
+                                        </div>
+                                        @if($item->out_of_stock == 1)
+                                            <div class="small text-danger mt-1 fw-bold" style="font-size: 10px;">Out of stock</div>
+                                        @endif
+                                    </td>
+
                                     <td class="text-center">
                                         <div
                                             class="toggle-status-btn main-toggle mx-auto {{ $item->status == 1 ? 'main-toggle-success on' : 'main-toggle-danger of' }}"
@@ -341,7 +379,7 @@
 
 @section('scripts')
     <script>
-
+        // Status toggle
         $(document).on('click', '.toggle-status-btn', function () {
             let button = $(this);
             let itemId = button.data('id');
@@ -360,6 +398,32 @@
             });
         });
 
+        // Out of stock toggle
+        $(document).on('click', '.toggle-out-of-stock-btn', function () {
+            let button = $(this);
+            let itemId = button.data('id');
+            $.ajax({
+                url: "{{ url('admin/items/change-out-of-stock') }}/" + itemId,
+                type: 'POST',
+                data: {_token: '{{ csrf_token() }}'},
+                success: function (response) {
+                    toastr.success("Stock status updated");
+                    if (response.out_of_stock == 1) {
+                        button.removeClass('main-toggle-success of').addClass('main-toggle-danger on');
+                        button.attr('title', 'Out of Stock');
+                        if(button.next('div').length === 0) {
+                            button.after('<div class="small text-danger mt-1 fw-bold" style="font-size: 10px;">Out of stock</div>');
+                        }
+                    } else {
+                        button.removeClass('main-toggle-danger on').addClass('main-toggle-success of');
+                        button.attr('title', 'In Stock');
+                        button.next('div.text-danger').remove();
+                    }
+                }
+            });
+        });
+
+        // Feature toggle (Special Offer)
         $(document).on('click', '.toggle-is-feature-btn', function () {
             let button = $(this);
             let itemId = button.data('id');
@@ -368,18 +432,61 @@
                 type: 'POST',
                 data: {_token: '{{ csrf_token() }}'},
                 success: function (response) {
-                    toastr.success("Featured Logic Applied");
+                    toastr.success("Special Offer Updated (Valid for 7 days)");
+
                     if (response.is_feature == 1) {
                         button.removeClass('main-toggle-danger of').addClass('main-toggle-success on');
+                        if(button.next('div').length === 0) {
+                            button.after('<div class="small text-success mt-1 fw-bold" style="font-size: 10px;">(7 Days Offer)</div>');
+                        }
                     } else {
                         button.removeClass('main-toggle-success on').addClass('main-toggle-danger of');
+                        button.removeAttr('title');
+                        button.next('div.text-success').remove();
                     }
+
+                    let priceCell = $('#price-cell-' + itemId);
+                    let price = parseFloat(priceCell.data('price')) || 0;
+                    let discount = parseFloat(priceCell.data('discount')) || 0;
+                    let discountType = priceCell.data('discount-type');
+
+                    let html = '';
+
+                    if (response.is_feature == 1 && discount > 0) {
+                        let priceAfter = discountType === 'percent' ? price - (price * discount / 100) : price - discount;
+                        priceAfter = Math.max(0, priceAfter);
+
+                        let formattedPriceAfter = Math.round(priceAfter).toLocaleString('en-US');
+                        let formattedPrice = Math.round(price).toLocaleString('en-US');
+                        let discountLabel = discountType === 'percent' ? '%' : ' SAR';
+
+                        html = `
+                            <div class="d-flex flex-column align-items-center">
+                                <span class="price-badge mb-1">${formattedPriceAfter} SAR</span>
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="text-decoration-line-through text-muted" style="font-size: 11px;">${formattedPrice}</span>
+                                    <span class="badge bg-danger" style="font-size: 9px; padding: 3px 5px;">
+                                        -${discount}${discountLabel}
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        let formattedPrice = Math.round(price).toLocaleString('en-US');
+                        html = `<span class="price-badge">${formattedPrice} SAR</span>`;
+                    }
+
+                    priceCell.html(html);
                 }
             });
         });
 
         document.addEventListener('DOMContentLoaded', function () {
             confirmDelete();
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
         });
     </script>
 @endsection

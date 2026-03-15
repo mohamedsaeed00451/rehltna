@@ -226,6 +226,7 @@
                                     <th>Title <span class="lang-tag">{{ strtoupper($lang) }}</span></th>
                                 @endforeach
                                 <th class="text-center">Order</th>
+                                <th class="text-center">WhatsApp</th>
                                 <th class="text-center">Item Count</th>
                                 <th class="text-center">Featured</th>
                                 <th class="text-center px-4">Actions</th>
@@ -240,6 +241,11 @@
                                         <td>
                                             <div class="fw-bold text-dark" style="font-size: 1rem;">
                                                 {{ $itemType->{'title_'.$lang} }}
+                                                @if($itemType->parent_id)
+                                                    <span class="badge bg-light text-secondary border ms-1" style="font-size: 10px;">
+                                    <i class="fas fa-level-up-alt fa-rotate-90 me-1"></i>Sub
+                                </span>
+                                                @endif
                                             </div>
                                         </td>
                                     @endforeach
@@ -249,9 +255,23 @@
                                     </td>
 
                                     <td class="text-center">
-                                            <span class="count-badge">
-                                                <i class="fas fa-layer-group me-1 opacity-50"></i> {{ $itemType->items_count }} Items
-                                            </span>
+                                        @if($itemType->whatsapp)
+                                            <a href="{{ str_starts_with($itemType->whatsapp, 'http') ? $itemType->whatsapp : 'https://wa.me/' . preg_replace('/[^0-9]/', '', $itemType->whatsapp) }}"
+                                               target="_blank"
+                                               class="btn-action mx-auto"
+                                               style="color: #25D366; border-color: rgba(37, 211, 102, 0.3); background: #ebfbf0;"
+                                               title="{{ $itemType->whatsapp }}">
+                                                <i class="fab fa-whatsapp fs-20"></i>
+                                            </a>
+                                        @else
+                                            <span class="text-muted opacity-50">-</span>
+                                        @endif
+                                    </td>
+
+                                    <td class="text-center">
+                    <span class="count-badge">
+                        <i class="fas fa-layer-group me-1 opacity-50"></i> {{ $itemType->items_count }} Trips
+                    </span>
                                     </td>
 
                                     <td class="text-center">

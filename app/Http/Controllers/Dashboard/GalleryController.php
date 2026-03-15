@@ -23,14 +23,14 @@ class GalleryController extends Controller
             $currentFolder = Folder::query()->findOrFail($request->folder_id);
             $galleries = $currentFolder->galleries()
                 ->latest()
-                ->paginate(20)
+                ->paginate(18)
                 ->appends(['folder_id' => $request->folder_id]);
             $folders = collect();
         } else {
             $folders = Folder::query()->latest()->get();
             $galleries = Gallery::query()->whereNull('galleryable_id')
                 ->latest()
-                ->paginate(20);
+                ->paginate(18);
         }
 
         return view('pages.gallery.index', compact('folders', 'galleries', 'currentFolder'));
@@ -151,11 +151,11 @@ class GalleryController extends Controller
         if ($request->has('folder_id') && $request->folder_id != null && $request->folder_id != 'root') {
             $currentFolder = Folder::find($request->folder_id);
             if($currentFolder) {
-                $galleries = $currentFolder->galleries()->latest()->paginate(18);
+                $galleries = $currentFolder->galleries()->latest()->paginate(45);
             }
         } else {
             $folders = Folder::latest()->get();
-            $galleries = Gallery::whereNull('galleryable_id')->latest()->paginate(18);
+            $galleries = Gallery::whereNull('galleryable_id')->latest()->paginate(45);
         }
 
         $folderIdParam = $request->folder_id ?? 'root';
