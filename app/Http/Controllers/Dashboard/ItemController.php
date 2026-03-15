@@ -64,6 +64,10 @@ class ItemController extends Controller
                 $data['discount'] = 0;
             }
 
+            if ($request->get('is_feature') == 1) {
+                $data['featured_at'] = now();
+            }
+
             foreach ($activeLangs as $lang) {
                 if ($request->filled('banner_' . $lang)) {
                     $data['banner_' . $lang] = $this->cleanPath($request->input('banner_' . $lang));
@@ -184,6 +188,14 @@ class ItemController extends Controller
 
             if (empty($data['discount'])) {
                 $data['discount'] = 0;
+            }
+
+            if ($request->has('is_feature')) {
+                if ($request->get('is_feature') == 1 && $item->is_feature == 0) {
+                    $data['featured_at'] = now();
+                } elseif ($request->get('is_feature') == 0) {
+                    $data['featured_at'] = null;
+                }
             }
 
             foreach ($activeLangs as $lang) {
