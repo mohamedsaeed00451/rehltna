@@ -26,7 +26,7 @@ class OrderController extends Controller
 {
     use ResponseTrait;
 
-    private function calculateOrderDetails($itemsRequest, $couponCode = null): array
+    private function calculateOrderDetails($itemsRequest, $couponCode = null, $email = null, $usePoints = false): array
     {
         $itemIds = collect($itemsRequest)->pluck('item_id')->toArray();
         $dbItems = Item::query()->whereIn('id', $itemIds)->get()->keyBy('id');
@@ -39,7 +39,6 @@ class OrderController extends Controller
             if (!$dbItem) continue;
 
             $actualItemPrice = $dbItem->price_after_discount;
-
             $itemTotal = $actualItemPrice * $reqItem['attendees'];
             $subTotal += $itemTotal;
 
@@ -82,9 +81,29 @@ class OrderController extends Controller
 
         $finalTotal = max(0, $subTotal - $discountAmount);
 
+        $pointsDiscount = 0;
+        $pointsUsed = 0;
+
+        if ($usePoints && $email) {
+            $user = ResidencyUser::where('email', $email)->first();
+            if ($user && $user->available_points > 0) {
+
+                $pointsValueInSAR = $user->available_points / 10;
+
+                $pointsDiscount = min($pointsValueInSAR, $finalTotal);
+
+                $pointsUsed = $pointsDiscount * 10;
+
+                $finalTotal -= $pointsDiscount;
+            }
+        }
+
         return [
             'sub_total' => $subTotal,
-            'discount_amount' => $discountAmount,
+            'coupon_discount' => $discountAmount,
+            'points_discount' => $pointsDiscount,
+            'points_used' => $pointsUsed,
+            'total_discount' => $discountAmount + $pointsDiscount,
             'coupon_id' => $couponId,
             'final_total' => $finalTotal,
             'order_items_data' => $orderItemsData
@@ -98,6 +117,7 @@ class OrderController extends Controller
             'name' => 'required|string',
             'email' => 'required|email',
             'phone' => 'required',
+            'use_points' => 'nullable|boolean',
             'payment_method_code' => [
                 'required',
                 function ($attribute, $value, $fail) {
@@ -134,7 +154,12 @@ class OrderController extends Controller
                 ->firstOrFail();
         }
 
-        $calculation = $this->calculateOrderDetails($request->get('items'), $request->get('coupon_code'));
+        $calculation = $this->calculateOrderDetails(
+            $request->get('items'),
+            $request->get('coupon_code'),
+            $request->get('email'),
+            $request->boolean('use_points')
+        );
 
         DB::beginTransaction();
         try {
@@ -148,7 +173,8 @@ class OrderController extends Controller
                 'payment_method' => $paymentCode,
                 'payment_status' => 'pending',
                 'sub_total' => $calculation['sub_total'],
-                'discount_amount' => $calculation['discount_amount'],
+                'discount_amount' => $calculation['total_discount'],
+                'used_points' => $calculation['points_used'],
                 'coupon_id' => $calculation['coupon_id'],
                 'total_amount' => $calculation['final_total'],
                 'transaction_token' => $securityToken,
@@ -175,6 +201,10 @@ class OrderController extends Controller
                 $order->items()->create($item);
             }
 
+            if ($calculation['points_used'] > 0) {
+                $user->decrement('available_points', $calculation['points_used']);
+            }
+
             DB::commit();
 
             $paymentBaseUrl = null;
@@ -191,7 +221,9 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'transaction_token' => $securityToken,
                 'sub_total' => $calculation['sub_total'],
-                'discount' => $calculation['discount_amount'],
+                'coupon_discount' => $calculation['coupon_discount'],
+                'points_discount' => $calculation['points_discount'],
+                'total_discount' => $calculation['total_discount'],
                 'total_amount' => $calculation['final_total'],
                 'status' => 'pending',
             ];
@@ -465,10 +497,12 @@ class OrderController extends Controller
     public function checkCoupon(Request $request): JsonResponse
     {
         $request->validate([
+            'email' => 'nullable|email',
             'coupon_code' => [
                 'nullable',
                 Rule::exists(Coupon::class, 'code'),
             ],
+            'use_points' => 'nullable|boolean',
             'items' => 'required|array',
             'items.*.item_id' => [
                 'required',
@@ -477,15 +511,23 @@ class OrderController extends Controller
             'items.*.attendees' => 'required|integer|min:1',
         ]);
 
-        $calculation = $this->calculateOrderDetails($request->get('items'), $request->get('coupon_code'));
+        $calculation = $this->calculateOrderDetails(
+            $request->get('items'),
+            $request->get('coupon_code'),
+            $request->get('email'),
+            $request->boolean('use_points')
+        );
 
         $responsePayload = [
             'sub_total' => $calculation['sub_total'],
-            'discount' => $calculation['discount_amount'],
+            'coupon_discount' => $calculation['coupon_discount'],
+            'points_discount' => $calculation['points_discount'],
+            'total_discount' => $calculation['total_discount'],
+            'points_used' => $calculation['points_used'],
             'total_amount' => $calculation['final_total'],
         ];
 
-        return $this->responseMessage(200, 'Coupon Code Discount', $responsePayload);
+        return $this->responseMessage(200, 'Order Calculation Details', $responsePayload);
     }
 
     public function success(Request $request): RedirectResponse
@@ -506,7 +548,12 @@ class OrderController extends Controller
             }
 
             if ($request->has('status') && strtolower($request->get('status')) !== 'paid') {
-                $order->update(['payment_status' => 'failed']);
+                if ($order->payment_status !== 'failed' && $order->payment_status !== 'canceled') {
+                    $order->update(['payment_status' => 'failed']);
+                    if ($order->used_points > 0 && $order->user) {
+                        $order->user->increment('available_points', $order->used_points);
+                    }
+                }
                 return redirect()->away($payment_failed_url . '?' . http_build_query(['order_id' => $order->id]));
             }
 
@@ -537,9 +584,13 @@ class OrderController extends Controller
                 ])
             );
         }
-        $order->update([
-            'payment_status' => 'canceled'
-        ]);
+        if ($order->payment_status !== 'canceled' && $order->payment_status !== 'failed') {
+            $order->update(['payment_status' => 'canceled']);
+            if ($order->used_points > 0 && $order->user) {
+                $order->user->increment('available_points', $order->used_points);
+            }
+        }
+
         return redirect()->away(
             $payment_cancel_url . '?' . http_build_query([
                 'order_id' => $request->get('order_id')
