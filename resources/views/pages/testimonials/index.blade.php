@@ -230,5 +230,10 @@
                 document.querySelectorAll('input[name="ids[]"]').forEach(cb => cb.checked = source.checked);
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            confirmDelete();
+        });
+
     </script>
 @endsection
