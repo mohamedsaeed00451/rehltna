@@ -135,6 +135,8 @@
                 'countries' => 'Countries',
                 'states' => 'States',
                 'cities' => 'Cities',
+                'employees' => 'Employees',
+                'role_permissions' => 'Role & Permissions',
                 'notifications' => 'Notifications',
                 'notification_templates' => 'Templates',
                 'packages' => 'Packages',

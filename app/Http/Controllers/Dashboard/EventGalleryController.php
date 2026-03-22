@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\EventGallery;
+use App\Models\Country; // <-- تم الإضافة
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,19 +14,19 @@ class EventGalleryController extends Controller
 {
     public function index(): View
     {
-        $eventGalleries = EventGallery::query()->orderByDesc('id')->paginate(10);
+        $eventGalleries = EventGallery::with('country')->orderByDesc('id')->paginate(10);
         return view('pages.events-galleries.index', compact('eventGalleries'));
     }
 
     public function create(): view
     {
-        return view('pages.events-galleries.create');
+        $countries = Country::all();
+        return view('pages.events-galleries.create', compact('countries'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         try {
-
             $data = $request->except(['meta_img', 'gallery', 'youtube_links']);
 
             if ($request->filled('meta_img')) {
@@ -54,7 +55,7 @@ class EventGalleryController extends Controller
                 }
             }
 
-            return redirect()->route('events-galleries.index')->with('success', 'Event Gallery created successfully.');
+            return redirect()->route('events-galleries.index')->with('success', 'Tourist Attraction created successfully.');
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -64,13 +65,13 @@ class EventGalleryController extends Controller
     public function edit($id): view
     {
         $eventGallery = EventGallery::query()->findOrFail(decrypt($id));
-        return view('pages.events-galleries.edit', compact('eventGallery'));
+        $countries = Country::all();
+        return view('pages.events-galleries.edit', compact('eventGallery', 'countries'));
     }
 
     public function update(Request $request, $id): RedirectResponse
     {
         try {
-
             $eventGallery = EventGallery::query()->findOrFail($id);
             $data = $request->except(['meta_img', 'gallery', 'youtube_links']);
 
@@ -102,7 +103,7 @@ class EventGalleryController extends Controller
             $eventGallery->setAttribute('order', $request->get('order'));
             $eventGallery->save();
 
-            return redirect()->route('events-galleries.index')->with('success', 'Event Gallery updated successfully.');
+            return redirect()->route('events-galleries.index')->with('success', 'Tourist Attraction updated successfully.');
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -112,12 +113,11 @@ class EventGalleryController extends Controller
     public function destroy($id): RedirectResponse
     {
         try {
-
             $eventGallery = EventGallery::query()->findOrFail($id);
             $eventGallery->galleries()->delete();
             $eventGallery->delete();
 
-            return redirect()->route('events-galleries.index')->with('success', 'Event Gallery deleted successfully.');
+            return redirect()->route('events-galleries.index')->with('success', 'Tourist Attraction deleted successfully.');
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());

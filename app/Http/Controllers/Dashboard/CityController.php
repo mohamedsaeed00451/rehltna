@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\City;
+use App\Models\Country;
 use App\Models\State;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -15,20 +16,25 @@ class CityController extends Controller
     public function index(): View
     {
         $states = State::with('country')->get();
+        $countries = Country::all();
         $cities = City::query()->with(['state', 'country'])->paginate(10);
-        return view('pages.cities.index', compact('cities', 'states'));
+        return view('pages.cities.index', compact('cities', 'states', 'countries'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         try {
-
-            $state = State::query()->with('country')->findOrFail($request->get('state_id'));
             $data = $request->all();
-            $data['country_id'] = $state->country_id;
+
+            if ($request->filled('state_id')) {
+                $state = State::query()->findOrFail($request->get('state_id'));
+                $data['country_id'] = $state->country_id;
+            } else {
+                $data['state_id'] = null;
+                $data['country_id'] = $request->filled('country_id') ? $request->get('country_id') : null;
+            }
 
             $city = City::query()->create($data);
-            $city->refresh();
 
             return redirect()->route('cities.index')->with('success', 'City created successfully');
 
@@ -37,18 +43,21 @@ class CityController extends Controller
         }
     }
 
-
     public function update(Request $request, $id): RedirectResponse
     {
         try {
-
             $city = City::query()->findOrFail($id);
-            $state = State::query()->with('country')->findOrFail($request->get('state_id'));
             $data = $request->all();
-            $data['country_id'] = $state->country_id;
+
+            if ($request->filled('state_id')) {
+                $state = State::query()->findOrFail($request->get('state_id'));
+                $data['country_id'] = $state->country_id;
+            } else {
+                $data['state_id'] = null;
+                $data['country_id'] = $request->filled('country_id') ? $request->get('country_id') : null;
+            }
 
             $city->update($data);
-            $city->refresh();
 
             return redirect()->route('cities.index')->with('success', 'City updated successfully');
 
@@ -56,7 +65,6 @@ class CityController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
 
     public function destroy($id): RedirectResponse
     {

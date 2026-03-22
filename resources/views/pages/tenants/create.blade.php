@@ -130,6 +130,8 @@
                 'states' => 'States',
                 'cities' => 'Cities',
                 'packages' => 'Packages',
+                'employees' => 'Employees',
+                'role_permissions' => 'Role & Permissions',
                 'notifications' => 'Notifications',
                 'notification_templates' => 'Templates',
                 'failed_jobs' => 'Failed Jobs',

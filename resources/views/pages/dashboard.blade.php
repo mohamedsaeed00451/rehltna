@@ -349,24 +349,90 @@
             <h4 class="mb-0 mt-3">Dashboard</h4>
         </div>
         @php
-            $cards = [
-                'blogs' => [
+
+            $cards = [];
+
+            if (auth()->user()->hasPermission('manage_blogs')) {
+                $cards['blogs'] = [
                     'title' => 'Blogs',
                     'route' => 'blogs.index',
                     'icon'  => 'fas fa-blog',
                     'color' => '#1877F2',
-                ],
+                ];
+            }
+
+            if (auth()->user()->hasPermission('manage_trips')) {
+                $cards['items'] = [
+                     'title' => 'Trips',
+                    'route' => 'items.index',
+                    'icon'  => 'fas fa-box',
+                    'color' => '#FFC107',
+                ];
+            }
+
+            if (auth()->user()->hasPermission('manage_customers')) {
+                $cards['residency_users'] = [
+                     'title' => 'Users',
+                    'route' => 'residency-users.index',
+                    'icon'  => 'fas fa-users',
+                    'color' => '#495057',
+                ];
+                $cards['subscribes'] = [
+                     'title' => 'Subscribers',
+                    'route' => 'subscribes.index',
+                    'icon'  => 'fas fa-envelope-open',
+                    'color' => '#FD7E14',
+                ];
+                $cards['contact'] = [
+                   'title' => 'Contact Messages',
+                    'route' => 'contact-us.index',
+                    'icon'  => 'fas fa-envelope',
+                    'color' => '#0dcaf0',
+                ];
+            }
+
+            if (auth()->user()->hasPermission('manage_payments')) {
+                $cards['orders'] = [
+                    'title' => 'Orders',
+                    'route' => 'orders.index',
+                    'icon'  => 'fas fa-shopping-cart',
+                    'color' => '#5b73e8',
+                ];
+                   $cards['coupons'] = [
+                     'title' => 'Coupons',
+                    'route' => 'coupons.index',
+                    'icon'  => 'fas fa-ticket-alt',
+                    'color' => '#5b73e6',
+                ];
+            }
+
+            if (auth()->user()->hasPermission('manage_website')) {
+                $cards['sliders'] = [
+                    'title' => 'Sliders',
+                    'route' => 'sliders.index',
+                    'icon'  => 'fas fa-images',
+                    'color' => '#DC3545',
+                ];
+                  $cards['testimonials'] = [
+                    'title' => 'Testimonials',
+                    'route' => 'testimonials.index',
+                    'icon'  => 'fas fa-comments',
+                    'color' => '#198754',
+                ];
+                    $cards['custom_pages'] = [
+                     'title' => 'Custom Pages',
+                    'route' => 'custom-pages.index',
+                    'icon'  => 'fas fa-file-alt',
+                    'color' => '#495057',
+                ];
+            }
+
+            $cards += [
                 'offers' => [
                     'title' => 'Offers',
                     'route' => 'offers.index',
                     'icon'  => 'fas fa-tags',
                     'color' => '#0F9D58',
-                ],
-                'items' => [
-                    'title' => 'Trips',
-                    'route' => 'items.index',
-                    'icon'  => 'fas fa-box',
-                    'color' => '#FFC107',
                 ],
                 'jobs' => [
                     'title' => 'Jobs',
@@ -380,66 +446,19 @@
                     'icon'  => 'fas fa-user-plus',
                     'color' => '#20C997',
                 ],
-                'subscribes' => [
-                    'title' => 'Subscribers',
-                    'route' => 'subscribes.index',
-                    'icon'  => 'fas fa-envelope-open',
-                    'color' => '#FD7E14',
-                ],
-                'contact' => [
-                'title' => 'Contact Messages',
-                'route' => 'contact-us.index',
-                'icon'  => 'fas fa-envelope',
-                'color' => '#0dcaf0',
-                ],
-                'sliders' => [
-                    'title' => 'Sliders',
-                    'route' => 'sliders.index',
-                    'icon'  => 'fas fa-images',
-                    'color' => '#DC3545',
-                ],
+
                 'portfolios' => [
                     'title' => 'Portfolios',
                     'route' => 'portfolios.index',
                     'icon'  => 'fas fa-layer-group',
                     'color' => '#0DCAF0',
                 ],
-                'testimonials' => [
-                    'title' => 'Testimonials',
-                    'route' => 'testimonials.index',
-                    'icon'  => 'fas fa-comments',
-                    'color' => '#198754',
-                ],
-                'custom_pages' => [
-                    'title' => 'Custom Pages',
-                    'route' => 'custom-pages.index',
-                    'icon'  => 'fas fa-file-alt',
-                    'color' => '#495057',
-                ],
-                   'orders' => [
-                    'title' => 'Orders',
-                    'route' => 'orders.index',
-                    'icon'  => 'fas fa-shopping-cart',
-                    'color' => '#5b73e8',
-                ],
-                'residency_users' => [
-                    'title' => 'Users',
-                    'route' => 'residency-users.index',
-                    'icon'  => 'fas fa-users',
-                    'color' => '#495057',
-                ],
-                 'register_users' => [
+                'register_users' => [
                     'title' => 'Register Users',
                     'route' => 'register-users.index',
                     'icon'  => 'fas fa-users',
                     'color' => '#5b73e6',
                 ],
-                'coupons' => [
-                'title' => 'Coupons',
-                'route' => 'coupons.index',
-                'icon'  => 'fas fa-ticket-alt',
-                'color' => '#5b73e6',
-            ],
 
             ];
         @endphp
@@ -469,7 +488,7 @@
             @endforeach
         </div>
 
-        @if(in_array('blogs', $tenantOptions) || in_array('offers', $tenantOptions) ||in_array('items', $tenantOptions))
+        @if(in_array('blogs', $tenantOptions) || in_array('offers', $tenantOptions) || in_array('items', $tenantOptions) || in_array('orders', $tenantOptions))
             <!-- Monthly Activity Chart -->
             <div class="card card-hover shadow-sm border-0 chart-container">
                 <div class="card-header">
@@ -494,7 +513,7 @@
             ];
         @endphp
 
-        @if(in_array('social_integration', $tenantOptions))
+        @if(in_array('social_integration', $tenantOptions) && auth()->user()->hasPermission('manage_settings'))
             <div class="row g-4 mb-4">
                 @foreach($settings as $item)
                     @php
@@ -547,10 +566,11 @@
                 @endforeach
             </div>
         @endif
+
         <!-- Latest 3 Blogs, Offers, Items -->
         <div class="row g-4 mb-4">
 
-            @if(in_array('blogs', $tenantOptions) && $latestBlogs->count() > 0)
+            @if(in_array('blogs', $tenantOptions) && $latestBlogs->count() > 0 && auth()->user()->hasPermission('manage_blogs'))
                 <div class="col-lg-6">
                     <div class="section-container">
                         <div class="section-header">
@@ -600,7 +620,7 @@
             {{--                </div>--}}
             {{--            @endif--}}
 
-            @if(in_array('items', $tenantOptions) && $latestItems->count() > 0)
+            @if(in_array('items', $tenantOptions) && $latestItems->count() > 0 && auth()->user()->hasPermission('manage_trips'))
                 <div class="col-lg-6">
                     <div class="section-container">
                         <div class="section-header">
@@ -642,7 +662,7 @@
             data: {
                 labels: {!! json_encode($months) !!},
                 datasets: [
-                        @if(in_array('blogs', $tenantOptions))
+                        @if(in_array('blogs', $tenantOptions) && auth()->user()->hasPermission('manage_blogs'))
                     {
                         label: 'Blogs',
                         data: {!! json_encode($blogsPerMonth) !!},
@@ -662,7 +682,7 @@
                     },
                         @endif
 
-                        @if(in_array('items', $tenantOptions))
+                        @if(in_array('items', $tenantOptions) && auth()->user()->hasPermission('manage_trips'))
                     {
                         label: 'Trips',
                         data: {!! json_encode($itemsPerMonth) !!},
@@ -671,7 +691,7 @@
                         barThickness: 25
                     },
                         @endif
-                        @if(in_array('orders', $tenantOptions))
+                        @if(in_array('orders', $tenantOptions) && auth()->user()->hasPermission('manage_payments'))
                     {
                         label: 'Orders',
                         data: {!! json_encode($ordersPerMonth) !!},

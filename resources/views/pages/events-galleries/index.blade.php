@@ -2,12 +2,10 @@
 
 @section('styles')
     <style>
-        /* Global Background */
         body {
             background-color: #f8fafc;
         }
 
-        /* Card Styling */
         .custom-card {
             border: none;
             border-radius: 24px;
@@ -17,7 +15,6 @@
             margin-top: 20px;
         }
 
-        /* Hero Header Section */
         .hero-section {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             border-radius: 24px;
@@ -30,7 +27,6 @@
             box-shadow: 0 20px 30px rgba(0, 0, 0, 0.12);
         }
 
-        /* FIX: Table Header Padding & Visibility */
         .table-responsive {
             border-radius: 18px;
             overflow: hidden;
@@ -74,7 +70,6 @@
             border-top: 1px solid #f1f5f9;
         }
 
-        /* Order Indicator */
         .order-indicator {
             width: 32px;
             height: 32px;
@@ -89,7 +84,6 @@
             font-size: 0.8rem;
         }
 
-        /* Action Buttons */
         .btn-action {
             width: 42px;
             height: 42px;
@@ -140,23 +134,22 @@
     <div class="breadcrumb-header justify-content-between mb-4 mt-3">
         <div class="my-auto">
             <h4 class="content-title mb-0 fw-bold" style="color: #1e293b; letter-spacing: -0.8px; font-size: 1.7rem;">
-                Event Galleries
+                Tourist Attractions
             </h4>
-            <p class="text-muted mb-0 small fw-medium">Media / <span class="text-primary">Visual Collections</span></p>
+            <p class="text-muted mb-0 small fw-medium">Management / <span class="text-primary">Attractions</span></p>
         </div>
     </div>
 
     <div class="hero-section">
         <div>
-            <h3 class="mb-2 fw-bold" style="letter-spacing: -0.5px;">Galleries Control Hub</h3>
-            <p class="mb-0 opacity-75 fw-medium">Showcase your events and visual content with stunning photo
-                collections.</p>
+            <h3 class="mb-2 fw-bold" style="letter-spacing: -0.5px;">Tourist Attractions Hub</h3>
+            <p class="mb-0 opacity-75 fw-medium">Manage and showcase beautiful destinations and landmarks.</p>
         </div>
         <div class="d-flex gap-3 align-items-center">
             <a href="{{ route('events-galleries.create') }}"
                class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold border-0 d-flex align-items-center"
                style="background: #ffffff; color: #1e293b; height: 48px;">
-                <i class="fas fa-plus-circle me-2 text-primary"></i> Add New Gallery
+                <i class="fas fa-plus-circle me-2 text-primary"></i> Add Attraction
             </a>
         </div>
     </div>
@@ -171,8 +164,9 @@
                             <tr>
                                 <th class="text-center" width="80">#</th>
                                 @foreach(get_active_langs() as $lang)
-                                    <th>Gallery Title <span class="lang-tag">{{ strtoupper($lang) }}</span></th>
+                                    <th>Attraction Title <span class="lang-tag">{{ strtoupper($lang) }}</span></th>
                                 @endforeach
+                                <th>Country</th>
                                 <th class="text-center">Order</th>
                                 <th class="text-center">Featured</th>
                                 <th class="text-center">Visibility</th>
@@ -187,11 +181,16 @@
                                     @foreach(get_active_langs() as $lang)
                                         <td>
                                             <div class="fw-bold text-dark"
-                                                 style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                 style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                 {{ $eventGallery->{'title_'.$lang} }}
                                             </div>
                                         </td>
                                     @endforeach
+
+                                    <td>
+                                        <span
+                                            class="badge bg-light text-dark border">{{ $eventGallery->country ? (transDB($eventGallery->country, 'title') ?? $eventGallery->country->name) : 'N/A' }}</span>
+                                    </td>
 
                                     <td class="text-center">
                                         <div class="order-indicator mx-auto">{{ $eventGallery->order ?? 0}}</div>
@@ -217,13 +216,13 @@
                                         <div class="d-flex justify-content-center gap-2">
                                             <a class="btn-action btn-edit-gal"
                                                href="{{ route('events-galleries.edit', encrypt($eventGallery->id)) }}"
-                                               title="Edit Gallery">
+                                               title="Edit Attraction">
                                                 <i class="las la-pen fs-18"></i>
                                             </a>
                                             <a class="btn-action btn-delete-gal delete-btn"
                                                data-route="{{ route('events-galleries.destroy',$eventGallery->id) }}"
                                                data-bs-toggle="modal" href="#" data-bs-target="#deleteModal"
-                                               title="Remove Gallery">
+                                               title="Remove Attraction">
                                                 <i class="las la-trash fs-18"></i>
                                             </a>
                                         </div>
@@ -251,7 +250,6 @@
 
 @section('scripts')
     <script>
-
         $(document).on('click', '.toggle-status-btn', function () {
             let button = $(this);
             let eventGalleryId = button.data('id');

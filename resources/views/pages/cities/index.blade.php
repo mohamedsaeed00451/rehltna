@@ -241,6 +241,7 @@
                                                data-title_en="{{ $city->title_en }}"
                                                data-title_ar="{{ $city->title_ar }}"
                                                data-state_id="{{ $city->state_id }}"
+                                               data-country_id="{{ $city->country_id }}"
                                                data-status="{{ $city->status }}"
                                                data-route="{{ route('cities.update', $city->id) }}"
                                                data-bs-toggle="modal" href="#editCityModal"
@@ -302,6 +303,9 @@
                     }
                     if (document.getElementById("edit-state_id")) {
                         document.getElementById("edit-state_id").value = btn.dataset.state_id;
+                    }
+                    if (document.getElementById("edit-country_id")) {
+                        document.getElementById("edit-country_id").value = btn.dataset.country_id;
                     }
                     if (document.getElementById("editCityForm")) {
                         document.getElementById("editCityForm").action = btn.dataset.route;

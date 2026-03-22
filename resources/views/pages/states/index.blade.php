@@ -182,7 +182,7 @@
                                     <td>
                                         <span class="country-badge">
                                             <i class="fas fa-globe-americas me-1 opacity-50"></i>
-                                            {{ $state->country->title_en ?? 'Deleted Country' }}
+                                            {{ $state->country->title_en ?? 'N/A' }}
                                         </span>
                                     </td>
 

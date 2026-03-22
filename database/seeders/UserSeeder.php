@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -21,6 +22,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('rehltna$2026@panel'),
             'email_verified_at' => now(),
             'role' => 'admin',
+            'role_id' => Role::query()->where('name', 'Admin')->first()->id,
             'tenant_id' => Tenant::query()->first()->id,
         ]);
     }

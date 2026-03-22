@@ -121,7 +121,7 @@
                     {{-- Select Country --}}
                     <div class="mb-4">
                         <label class="form-label custom-label">Country</label>
-                        <select name="country_id" class="form-select custom-select" required>
+                        <select name="country_id" class="form-select custom-select">
                             <option value="" selected disabled>-- Select Country --</option>
                             @foreach($countries as $country)
                                 <option value="{{ $country->id }}">{{ $country->title_en }}</option>

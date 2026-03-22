@@ -14,6 +14,7 @@ use App\Http\Controllers\Dashboard\{AiController,
     CustomPageController,
     DashboardController,
     DiseaseTypeController,
+    EmployeeController,
     EventController,
     EventGalleryController,
     GalleryController,
@@ -39,6 +40,7 @@ use App\Http\Controllers\Dashboard\{AiController,
     RegisterUsersController,
     ResidencyProgramController,
     ResidencyUsersController,
+    RoleController,
     SettingController,
     SliderController,
     StateController,
@@ -242,6 +244,9 @@ Route::group([
         Route::post('/notification-templates', [NotificationTemplateController::class, 'store'])->name('notification-templates.store');
         Route::delete('/notification-templates/{id}', [NotificationTemplateController::class, 'destroy'])->name('notification-templates.destroy');
         Route::put('/notification-templates/{id}', [NotificationTemplateController::class, 'update'])->name('notification-templates.update');
+
+        Route::resource('employees', EmployeeController::class);
+        Route::resource('roles', RoleController::class);
 
         Route::group(['prefix' => 'gallery', 'as' => 'gallery.'], function () {
             Route::get('/', [GalleryController::class, 'index'])->name('index');

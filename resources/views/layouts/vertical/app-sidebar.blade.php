@@ -29,7 +29,8 @@
             </li>
         @endif
 
-        @if(in_array('blogs', $tenantOptions))
+        {{-- Blogs System --}}
+        @if(in_array('blogs', $tenantOptions) && auth()->user()->hasPermission('manage_blogs'))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -46,7 +47,8 @@
             </li>
         @endif
 
-        @if(in_array('items', $tenantOptions) || in_array('events_galleries', $tenantOptions))
+        {{-- Trips System --}}
+        @if(in_array('items', $tenantOptions) && auth()->user()->hasPermission('manage_trips'))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -64,14 +66,12 @@
                     @if(in_array('items', $tenantOptions))
                         <li><a class="slide-item" href="{{ route('items.index') }}"><span>Trips</span></a></li>
                     @endif
-                    @if(in_array('events_galleries', $tenantOptions))
-                        <li><a class="slide-item"
-                               href="{{ route('events-galleries.index') }}"><span>Galleries</span></a></li>
-                    @endif
                 </ul>
             </li>
         @endif
-        @if(in_array('countries', $tenantOptions) || in_array('states', $tenantOptions) || in_array('cities', $tenantOptions))
+
+        {{-- Location System --}}
+        @if((in_array('countries', $tenantOptions) || in_array('states', $tenantOptions) || in_array('cities', $tenantOptions) || in_array('events_galleries', $tenantOptions)) && auth()->user()->hasPermission('manage_locations'))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -91,11 +91,39 @@
                     @if(in_array('cities', $tenantOptions))
                         <li><a class="slide-item" href="{{ route('cities.index') }}">Cities</a></li>
                     @endif
+                    @if(in_array('events_galleries', $tenantOptions))
+                        <li><a class="slide-item"
+                               href="{{ route('events-galleries.index') }}"><span>Tourist Attractions</span></a></li>
+                    @endif
                 </ul>
             </li>
         @endif
 
-        @if(in_array('residency_users', $tenantOptions) || in_array('register_users', $tenantOptions) || in_array('contact', $tenantOptions) || in_array('subscribes', $tenantOptions) || in_array('packages', $tenantOptions))
+        {{-- Staff & Roles --}}
+        @if((in_array('employees', $tenantOptions) || in_array('role_permissions', $tenantOptions)) && auth()->user()->hasPermission('manage_staff'))
+            <li class="slide">
+                <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
+                   href="#">
+                    <div class="d-flex align-items-center">
+                        <i class="side-menu__icon fe fe-briefcase me-2 mb-3"></i>
+                        <span class="side-menu__label tx-15 bold">Staff & Roles</span>
+                    </div>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    @if(in_array('employees', $tenantOptions))
+                        <li><a class="slide-item" href="{{ route('employees.index') }}"><span>Employees</span></a></li>
+                    @endif
+                    @if(in_array('role_permissions', $tenantOptions))
+                        <li><a class="slide-item" href="{{ route('roles.index') }}"><span>Roles & Permissions</span></a>
+                        </li>
+                    @endif
+                </ul>
+            </li>
+        @endif
+
+        {{-- Customers --}}
+        @if((in_array('residency_users', $tenantOptions) || in_array('register_users', $tenantOptions) || in_array('contact', $tenantOptions) || in_array('subscribes', $tenantOptions) || in_array('packages', $tenantOptions)) && auth()->user()->hasPermission('manage_customers'))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -130,7 +158,8 @@
             </li>
         @endif
 
-        @if(in_array('notifications', $tenantOptions))
+        {{-- Notifications --}}
+        @if(in_array('notifications', $tenantOptions) && auth()->user()->hasPermission('manage_notifications'))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -155,7 +184,8 @@
             </li>
         @endif
 
-        @if(in_array('payment_methods', $tenantOptions) || in_array('coupons', $tenantOptions) || in_array('orders', $tenantOptions) || in_array('payment_links', $tenantOptions))
+        {{-- Payments --}}
+        @if((in_array('payment_methods', $tenantOptions) || in_array('coupons', $tenantOptions) || in_array('orders', $tenantOptions) || in_array('payment_links', $tenantOptions)) && auth()->user()->hasPermission('manage_payments'))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -184,7 +214,8 @@
             </li>
         @endif
 
-        @if(in_array('sliders', $tenantOptions) || in_array('members', $tenantOptions) || in_array('testimonials', $tenantOptions) || in_array('custom_pages', $tenantOptions))
+        {{-- Website --}}
+        @if((in_array('sliders', $tenantOptions) || in_array('members', $tenantOptions) || in_array('testimonials', $tenantOptions) || in_array('custom_pages', $tenantOptions)) && auth()->user()->hasPermission('manage_website'))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -213,25 +244,8 @@
             </li>
         @endif
 
-        @if(in_array('leads', $tenantOptions))
-            <li class="slide">
-                <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
-                   href="#">
-                    <div class="d-flex align-items-center">
-                        <i class="side-menu__icon fe fe-target me-2 mb-3"></i>
-                        <span class="side-menu__label tx-15 bold">Leads System</span>
-                    </div>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                <ul class="slide-menu">
-                    <li><a class="slide-item" href="{{ route('lead-magnet-types.index') }}">Lead Magnet Types</a></li>
-                    <li><a class="slide-item" href="{{ route('lead-magnets.index') }}">Lead Magnets</a></li>
-                    <li><a class="slide-item" href="{{ route('leads.index') }}">Leads</a></li>
-                </ul>
-            </li>
-        @endif
-
-        @if(in_array('settings', $tenantOptions) || in_array('social_integration', $tenantOptions) || in_array('ai_settings', $tenantOptions) || in_array('sitemaps', $tenantOptions) || in_array('failed_jobs', $tenantOptions) || in_array('images_uploader', $tenantOptions))
+        {{-- Settings --}}
+        @if((in_array('settings', $tenantOptions) || in_array('social_integration', $tenantOptions) || in_array('ai_settings', $tenantOptions) || in_array('sitemaps', $tenantOptions) || in_array('failed_jobs', $tenantOptions) || in_array('images_uploader', $tenantOptions)) && auth()->user()->hasPermission('manage_settings'))
             <li class="slide">
                 <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
                    href="#">
@@ -270,6 +284,24 @@
 
     </ul>
 </aside>
+{{-- Leads System --}}
+@if(in_array('leads', $tenantOptions))
+    <li class="slide">
+        <a class="side-menu__item d-flex align-items-center justify-content-between" data-bs-toggle="slide"
+           href="#">
+            <div class="d-flex align-items-center">
+                <i class="side-menu__icon fe fe-target me-2 mb-3"></i>
+                <span class="side-menu__label tx-15 bold">Leads System</span>
+            </div>
+            <i class="angle fe fe-chevron-down"></i>
+        </a>
+        <ul class="slide-menu">
+            <li><a class="slide-item" href="{{ route('lead-magnet-types.index') }}">Lead Magnet Types</a></li>
+            <li><a class="slide-item" href="{{ route('lead-magnets.index') }}">Lead Magnets</a></li>
+            <li><a class="slide-item" href="{{ route('leads.index') }}">Leads</a></li>
+        </ul>
+    </li>
+@endif
 @if(in_array('offers', $tenantOptions))
     <li class="slide">
         <a class="side-menu__item" data-bs-toggle="slide" href="#">

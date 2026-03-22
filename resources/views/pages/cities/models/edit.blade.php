@@ -14,10 +14,19 @@
                 </div>
 
                 <div class="modal-body custom-modal-body">
-                    {{-- Select State --}}
+                    {{-- Select Country for Edit --}}
+                    <div class="mb-4">
+                        <label class="form-label custom-label">Country</label>
+                        <select name="country_id" id="edit-country_id" class="form-select custom-select">
+                            <option value="" disabled>-- Select Country --</option>
+                            @foreach($countries as $country)
+                                <option value="{{ $country->id }}">{{ $country->title_en }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="mb-4">
                         <label class="form-label custom-label">State / Region</label>
-                        <select name="state_id" id="edit-state_id" class="form-select custom-select" required>
+                        <select name="state_id" id="edit-state_id" class="form-select custom-select">
                             @foreach($states as $state)
                                 <option value="{{ $state->id }}">
                                     {{ $state->title_en }} ({{ $state->country->title_en ?? 'N/A' }})

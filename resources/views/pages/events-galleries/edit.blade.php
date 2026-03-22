@@ -197,7 +197,7 @@
         <div class="my-auto">
             <div class="d-flex align-items-center">
                 <a href="{{ route('dashboard') }}" class="content-title mb-0 my-auto text-dark hover-primary">Home</a>
-                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/ Edit Gallery</span>
+                <span class="text-muted mt-1 tx-13 ms-2 mb-0">/ Edit Attraction</span>
             </div>
         </div>
     </div>
@@ -243,8 +243,20 @@
 
                                 <div class="col-12 my-2"></div>
 
+                                {{-- Country Selection --}}
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Country <span class="text-danger">*</span></label>
+                                    <select name="country_id" class="form-select" required>
+                                        <option value="" disabled>-- Select Country --</option>
+                                        @foreach($countries as $country)
+                                            <option
+                                                value="{{ $country->id }}" {{ $eventGallery->country_id == $country->id ? 'selected' : '' }}>{{ transDB($country, 'title') ?? $country->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
                                 {{-- Status & Feature & Order --}}
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Status</label>
                                     <select name="status" class="form-select">
                                         <option value="1" {{ $eventGallery->status == 1 ? 'selected' : '' }}>Active
@@ -254,7 +266,7 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Feature</label>
                                     <select name="is_feature" class="form-select">
                                         <option value="1" {{ $eventGallery->is_feature == 1 ? 'selected' : '' }}>
@@ -266,7 +278,7 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <label class="form-label">Order <span class="text-danger">*</span></label>
                                     <select name="order" class="form-select" required>
                                         <option value="" disabled>-- Select --</option>
@@ -278,7 +290,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="step-content" id="step-2">
                             <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 2: Gallery Media</h5>
 
@@ -333,16 +344,21 @@
                                             @foreach($eventGallery->galleries as $item)
                                                 @if(str_contains($item->image, 'youtube.com') || str_contains($item->image, 'youtu.be'))
                                                     <div class="input-group mb-2 youtube-row">
-                                                        <span class="input-group-text bg-white"><i class="fab fa-youtube text-danger"></i></span>
-                                                        <input type="url" name="youtube_links[]" class="form-control" placeholder="https://www.youtube.com/watch?v=..." value="{{ $item->image }}">
-                                                        <button type="button" class="btn btn-danger remove-youtube-row"><i class="fas fa-trash"></i></button>
+                                                        <span class="input-group-text bg-white"><i
+                                                                class="fab fa-youtube text-danger"></i></span>
+                                                        <input type="url" name="youtube_links[]" class="form-control"
+                                                               placeholder="https://www.youtube.com/watch?v=..."
+                                                               value="{{ $item->image }}">
+                                                        <button type="button" class="btn btn-danger remove-youtube-row">
+                                                            <i class="fas fa-trash"></i></button>
                                                     </div>
                                                 @endif
                                             @endforeach
                                         @endif
                                     </div>
 
-                                    <button type="button" class="btn btn-outline-danger btn-sm mt-2" id="add_youtube_link">
+                                    <button type="button" class="btn btn-outline-danger btn-sm mt-2"
+                                            id="add_youtube_link">
                                         <i class="fas fa-plus me-1"></i> Add YouTube Link
                                     </button>
                                 </div>
@@ -412,7 +428,7 @@
                                     Next <i class="fas fa-arrow-right ms-1"></i>
                                 </button>
                                 <button type="submit" class="btn btn-success px-5" id="submitBtn" style="display:none;">
-                                    <i class="fas fa-check-circle me-1"></i> Update Gallery
+                                    <i class="fas fa-check-circle me-1"></i> Update Attraction
                                 </button>
                             </div>
                         </div>
@@ -540,7 +556,7 @@
 
         });
         // --- YouTube Repeater Logic ---
-        $('#add_youtube_link').click(function() {
+        $('#add_youtube_link').click(function () {
             let row = `
         <div class="input-group mb-2 youtube-row">
             <span class="input-group-text bg-white"><i class="fab fa-youtube text-danger"></i></span>
@@ -551,7 +567,7 @@
             $('#youtube_repeater_container').append(row);
         });
 
-        $(document).on('click', '.remove-youtube-row', function() {
+        $(document).on('click', '.remove-youtube-row', function () {
             $(this).closest('.youtube-row').remove();
         });
     </script>
