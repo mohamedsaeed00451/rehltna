@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Item extends Model
 {
     use softDeletes;
+
     protected $guarded = [];
     protected $connection = 'tenant';
 
@@ -20,6 +21,7 @@ class Item extends Model
     {
         return $this->hasMany(ItemPackage::class, 'item_id');
     }
+
     public function itemType(): BelongsTo
     {
         return $this->belongsTo(ItemType::class, 'item_type_id');
@@ -35,6 +37,11 @@ class Item extends Model
         return $this->hasMany(ItemItinerary::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function students(): BelongsToMany
     {
         return $this->belongsToMany(ResidencyUser::class, 'item_residency_users', 'item_id', 'residency_user_id')
@@ -42,7 +49,7 @@ class Item extends Model
             ->withTimestamps();
     }
 
-    protected $appends = ['coupons','price_after_discount', 'is_active_feature'];
+    protected $appends = ['coupons', 'price_after_discount', 'is_active_feature'];
 
     protected $hidden = ['assignedCoupons'];
 
@@ -88,6 +95,7 @@ class Item extends Model
     {
         return $this->belongsToMany(Coupon::class, 'coupon_items');
     }
+
     public function getCouponsAttribute()
     {
         $validSpecificCoupons = $this->assignedCoupons->filter(function ($coupon) {

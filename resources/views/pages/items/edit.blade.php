@@ -280,6 +280,21 @@
                                                                                                           required>@for($i=1;$i<=5;$i++)
                                             <option value="{{$i}}" {{$item->order==$i?'selected':''}}>{{$i}}</option>
                                         @endfor</select></div>
+                                @if(checkIfAdmin())
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">Responsible Employee <span
+                                                class="text-danger">*</span></label>
+                                        <select name="user_id" class="form-select" required>
+                                            <option value="">-- Select Employee --</option>
+                                            @foreach($employees as $employee)
+                                                <option
+                                                    value="{{ $employee->id }}" {{ $item->user_id == $employee->id ? 'selected' : '' }}>
+                                                    {{ $employee->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -400,21 +415,30 @@
 
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Discount</label>
-                                    <input type="number" name="discount" class="form-control" value="{{ $item->discount }}" step="0.01" min="0">
+                                    <input type="number" name="discount" class="form-control"
+                                           value="{{ $item->discount }}" step="0.01" min="0">
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Discount Type</label>
                                     <select name="discount_type" class="form-select">
-                                        <option value="amount" {{ $item->discount_type == 'amount' ? 'selected' : '' }}>Amount (SAR)</option>
-                                        <option value="percent" {{ $item->discount_type == 'percent' ? 'selected' : '' }}>Percentage (%)</option>
+                                        <option value="amount" {{ $item->discount_type == 'amount' ? 'selected' : '' }}>
+                                            Amount (SAR)
+                                        </option>
+                                        <option
+                                            value="percent" {{ $item->discount_type == 'percent' ? 'selected' : '' }}>
+                                            Percentage (%)
+                                        </option>
                                     </select>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Stock Status</label>
                                     <select name="out_of_stock" class="form-select">
-                                        <option value="0" {{ $item->out_of_stock == 0 ? 'selected' : '' }}>In Stock</option>
-                                        <option value="1" {{ $item->out_of_stock == 1 ? 'selected' : '' }}>Out of Stock</option>
+                                        <option value="0" {{ $item->out_of_stock == 0 ? 'selected' : '' }}>In Stock
+                                        </option>
+                                        <option value="1" {{ $item->out_of_stock == 1 ? 'selected' : '' }}>Out of
+                                            Stock
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -482,19 +506,22 @@
                             <h6 class="text-dark fw-bold mb-3">Contact Information</h6>
                             <div class="row mb-4">
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label"><i class="fab fa-whatsapp text-success"></i> WhatsApp Number <span class="text-danger">*</span></label>
+                                    <label class="form-label"><i class="fab fa-whatsapp text-success"></i> WhatsApp
+                                        Number <span class="text-danger">*</span></label>
                                     <input type="text" name="whatsapp" class="form-control"
                                            placeholder="+9665xxxxxxxx"
                                            value="{{ $item->whatsapp ?? old('whatsapp') }}" required>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label"><i class="fas fa-phone-alt text-primary"></i> Quick Contact <span class="text-danger">*</span></label>
+                                    <label class="form-label"><i class="fas fa-phone-alt text-primary"></i> Quick
+                                        Contact <span class="text-danger">*</span></label>
                                     <input type="text" name="quick_contact" class="form-control"
                                            placeholder="e.g. 05xxxxxxxx"
                                            value="{{ $item->quick_contact ?? old('quick_contact') }}" required>
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label"><i class="fas fa-headset text-info"></i> Contact Us URL/Number <span class="text-danger">*</span></label>
+                                    <label class="form-label"><i class="fas fa-headset text-info"></i> Contact Us
+                                        URL/Number <span class="text-danger">*</span></label>
                                     <input type="text" name="contact_us" class="form-control"
                                            placeholder="Link or info"
                                            value="{{ $item->contact_us ?? old('contact_us') }}" required>
@@ -615,7 +642,7 @@
 
                         <div class="step-content" id="step-5">
 
-                            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 5:  SEO Configuration</h5>
+                            <h5 class="mb-4 text-primary fw-bold border-bottom pb-2">Step 5: SEO Configuration</h5>
 
                             <div class="mb-4">
                                 <label class="form-label">Meta Image</label>

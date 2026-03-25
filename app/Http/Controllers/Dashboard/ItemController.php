@@ -12,6 +12,7 @@ use App\Models\Item;
 use App\Models\ItemType;
 use App\Models\NotificationTemplate;
 use App\Models\ResidencyUser;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,7 +30,11 @@ class ItemController extends Controller
      */
     public function index(): view
     {
-        $items = Item::query()->orderByDesc('id')->paginate(10);
+        $query = Item::query();
+        if (!checkIfAdmin()) {
+            $query->where('user_id', auth()->id());
+        }
+        $items = $query->with('user')->orderByDesc('id')->paginate(10);
         $templates = NotificationTemplate::all();
         return view('pages.items.index', compact('items', 'templates'));
     }
@@ -41,7 +46,8 @@ class ItemController extends Controller
     {
         $itemTypes = ItemType::all();
         $cities = City::all();
-        return view('pages.items.create', compact('itemTypes', 'cities'));
+        $employees = User::query()->whereNot('role', 'admin')->get();
+        return view('pages.items.create', compact('itemTypes', 'cities', 'employees'));
     }
 
     /**
@@ -59,6 +65,12 @@ class ItemController extends Controller
             }
 
             $data = $request->except($fieldsToExclude);
+            if (checkIfAdmin()) {
+                $request->validate(['user_id' => 'required|exists:users,id']);
+                $data['user_id'] = $request->input('user_id');
+            } else {
+                $data['user_id'] = auth()->id();
+            }
 
             if (empty($data['discount'])) {
                 $data['discount'] = 0;
@@ -165,7 +177,8 @@ class ItemController extends Controller
         $item = Item::query()->findOrFail(decrypt($id));
         $itemTypes = ItemType::all();
         $cities = City::all();
-        return view('pages.items.edit', compact('item', 'itemTypes', 'cities'));
+        $employees = User::query()->whereNot('role', 'admin')->get();
+        return view('pages.items.edit', compact('item', 'itemTypes', 'cities', 'employees'));
     }
 
     /**
@@ -185,6 +198,12 @@ class ItemController extends Controller
             }
 
             $data = $request->except($fieldsToExclude);
+
+            if (checkIfAdmin()) {
+                $data['user_id'] = $request->input('user_id');
+            } else {
+                unset($data['user_id']);
+            }
 
             if (empty($data['discount'])) {
                 $data['discount'] = 0;

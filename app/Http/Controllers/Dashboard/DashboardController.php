@@ -55,7 +55,7 @@ class DashboardController extends Controller
         $offersPerMonth = array_values($offersPerMonth);
 
         // ===== Items =====
-        $itemsRaw = Item::query()
+        $itemsRaw = Item::query()->when(!checkIfAdmin(), fn($query) => $query->where('user_id', auth()->id()))
             ->where('status', 1)
             ->whereYear('created_at', now()->year)
             ->selectRaw('MONTH(created_at) as month, COUNT(*) as total')
@@ -88,7 +88,11 @@ class DashboardController extends Controller
         $stats = [
             'blogs' => ['count' => Blog::query()->count()],
             'offers' => ['count' => Offer::query()->count()],
-            'items' => ['count' => Item::query()->count()],
+            'items' => [
+                'count' => Item::query()
+                    ->when(!checkIfAdmin(), fn($query) => $query->where('user_id', auth()->id()))
+                    ->count()
+            ],
             'jobs' => ['count' => Career::query()->count()],
             'leads' => ['count' => Lead::query()->count()],
             'subscribes' => ['count' => Subscribe::query()->count()],
