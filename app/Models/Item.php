@@ -32,6 +32,11 @@ class Item extends Model
         return $this->morphMany(Gallery::class, 'galleryable')->where('type', 'general');
     }
 
+    public function privateGalleries(): MorphMany
+    {
+        return $this->morphMany(Gallery::class, 'galleryable')->where('type', 'private');
+    }
+
     public function itineraries(): HasMany
     {
         return $this->hasMany(ItemItinerary::class);

@@ -59,7 +59,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights'];
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
             }
@@ -99,9 +99,17 @@ class ItemController extends Controller
             $item->save();
 
             if ($request->has('gallery')) {
-                $item->galleries()->delete();
                 foreach ($request->input('gallery') as $imagePath) {
                     $item->galleries()->create(['image' => $this->cleanPath($imagePath)]);
+                }
+            }
+
+            if ($request->has('private_gallery')) {
+                foreach ($request->input('private_gallery') as $filePath) {
+                    $item->privateGalleries()->create([
+                        'image' => $this->cleanPath($filePath),
+                        'type' => 'private'
+                    ]);
                 }
             }
 
@@ -110,7 +118,6 @@ class ItemController extends Controller
                 $starts = $request->input('itinerary_start');
                 $ends = $request->input('itinerary_end');
                 $nights = $request->input('itinerary_nights');
-
                 foreach ($cityIds as $index => $cityId) {
                     if (!empty($cityId) && !empty($starts[$index])) {
                         $item->itineraries()->create([
@@ -192,7 +199,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights'];
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
             }
@@ -241,13 +248,24 @@ class ItemController extends Controller
                 $item->galleries()->delete();
             }
 
+            if ($request->has('private_gallery')) {
+                $item->privateGalleries()->delete();
+                foreach ($request->input('private_gallery') as $filePath) {
+                    $item->privateGalleries()->create([
+                        'image' => $this->cleanPath($filePath),
+                        'type' => 'private'
+                    ]);
+                }
+            } elseif ($request->has('private_gallery_cleared')) {
+                $item->privateGalleries()->delete();
+            }
+
             if ($request->has('itinerary_city_id')) {
                 $item->itineraries()->delete();
                 $cityIds = $request->input('itinerary_city_id');
                 $starts = $request->input('itinerary_start');
                 $ends = $request->input('itinerary_end');
                 $nights = $request->input('itinerary_nights');
-
                 foreach ($cityIds as $index => $cityId) {
                     if (!empty($cityId) && !empty($starts[$index])) {
                         $item->itineraries()->create([
@@ -280,11 +298,10 @@ class ItemController extends Controller
     public function destroy($id): RedirectResponse
     {
         try {
-
             $item = Item::query()->findOrFail($id);
             $item->galleries()->delete();
+            $item->privateGalleries()->delete();
             $item->delete();
-
             return redirect()->route('items.index')->with('success', 'Item deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Oops! Something went wrong');
@@ -352,7 +369,6 @@ class ItemController extends Controller
         $item = Item::query()->findOrFail($id);
         $item->out_of_stock = $item->out_of_stock == 1 ? 0 : 1;
         $item->save();
-
         return response()->json(['out_of_stock' => $item->out_of_stock]);
     }
 
@@ -484,7 +500,7 @@ class ItemController extends Controller
         return back()->with('success', 'Items imported successfully!');
     }
 
-    private function downloadGoogleImage($url, string $dist, string $prefix = null)
+    private function downloadGoogleImage($url, string $dist, string $prefix = null): ?string
     {
         try {
             preg_match('/\/d\/(.*?)\//', $url, $matches);
@@ -527,18 +543,15 @@ class ItemController extends Controller
         return null;
     }
 
-
-    public function generateSlug($slugModel, $title)
+    public function generateSlug($slugModel, $title): string
     {
         $slug = Str::slug($title, '-');
         $original = $slug;
         $counter = 1;
-
         while (Item::where($slugModel, $slug)->exists()) {
             $slug = $original . '-' . $counter;
             $counter++;
         }
-
         return $slug;
     }
 

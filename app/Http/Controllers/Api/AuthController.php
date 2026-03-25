@@ -83,7 +83,6 @@ class AuthController extends Controller
 
         $user->tokens()->delete();
         $token = $user->createToken('api-token')->plainTextToken;
-
         $user->acssess_token = $token;
         $user->token_type = 'Bearer';
 
@@ -103,7 +102,6 @@ class AuthController extends Controller
         $code = rand(100000, 999999);
 
         PasswordResetCode::query()->where('email', $request->get('email'))->delete();
-
         PasswordResetCode::query()->create([
             'email' => $request->get('email'),
             'code' => $code,
@@ -118,7 +116,6 @@ class AuthController extends Controller
         return $this->responseMessage(201, 'Check your email for password reset code');
 
     }
-
     public function resetPassword(Request $request): JsonResponse
     {
         $request->validate([
@@ -146,27 +143,22 @@ class AuthController extends Controller
 
         $user->password = Hash::make($request->get('password'));
         $user->save();
-
         PasswordResetCode::query()->where('email', $request->get('email'))->delete();
-
         $user->tokens()->delete();
 
         return $this->responseMessage(201, 'Password reset successful');
 
     }
-
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()?->delete();
         return $this->responseMessage(200, 'Logged out');
     }
-
     public function profile(): JsonResponse
     {
         $user = auth()->user();
-        return $this->responseMessage(200, 'Profile', $user->load('package', 'orders', 'items'));
+        return $this->responseMessage(200, 'Profile', $user->load('package', 'orders', 'items.privateGalleries'));
     }
-
     public function updateFcmToken(Request $request): JsonResponse
     {
         $request->validate([
