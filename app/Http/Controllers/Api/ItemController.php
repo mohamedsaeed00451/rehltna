@@ -16,19 +16,96 @@ class ItemController extends Controller
     public function getItems(Request $request): JsonResponse
     {
         $query = Item::query()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city');
-        if ($request->get('search')) {
-            $query = $query->where(function ($query) use ($request) {
-                $query->where('title_en', 'like', '%' . $request->get('search') . '%')
-                    ->orWhere('title_ar', 'like', '%' . $request->get('search') . '%')
-                    ->orWhere('title_fr', 'like', '%' . $request->get('search') . '%')
-                    ->orWhere('title_de', 'like', '%' . $request->get('search') . '%');
+
+        if ($request->filled('search')) {
+            $keyword = trim($request->get('search'));
+            $lowerKeyword = mb_strtolower($keyword, 'UTF-8');
+            $gregorianMonths = [
+                'january' => '01', 'يناير' => '01',
+                'february' => '02', 'فبراير' => '02',
+                'march' => '03', 'مارس' => '03',
+                'april' => '04', 'ابريل' => '04', 'إبريل' => '04',
+                'may' => '05', 'مايو' => '05',
+                'june' => '06', 'يونيو' => '06',
+                'july' => '07', 'يوليو' => '07',
+                'august' => '08', 'اغسطس' => '08', 'أغسطس' => '08',
+                'september' => '09', 'سبتمبر' => '09',
+                'october' => '10', 'اكتوبر' => '10', 'أكتوبر' => '10',
+                'november' => '11', 'نوفمبر' => '11',
+                'december' => '12', 'ديسمبر' => '12',
+            ];
+
+            $hijriMonths = [
+                'muharram' => '01', 'محرم' => '01',
+                'safar' => '02', 'صفر' => '02',
+                'rabi al-awwal' => '03', 'ربيع الأول' => '03', 'ربيع الاول' => '03',
+                'rabi al-thani' => '04', 'ربيع الثاني' => '04', 'ربيع الاخر' => '04',
+                'jumada al-awwal' => '05', 'جمادى الأول' => '05', 'جمادى الاولى' => '05',
+                'jumada al-thani' => '06', 'جمادى الثاني' => '06', 'جمادى الاخرة' => '06',
+                'rajab' => '07', 'رجب' => '07',
+                'shaaban' => '08', 'شعبان' => '08',
+                'ramadan' => '09', 'رمضان' => '09',
+                'shawwal' => '10', 'شوال' => '10',
+                'dhu al-qadah' => '11', 'ذو القعدة' => '11',
+                'dhu al-hijjah' => '12', 'ذو الحجة' => '12',
+            ];
+
+            $matchedGregMonths = [];
+            $matchedHijriMonths = [];
+
+            foreach ($gregorianMonths as $name => $num) {
+                if (mb_strpos($lowerKeyword, $name) !== false) $matchedGregMonths[] = $num;
+            }
+            foreach ($hijriMonths as $name => $num) {
+                if (mb_strpos($lowerKeyword, $name) !== false) $matchedHijriMonths[] = $num;
+            }
+
+            $query->where(function ($q) use ($keyword, $matchedGregMonths, $matchedHijriMonths) {
+
+                $q->where('title_en', 'like', "%{$keyword}%")
+                    ->orWhere('title_ar', 'like', "%{$keyword}%")
+                    ->orWhere('season', 'like', "%{$keyword}%")
+                    ->orWhere('start_date_hijri', 'like', "%{$keyword}%")
+                    ->orWhere('end_date_hijri', 'like', "%{$keyword}%")
+                    ->orWhere('start_date', 'like', "%{$keyword}%")
+                    ->orWhere('end_date', 'like', "%{$keyword}%");
+
+                $q->orWhereHas('itemType', function ($typeQ) use ($keyword) {
+                    $typeQ->where('title_ar', 'like', "%{$keyword}%")
+                        ->orWhere('title_en', 'like', "%{$keyword}%");
+                });
+
+                $q->orWhereHas('itineraries.city', function ($cityQ) use ($keyword) {
+                    $cityQ->where('title_ar', 'like', "%{$keyword}%")
+                        ->orWhere('title_en', 'like', "%{$keyword}%");
+                });
+
+                if (!empty($matchedGregMonths)) {
+                    $q->orWhere(function ($monthQ) use ($matchedGregMonths) {
+                        foreach ($matchedGregMonths as $monthNum) {
+                            $monthQ->orWhereMonth('start_date', $monthNum)
+                                ->orWhereMonth('end_date', $monthNum);
+                        }
+                    });
+                }
+
+                if (!empty($matchedHijriMonths)) {
+                    $q->orWhere(function ($hijriQ) use ($matchedHijriMonths) {
+                        foreach ($matchedHijriMonths as $monthNum) {
+                            $hijriQ->orWhere('start_date_hijri', 'like', "%-{$monthNum}-%")
+                                ->orWhere('start_date_hijri', 'like', "%/{$monthNum}/%")
+                                ->orWhere('end_date_hijri', 'like', "%-{$monthNum}-%")
+                                ->orWhere('end_date_hijri', 'like', "%/{$monthNum}/%");
+                        }
+                    });
+                }
             });
         }
 
         $Items = $query->orderByDesc('id')->paginate(10);
-        $total = $Items->total();
+
         $data = [
-            'items_count' => $total,
+            'items_count' => $Items->total(),
             'items' => $Items,
         ];
 
