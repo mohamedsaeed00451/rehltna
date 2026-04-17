@@ -555,6 +555,16 @@
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </div>
+                                            <div class="col-md-12 mt-2">
+                                                <label class="form-label text-dark fw-bold">City Map Link</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-white"><i
+                                                            class="fas fa-map-marker-alt text-danger"></i></span>
+                                                    <input type="text" name="itinerary_map[]" class="form-control"
+                                                           placeholder="Google Maps Link"
+                                                           value="{{ $itin->map ?? '' }}">
+                                                </div>
+                                            </div>
                                         </div>
                                     @endforeach
                                 @else
@@ -600,6 +610,105 @@
                                                     style="height: 46px; border-radius: 8px;" title="Remove">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
+                                        </div>
+                                        <div class="col-md-12 mt-2">
+                                            <label class="form-label text-dark fw-bold">City Map Link</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white"><i
+                                                        class="fas fa-map-marker-alt text-danger"></i></span>
+                                                <input type="text" name="itinerary_map[]" class="form-control"
+                                                       placeholder="Google Maps Link" value="{{ $itin->map ?? '' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="col-12">
+                                <hr class="my-4 border-light">
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="text-dark fw-bold mb-0"><i class="fas fa-route me-2 text-primary"></i> Trip
+                                    Route (Steps)</h6>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addRouteRow()">
+                                    <i class="fas fa-plus me-1"></i> Add Route Step
+                                </button>
+                            </div>
+
+                            <div id="route-repeater">
+                                @if(isset($item) && $item->routes && $item->routes->count() > 0)
+                                    @foreach($item->routes as $route)
+                                        @php $uid = uniqid(); @endphp
+                                        <div class="row route-row mb-3 align-items-center p-3 rounded"
+                                             style="background-color: #fff; border: 1px dashed #ced4da;">
+                                            <div class="col-md-4 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Title (EN)</label>
+                                                <input type="text" name="route_title_en[]" class="form-control"
+                                                       value="{{ $route->title_en }}" required>
+                                            </div>
+                                            <div class="col-md-4 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Title (AR)</label>
+                                                <input type="text" name="route_title_ar[]" class="form-control"
+                                                       value="{{ $route->title_ar }}">
+                                            </div>
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Icon/Image</label>
+                                                <div class="media-selector-group">
+                                                    <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]"
+                                                           readonly placeholder="Icon..."
+                                                           value="{{ $route->icon ? asset($route->icon) : '' }}"
+                                                           onclick="$('#btn_route_{{ $uid }}').click()">
+                                                    <button type="button" id="btn_route_{{ $uid }}"
+                                                            class="btn btn-primary btn-choose open-gallery"
+                                                            data-input="route_icon_{{ $uid }}"
+                                                            data-preview="preview_route_{{ $uid }}">Choose
+                                                    </button>
+                                                </div>
+                                                <div id="preview_route_{{ $uid }}" class="mt-1">
+                                                    @if($route->icon)
+                                                        <img src="{{ asset($route->icon) }}" width="40" height="40"
+                                                             class="rounded">
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1 mt-4 text-center">
+                                                <button type="button"
+                                                        class="btn btn-danger remove-route-row w-100 shadow-sm"
+                                                        title="Remove"><i class="fas fa-times"></i></button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    @php $uid = uniqid(); @endphp
+                                    <div class="row route-row mb-3 align-items-center p-3 rounded"
+                                         style="background-color: #fff; border: 1px dashed #ced4da;">
+                                        <div class="col-md-4 mb-2 mb-md-0">
+                                            <label class="form-label fw-bold">Title (EN)</label>
+                                            <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Day 1: Arrival">
+                                        </div>
+                                        <div class="col-md-4 mb-2 mb-md-0">
+                                            <label class="form-label fw-bold">Title (AR)</label>
+                                            <input type="text" name="route_title_ar[]" class="form-control" placeholder="اليوم الأول: الوصول">
+                                        </div>
+                                        <div class="col-md-3 mb-2 mb-md-0">
+                                            <label class="form-label fw-bold">Icon/Image</label>
+                                            <div class="media-selector-group">
+                                                <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]"
+                                                       readonly placeholder="Icon..."
+                                                       onclick="$('#btn_route_{{ $uid }}').click()">
+                                                <button type="button" id="btn_route_{{ $uid }}"
+                                                        class="btn btn-primary btn-choose open-gallery"
+                                                        data-input="route_icon_{{ $uid }}"
+                                                        data-preview="preview_route_{{ $uid }}">Choose
+                                                </button>
+                                            </div>
+                                            <div id="preview_route_{{ $uid }}" class="mt-1"></div>
+                                        </div>
+                                        <div class="col-md-1 mt-4 text-center">
+                                            <button type="button"
+                                                    class="btn btn-danger remove-route-row w-100 shadow-sm"
+                                                    title="Remove"><i class="fas fa-times"></i></button>
                                         </div>
                                     </div>
                                 @endif
@@ -841,6 +950,38 @@
                 }
             }
 
+            window.addRouteRow = function () {
+                let uid = Date.now();
+                let rowHtml = `
+        <div class="row route-row mb-3 align-items-center p-3 rounded" style="background-color: #fff; border: 1px dashed #ced4da; animation: fadeIn 0.3s;">
+            <div class="col-md-4 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Title (EN)</label>
+                <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Day 1: Arrival" required>
+            </div>
+            <div class="col-md-4 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Title (AR)</label>
+                <input type="text" name="route_title_ar[]" class="form-control" placeholder="اليوم الأول: الوصول">
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Icon/Image</label>
+                <div class="media-selector-group">
+                    <input type="text" id="route_icon_${uid}" name="route_icon[]" readonly placeholder="Icon..." onclick="$('#btn_route_${uid}').click()">
+                    <button type="button" id="btn_route_${uid}" class="btn btn-primary btn-choose open-gallery" data-input="route_icon_${uid}" data-preview="preview_route_${uid}">Choose</button>
+                </div>
+                <div id="preview_route_${uid}" class="mt-1"></div>
+            </div>
+            <div class="col-md-1 mt-4 text-center">
+                <button type="button" class="btn btn-danger remove-route-row w-100 shadow-sm"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+    `;
+                document.getElementById('route-repeater').insertAdjacentHTML('beforeend', rowHtml);
+            }
+
+            $(document).on('click', '.remove-route-row', function () {
+                $(this).closest('.route-row').remove();
+            });
+
             window.addItineraryRow = function () {
                 let cityOptions = '<option value="">-- Select City --</option>';
                 @foreach($cities as $city)
@@ -871,6 +1012,13 @@
                             <button type="button" class="btn btn-danger remove-row w-100 shadow-sm" style="height: 46px; border-radius: 8px;" title="Remove">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <label class="form-label text-dark fw-bold">City Map Link</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt text-danger"></i></span>
+                                <input type="text" name="itinerary_map[]" class="form-control" placeholder="Google Maps Link">
+                            </div>
                         </div>
                     </div>
                 `;

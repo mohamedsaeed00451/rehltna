@@ -59,7 +59,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon'];
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
             }
@@ -114,10 +114,16 @@ class ItemController extends Controller
             }
 
             if ($request->has('itinerary_city_id')) {
+                if (isset($item)) {
+                    $item->itineraries()->delete();
+                }
+
                 $cityIds = $request->input('itinerary_city_id');
                 $starts = $request->input('itinerary_start');
                 $ends = $request->input('itinerary_end');
                 $nights = $request->input('itinerary_nights');
+                $maps = $request->input('itinerary_map');
+
                 foreach ($cityIds as $index => $cityId) {
                     if (!empty($cityId) && !empty($starts[$index])) {
                         $item->itineraries()->create([
@@ -125,8 +131,37 @@ class ItemController extends Controller
                             'start_date' => $starts[$index],
                             'end_date' => $ends[$index],
                             'nights' => $nights[$index] ?? 0,
+                            'map' => $maps[$index] ?? null,
                         ]);
                     }
+                }
+            } else {
+                if (isset($item)) {
+                    $item->itineraries()->delete();
+                }
+            }
+
+            if ($request->has('route_title_en')) {
+                if (isset($item)) {
+                    $item->routes()->delete();
+                }
+
+                $routeEn = $request->input('route_title_en');
+                $routeAr = $request->input('route_title_ar');
+                $routeIcons = $request->input('route_icon');
+
+                foreach ($routeEn as $index => $titleEn) {
+                    if (!empty($titleEn) || !empty($routeAr[$index])) {
+                        $item->routes()->create([
+                            'title_en' => $titleEn,
+                            'title_ar' => $routeAr[$index] ?? null,
+                            'icon' => isset($routeIcons[$index]) ? $this->cleanPath($routeIcons[$index]) : null,
+                        ]);
+                    }
+                }
+            } else {
+                if (isset($item)) {
+                    $item->routes()->delete();
                 }
             }
 
@@ -199,7 +234,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon'];
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
             }
@@ -261,11 +296,16 @@ class ItemController extends Controller
             }
 
             if ($request->has('itinerary_city_id')) {
-                $item->itineraries()->delete();
+                if (isset($item)) {
+                    $item->itineraries()->delete();
+                }
+
                 $cityIds = $request->input('itinerary_city_id');
                 $starts = $request->input('itinerary_start');
                 $ends = $request->input('itinerary_end');
                 $nights = $request->input('itinerary_nights');
+                $maps = $request->input('itinerary_map');
+
                 foreach ($cityIds as $index => $cityId) {
                     if (!empty($cityId) && !empty($starts[$index])) {
                         $item->itineraries()->create([
@@ -273,11 +313,38 @@ class ItemController extends Controller
                             'start_date' => $starts[$index],
                             'end_date' => $ends[$index],
                             'nights' => $nights[$index] ?? 0,
+                            'map' => $maps[$index] ?? null,
                         ]);
                     }
                 }
             } else {
-                $item->itineraries()->delete();
+                if (isset($item)) {
+                    $item->itineraries()->delete();
+                }
+            }
+
+            if ($request->has('route_title_en')) {
+                if (isset($item)) {
+                    $item->routes()->delete();
+                }
+
+                $routeEn = $request->input('route_title_en');
+                $routeAr = $request->input('route_title_ar');
+                $routeIcons = $request->input('route_icon');
+
+                foreach ($routeEn as $index => $titleEn) {
+                    if (!empty($titleEn) || !empty($routeAr[$index])) {
+                        $item->routes()->create([
+                            'title_en' => $titleEn,
+                            'title_ar' => $routeAr[$index] ?? null,
+                            'icon' => isset($routeIcons[$index]) ? $this->cleanPath($routeIcons[$index]) : null,
+                        ]);
+                    }
+                }
+            } else {
+                if (isset($item)) {
+                    $item->routes()->delete();
+                }
             }
 
             $item->fill($data);
