@@ -59,7 +59,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type'];
 
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
@@ -73,9 +73,6 @@ class ItemController extends Controller
                 $data['user_id'] = auth()->id();
             }
 
-            if (empty($data['discount'])) {
-                $data['discount'] = 0;
-            }
 
             if ($request->get('is_feature') == 1) {
                 $data['featured_at'] = now();
@@ -93,6 +90,12 @@ class ItemController extends Controller
 
             if ($request->hasFile('pdf')) {
                 $data['pdf'] = uploadFile($request->file('pdf'), 'pdfs', 'pdf');
+            }
+
+            if ($request->has('price_value') && count($request->price_value) > 0) {
+                $data['price'] = $request->price_value[0] ?? 0;
+                $data['discount'] = $request->price_discount[0] ?? 0;
+                $data['discount_type'] = $request->price_discount_type[0] ?? 'amount';
             }
 
             $item = Item::query()->create($data);
@@ -171,6 +174,28 @@ class ItemController extends Controller
 
             }
 
+            if ($request->has('price_value')) {
+                if (isset($item)) { $item->prices()->delete(); }
+
+                $pTitlesAr = $request->input('price_title_ar');
+                $pTitlesEn = $request->input('price_title_en');
+                $pValues = $request->input('price_value');
+                $pDiscounts = $request->input('price_discount');
+                $pTypes = $request->input('price_discount_type');
+
+                foreach ($pValues as $index => $val) {
+                    if (!empty($val) || $val === '0') {
+                        $item->prices()->create([
+                            'title_ar' => $pTitlesAr[$index] ?? null,
+                            'title_en' => $pTitlesEn[$index] ?? null,
+                            'price' => $val,
+                            'discount' => $pDiscounts[$index] ?? 0,
+                            'discount_type' => $pTypes[$index] ?? 'amount',
+                        ]);
+                    }
+                }
+            }
+
             try {
                 $template = NotificationTemplate::inRandomOrder()->first();
                 if ($template) {
@@ -240,7 +265,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type'];
 
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
@@ -252,10 +277,6 @@ class ItemController extends Controller
                 $data['user_id'] = $request->input('user_id');
             } else {
                 unset($data['user_id']);
-            }
-
-            if (empty($data['discount'])) {
-                $data['discount'] = 0;
             }
 
             if ($request->has('is_feature')) {
@@ -360,6 +381,34 @@ class ItemController extends Controller
                     $item->routes()->delete();
                 }
 
+            }
+
+            if ($request->has('price_value')) {
+                if (isset($item)) { $item->prices()->delete(); }
+
+                $pTitlesAr = $request->input('price_title_ar');
+                $pTitlesEn = $request->input('price_title_en');
+                $pValues = $request->input('price_value');
+                $pDiscounts = $request->input('price_discount');
+                $pTypes = $request->input('price_discount_type');
+
+                foreach ($pValues as $index => $val) {
+                    if (!empty($val) || $val === '0') {
+                        $item->prices()->create([
+                            'title_ar' => $pTitlesAr[$index] ?? null,
+                            'title_en' => $pTitlesEn[$index] ?? null,
+                            'price' => $val,
+                            'discount' => $pDiscounts[$index] ?? 0,
+                            'discount_type' => $pTypes[$index] ?? 'amount',
+                        ]);
+                    }
+                }
+            }
+
+            if ($request->has('price_value') && count($request->price_value) > 0) {
+                $data['price'] = $request->price_value[0] ?? 0;
+                $data['discount'] = $request->price_discount[0] ?? 0;
+                $data['discount_type'] = $request->price_discount_type[0] ?? 'amount';
             }
 
             $item->fill($data);

@@ -22,6 +22,11 @@ class Item extends Model
         return $this->hasMany(ItemPackage::class, 'item_id');
     }
 
+    public function prices(): HasMany
+    {
+        return $this->hasMany(ItemPrice::class, 'item_id');
+    }
+
     public function routes(): HasMany
     {
         return $this->hasMany(ItemRoute::class, 'item_id');

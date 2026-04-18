@@ -459,33 +459,92 @@
 
                             {{-- Price & Map Row --}}
                             <div class="row mb-3">
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Price <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light fw-bold">SAR</span>
-                                        <input type="number" name="price" class="form-control"
-                                               value="{{ $item->price }}" required step="0.01" min="0">
-                                    </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-tags me-2 text-success"></i> Pricing Packages</h6>
+                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="addPriceRow()">
+                                        <i class="fas fa-plus me-1"></i> Add Price Option
+                                    </button>
                                 </div>
 
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Discount</label>
-                                    <input type="number" name="discount" class="form-control"
-                                           value="{{ $item->discount }}" step="0.01" min="0">
+                                <div id="price-repeater">
+                                    @if(isset($item) && $item->prices && $item->prices->count() > 0)
+                                        {{-- لو بنعمل Edit وفيه أسعار متسجلة --}}
+                                        @foreach($item->prices as $price)
+                                            <div class="row price-row mb-3 align-items-end p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                                <div class="col-md-3 mb-2 mb-md-0">
+                                                    <label class="form-label fw-bold">Title (AR) <span class="text-danger">*</span></label>
+                                                    <input type="text" name="price_title_ar[]" class="form-control" value="{{ $price->title_ar }}" required>
+                                                </div>
+                                                <div class="col-md-3 mb-2 mb-md-0">
+                                                    <label class="form-label fw-bold">Title (EN)</label>
+                                                    <input type="text" name="price_title_en[]" class="form-control" value="{{ $price->title_en }}">
+                                                </div>
+                                                <div class="col-md-2 mb-2 mb-md-0">
+                                                    <label class="form-label fw-bold">Price (SAR) <span class="text-danger">*</span></label>
+                                                    <input type="number" name="price_value[]" class="form-control" value="{{ $price->price }}" step="0.01" min="0" required>
+                                                </div>
+                                                <div class="col-md-3 mb-2 mb-md-0">
+                                                    <label class="form-label fw-bold">Discount</label>
+                                                    <div class="input-group">
+                                                        <input type="number" name="price_discount[]" class="form-control" value="{{ $price->discount }}" step="0.01" min="0">
+                                                        <select name="price_discount_type[]" class="form-select bg-light" style="flex: 0 0 110px;">
+                                                            <option value="amount" {{ $price->discount_type == 'amount' ? 'selected' : '' }}>مبلغ (SAR)</option>
+                                                            <option value="percent" {{ $price->discount_type == 'percent' ? 'selected' : '' }}>نسبة (%)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1 mb-2 mb-md-0 text-center">
+                                                    <button type="button" class="btn btn-danger remove-price-row shadow-sm" style="padding: 10px 15px; border-radius: 8px;" title="Remove">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        {{-- لو بنعمل Create (القيم الافتراضية) --}}
+                                        @php
+                                            $defaultPrices = [
+                                                ['ar' => 'سعر الشخص بالغرفة المفردة', 'en' => 'Single Room Person Price'],
+                                                ['ar' => 'سعر الشخص بالغرفة المزدوجة', 'en' => 'Double Room Person Price'],
+                                                ['ar' => 'سعر الشخص بالغرفة الثلاثية', 'en' => 'Triple Room Person Price']
+                                            ];
+                                        @endphp
+                                        @foreach($defaultPrices as $dp)
+                                            <div class="row price-row mb-3 align-items-end p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                                <div class="col-md-3 mb-2 mb-md-0">
+                                                    <label class="form-label fw-bold">Title (AR) <span class="text-danger">*</span></label>
+                                                    <input type="text" name="price_title_ar[]" class="form-control" value="{{ $dp['ar'] }}" required>
+                                                </div>
+                                                <div class="col-md-3 mb-2 mb-md-0">
+                                                    <label class="form-label fw-bold">Title (EN)</label>
+                                                    <input type="text" name="price_title_en[]" class="form-control" value="{{ $dp['en'] }}">
+                                                </div>
+                                                <div class="col-md-2 mb-2 mb-md-0">
+                                                    <label class="form-label fw-bold">Price (SAR) <span class="text-danger">*</span></label>
+                                                    <input type="number" name="price_value[]" class="form-control" step="0.01" min="0" required>
+                                                </div>
+                                                <div class="col-md-3 mb-2 mb-md-0">
+                                                    <label class="form-label fw-bold">Discount</label>
+                                                    <div class="input-group">
+                                                        <input type="number" name="price_discount[]" class="form-control" value="0" step="0.01" min="0">
+                                                        <select name="price_discount_type[]" class="form-select bg-light" style="flex: 0 0 110px;">
+                                                            <option value="amount">مبلغ (SAR)</option>
+                                                            <option value="percent">نسبة (%)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1 mb-2 mb-md-0 text-center">
+                                                    <button type="button" class="btn btn-danger remove-price-row shadow-sm" style="padding: 10px 15px; border-radius: 8px;" title="Remove">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                    <label class="form-label">Discount Type</label>
-                                    <select name="discount_type" class="form-select">
-                                        <option value="amount" {{ $item->discount_type == 'amount' ? 'selected' : '' }}>
-                                            Amount (SAR)
-                                        </option>
-                                        <option
-                                            value="percent" {{ $item->discount_type == 'percent' ? 'selected' : '' }}>
-                                            Percentage (%)
-                                        </option>
-                                    </select>
-                                </div>
+                            </div>
 
+                            <div class="row mb-3">
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">Stock Status</label>
                                     <select name="out_of_stock" class="form-select">
@@ -496,10 +555,7 @@
                                         </option>
                                     </select>
                                 </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-12 mb-3">
+                                <div class="col-md-9 mb-3">
                                     <label class="form-label">Map Link <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light"><i
@@ -1126,6 +1182,48 @@
                 }
             });
 
+        });
+
+        window.addPriceRow = function () {
+            let rowHtml = `
+        <div class="row price-row mb-3 align-items-end p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6; animation: fadeIn 0.3s;">
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Title (AR) <span class="text-danger">*</span></label>
+                <input type="text" name="price_title_ar[]" class="form-control" placeholder="مثال: سعر تذكرة الطفل" required>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Title (EN)</label>
+                <input type="text" name="price_title_en[]" class="form-control" placeholder="e.g. Child Ticket">
+            </div>
+            <div class="col-md-2 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Price (SAR) <span class="text-danger">*</span></label>
+                <input type="number" name="price_value[]" class="form-control" step="0.01" min="0" required>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Discount</label>
+                <div class="input-group">
+                    <input type="number" name="price_discount[]" class="form-control" value="0" step="0.01" min="0">
+                    <select name="price_discount_type[]" class="form-select bg-light" style="flex: 0 0 110px;">
+                        <option value="amount">مبلغ (SAR)</option>
+                        <option value="percent">نسبة (%)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-1 mb-2 mb-md-0 text-center">
+                <button type="button" class="btn btn-danger remove-price-row shadow-sm" style="padding: 10px 15px; border-radius: 8px;" title="Remove">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    `;
+            document.getElementById('price-repeater').insertAdjacentHTML('beforeend', rowHtml);
+        }
+        $(document).on('click', '.remove-price-row', function () {
+            if ($('.price-row').length > 1) {
+                $(this).closest('.price-row').remove();
+            } else {
+                alert('You must have at least one pricing option.');
+            }
         });
 
         window.addMultiFile = function (url, type) {
