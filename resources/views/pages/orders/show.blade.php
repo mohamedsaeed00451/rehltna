@@ -122,8 +122,9 @@
                             <thead>
                             <tr>
                                 <th>Description</th>
-                                <th>Attendees</th>
-                                <th>Price</th>
+                                <th>Variation / Package</th>
+                                <th class="text-center">Attendees</th>
+                                <th>Unit Price</th>
                                 <th>Total</th>
                             </tr>
                             </thead>
@@ -131,29 +132,39 @@
                             @foreach($order->items as $item)
                                 <tr>
                                     <td>
-                                        <div
-                                            class="info-value">{{ $item->item->title_en ?? 'Item #' . $item->item_id }}</div>
-                                        <small
-                                            class="text-muted fw-bold">{{ $item->item->itemType->title_en ?? '' }}</small>
+                                        <div class="info-value">{{ $item->item->title_en ?? 'Item #' . $item->item_id }}</div>
+                                        <small class="text-muted fw-bold">{{ $item->item->itemType->title_en ?? '' }}</small>
                                     </td>
-                                    <td class="fw-bold">{{ $item->attendees_count }}</td>
-                                    <td class="text-muted">{{ $item->price_per_unit }} SAR</td>
-                                    <td class="fw-bold text-dark">{{ $item->total }} SAR</td>
+                                    <td>
+                                        @if($item->variation_title_en || $item->variation_title_ar)
+                                            <span class="badge bg-light text-primary border px-2 py-1">
+                                                <i class="fas fa-tag me-1"></i>
+                                                {{ $item->variation_title_en ?? $item->variation_title_ar }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted small">Standard Package</span>
+                                        @endif
+                                    </td>
+                                    <td class="fw-bold text-center">
+                                        <span class="badge rounded-pill bg-dark px-3">{{ $item->attendees_count }}</span>
+                                    </td>
+                                    <td class="text-muted">{{ number_format($item->price_per_unit, 2) }} SAR</td>
+                                    <td class="fw-bold text-dark">{{ number_format($item->total, 2) }} SAR</td>
                                 </tr>
                             @endforeach
                             </tbody>
                             <tfoot class="bg-light bg-opacity-50">
                             <tr>
-                                <td colspan="3" class="text-end fw-bold py-3">Sub Total</td>
-                                <td class="py-3 fw-bold">{{ $order->sub_total }} SAR</td>
+                                <td colspan="4" class="text-end fw-bold py-3">Sub Total</td>
+                                <td class="py-3 fw-bold">{{ number_format($order->sub_total, 2) }} SAR</td>
                             </tr>
                             <tr>
-                                <td colspan="3" class="text-end fw-bold text-danger py-2">Discount</td>
-                                <td class="text-danger py-2">- {{ $order->discount_amount }} SAR</td>
+                                <td colspan="4" class="text-end fw-bold text-danger py-2">Discount</td>
+                                <td class="text-danger py-2">- {{ number_format($order->discount_amount, 2) }} SAR</td>
                             </tr>
                             <tr style="background-color: #f5f3ff;">
-                                <td colspan="3" class="text-end fw-extrabold tx-16 py-3 text-primary">Total Amount</td>
-                                <td class="fw-extrabold tx-16 text-primary py-3">{{ $order->total_amount }} SAR</td>
+                                <td colspan="4" class="text-end fw-extrabold tx-16 py-3 text-primary">Total Amount</td>
+                                <td class="fw-extrabold tx-16 text-primary py-3">{{ number_format($order->total_amount, 2) }} SAR</td>
                             </tr>
                             </tfoot>
                         </table>
@@ -161,7 +172,7 @@
                 </div>
             </div>
 
-            {{-- Customer Details Card (Moved inside left column for balance) --}}
+            {{-- Customer Details Card --}}
             <div class="card custom-card">
                 <div class="card-header"><h6 class="card-title mb-0">Customer Profile</h6></div>
                 <div class="card-body">
@@ -257,7 +268,7 @@
                         </div>
                     @endif
 
-                    {{-- Update Status Form (Only for manual methods) --}}
+                    {{-- Update Status Form --}}
                     @php
                         $isManualMethod = str_contains($order->payment_method, 'bank_transfer') || str_contains($order->payment_method, 'wallet') || $order->payment_method === 'instapay';
                     @endphp

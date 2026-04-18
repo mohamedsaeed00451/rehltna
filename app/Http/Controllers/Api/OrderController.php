@@ -29,7 +29,8 @@ class OrderController extends Controller
     private function calculateOrderDetails($itemsRequest, $couponCode = null, $email = null, $usePoints = false): array
     {
         $itemIds = collect($itemsRequest)->pluck('item_id')->toArray();
-        $dbItems = Item::query()->whereIn('id', $itemIds)->get()->keyBy('id');
+
+        $dbItems = Item::with('prices')->whereIn('id', $itemIds)->get()->keyBy('id');
 
         $subTotal = 0;
         $orderItemsData = [];
@@ -38,16 +39,38 @@ class OrderController extends Controller
             $dbItem = $dbItems->get($reqItem['item_id']);
             if (!$dbItem) continue;
 
-            $actualItemPrice = $dbItem->price_after_discount;
-            $itemTotal = $actualItemPrice * $reqItem['attendees'];
-            $subTotal += $itemTotal;
+            if (isset($reqItem['selected_prices']) && is_array($reqItem['selected_prices'])) {
+                foreach ($reqItem['selected_prices'] as $selPrice) {
 
-            $orderItemsData[] = [
-                'item_id' => $dbItem->id,
-                'attendees_count' => $reqItem['attendees'],
-                'price_per_unit' => $actualItemPrice,
-                'total' => $itemTotal,
-            ];
+                    $priceModel = $dbItem->prices->where('id', $selPrice['price_id'])->first();
+                    if (!$priceModel) continue;
+
+                    $attendees = $selPrice['attendees'];
+
+                    $unitPrice = $priceModel->price;
+
+                    if ($priceModel->discount > 0) {
+                        if ($priceModel->discount_type === 'percent') {
+                            $unitPrice = max(0, $unitPrice - ($unitPrice * $priceModel->discount / 100));
+                        } else {
+                            $unitPrice = max(0, $unitPrice - $priceModel->discount);
+                        }
+                    }
+
+                    $itemTotal = $unitPrice * $attendees;
+                    $subTotal += $itemTotal;
+
+                    $orderItemsData[] = [
+                        'item_id' => $dbItem->id,
+                        'item_price_id' => $priceModel->id,
+                        'variation_title_ar' => $priceModel->title_ar,
+                        'variation_title_en' => $priceModel->title_en,
+                        'attendees_count' => $attendees,
+                        'price_per_unit' => $unitPrice,
+                        'total' => $itemTotal,
+                    ];
+                }
+            }
         }
 
         $discountAmount = 0;
@@ -84,16 +107,13 @@ class OrderController extends Controller
         $pointsDiscount = 0;
         $pointsUsed = 0;
 
+        // حساب النقاط
         if ($usePoints && $email) {
             $user = ResidencyUser::where('email', $email)->first();
             if ($user && $user->available_points > 0) {
-
                 $pointsValueInSAR = $user->available_points / 10;
-
                 $pointsDiscount = min($pointsValueInSAR, $finalTotal);
-
                 $pointsUsed = $pointsDiscount * 10;
-
                 $finalTotal -= $pointsDiscount;
             }
         }
@@ -133,12 +153,18 @@ class OrderController extends Controller
                 'nullable',
                 Rule::exists(Coupon::class, 'code'),
             ],
+            // الفاليديشن الجديد عشان يقبل الباقات
             'items' => 'required|array',
             'items.*.item_id' => [
                 'required',
                 Rule::exists(Item::class, 'id'),
             ],
-            'items.*.attendees' => 'required|integer|min:1',
+            'items.*.selected_prices' => 'required|array|min:1',
+            'items.*.selected_prices.*.price_id' => [
+                'required',
+                Rule::exists('item_prices', 'id'),
+            ],
+            'items.*.selected_prices.*.attendees' => 'required|integer|min:1',
         ]);
 
         $source = $request->get('source');
@@ -316,8 +342,8 @@ class OrderController extends Controller
                     $tamaraItems[] = [
                         'reference_id' => (string)$item->id,
                         'type' => 'Digital',
-                        'name' => 'Item #' . $item->item_id,
-                        'sku' => 'SKU-' . $item->item_id,
+                        'name' => ($item->variation_title_en ?? 'Variation') . ' - Item #' . $item->item_id,
+                        'sku' => 'SKU-' . $item->item_id . '-' . $item->item_price_id,
                         'quantity' => (int)$item->attendees_count,
                         'unit_price' => [
                             'amount' => (float)$item->price_per_unit,
@@ -496,6 +522,7 @@ class OrderController extends Controller
 
     public function checkCoupon(Request $request): JsonResponse
     {
+        // نفس تحديثات الفاليديشن
         $request->validate([
             'email' => 'nullable|email',
             'coupon_code' => [
@@ -508,7 +535,12 @@ class OrderController extends Controller
                 'required',
                 Rule::exists(Item::class, 'id'),
             ],
-            'items.*.attendees' => 'required|integer|min:1',
+            'items.*.selected_prices' => 'required|array|min:1',
+            'items.*.selected_prices.*.price_id' => [
+                'required',
+                Rule::exists('item_prices', 'id'),
+            ],
+            'items.*.selected_prices.*.attendees' => 'required|integer|min:1',
         ]);
 
         $calculation = $this->calculateOrderDetails(
