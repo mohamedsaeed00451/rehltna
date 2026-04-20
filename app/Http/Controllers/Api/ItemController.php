@@ -16,7 +16,7 @@ class ItemController extends Controller
     public function getItems(Request $request): JsonResponse
     {
 
-        $query = Item::query()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices');
+        $query = Item::query()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices', 'excludes');
 
 
         if ($request->filled('search')) {
@@ -117,7 +117,7 @@ class ItemController extends Controller
     public function getItem($slug): JsonResponse
     {
 
-        $Item = Item::query()->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices')->where(function ($query) use ($slug) {
+        $Item = Item::query()->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices', 'excludes')->where(function ($query) use ($slug) {
 
             $query->where('slug_en', $slug)
                 ->orWhere('slug_ar', $slug)
@@ -136,7 +136,7 @@ class ItemController extends Controller
         if (!$itemType)
             return $this->responseMessage(404, 'not found');
 
-        $items = $itemType->items()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices')->orderByDesc('id')->paginate(10);
+        $items = $itemType->items()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices', 'excludes')->orderByDesc('id')->paginate(10);
 
         $data = [
             'itemType' => $itemType,
@@ -149,7 +149,7 @@ class ItemController extends Controller
 
     public function getItemsFeatures(): JsonResponse
     {
-        $itemsFeatures = Item::query()->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices')->orderByDesc('id')->where('status', 1)->where('is_feature', 1)->get();
+        $itemsFeatures = Item::query()->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices', 'excludes')->orderByDesc('id')->where('status', 1)->where('is_feature', 1)->get();
 
         return $this->responseMessage(200, 'success', $itemsFeatures);
     }

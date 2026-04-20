@@ -59,7 +59,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon'];
 
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
@@ -175,7 +175,9 @@ class ItemController extends Controller
             }
 
             if ($request->has('price_value')) {
-                if (isset($item)) { $item->prices()->delete(); }
+                if (isset($item)) {
+                    $item->prices()->delete();
+                }
 
                 $pTitlesAr = $request->input('price_title_ar');
                 $pTitlesEn = $request->input('price_title_en');
@@ -194,6 +196,24 @@ class ItemController extends Controller
                         ]);
                     }
                 }
+            }
+
+            if ($request->has('exclude_title_en')) {
+                if (isset($item)) { $item->excludes()->delete(); }
+                $excludeEn = $request->input('exclude_title_en');
+                $excludeAr = $request->input('exclude_title_ar');
+                $excludeIcons = $request->input('exclude_icon');
+                foreach ($excludeEn as $index => $titleEn) {
+                    if (!empty($titleEn) || !empty($excludeAr[$index])) {
+                        $item->excludes()->create([
+                            'title_en' => $titleEn,
+                            'title_ar' => $excludeAr[$index] ?? null,
+                            'icon' => isset($excludeIcons[$index]) ? $this->cleanPath($excludeIcons[$index]) : null,
+                        ]);
+                    }
+                }
+            } else {
+                if (isset($item)) { $item->excludes()->delete(); }
             }
 
             try {
@@ -265,7 +285,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon'];
 
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
@@ -384,8 +404,9 @@ class ItemController extends Controller
             }
 
             if ($request->has('price_value')) {
-                if (isset($item)) { $item->prices()->delete(); }
-
+                if (isset($item)) {
+                    $item->prices()->delete();
+                }
                 $pTitlesAr = $request->input('price_title_ar');
                 $pTitlesEn = $request->input('price_title_en');
                 $pValues = $request->input('price_value');
@@ -403,6 +424,24 @@ class ItemController extends Controller
                         ]);
                     }
                 }
+            }
+
+            if ($request->has('exclude_title_en')) {
+                if (isset($item)) { $item->excludes()->delete(); }
+                $excludeEn = $request->input('exclude_title_en');
+                $excludeAr = $request->input('exclude_title_ar');
+                $excludeIcons = $request->input('exclude_icon');
+                foreach ($excludeEn as $index => $titleEn) {
+                    if (!empty($titleEn) || !empty($excludeAr[$index])) {
+                        $item->excludes()->create([
+                            'title_en' => $titleEn,
+                            'title_ar' => $excludeAr[$index] ?? null,
+                            'icon' => isset($excludeIcons[$index]) ? $this->cleanPath($excludeIcons[$index]) : null,
+                        ]);
+                    }
+                }
+            } else {
+                if (isset($item)) { $item->excludes()->delete(); }
             }
 
             if ($request->has('price_value') && count($request->price_value) > 0) {

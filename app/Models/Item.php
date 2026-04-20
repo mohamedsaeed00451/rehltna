@@ -22,6 +22,11 @@ class Item extends Model
         return $this->hasMany(ItemPackage::class, 'item_id');
     }
 
+    public function excludes(): HasMany
+    {
+        return $this->hasMany(ItemExclude::class, 'item_id');
+    }
+
     public function prices(): HasMany
     {
         return $this->hasMany(ItemPrice::class, 'item_id');

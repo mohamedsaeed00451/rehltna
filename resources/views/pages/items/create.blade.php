@@ -688,94 +688,104 @@
                                 @endif
                             </div>
 
-                            <div class="col-12">
-                                <hr class="my-4 border-light">
-                            </div>
+                            <div class="col-12"><hr class="my-4 border-light"></div>
 
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="text-dark fw-bold mb-0"><i class="fas fa-route me-2 text-primary"></i> Trip
-                                    Route (Steps)</h6>
-                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addRouteRow()">
-                                    <i class="fas fa-plus me-1"></i> Add Route Step
+                                <h6 class="text-dark fw-bold mb-0"><i class="fas fa-check-circle me-2 text-success"></i> What's Included (ما تشمله الرحلة)</h6>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="addRouteRow()">
+                                    <i class="fas fa-plus me-1"></i> Add Included Item
                                 </button>
                             </div>
 
-                            <div id="route-repeater">
+                            <div id="route-repeater" class="mb-5">
                                 @if(isset($item) && $item->routes && $item->routes->count() > 0)
                                     @foreach($item->routes as $route)
                                         @php $uid = uniqid(); @endphp
-                                        <div class="row route-row mb-3 align-items-center p-3 rounded"
-                                             style="background-color: #fff; border: 1px dashed #ced4da;">
+                                        <div class="row route-row mb-3 align-items-center p-3 rounded" style="background-color: #f0fdf4; border: 1px dashed #bbf7d0;">
                                             <div class="col-md-4 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Title (EN)</label>
-                                                <input type="text" name="route_title_en[]" class="form-control"
-                                                       value="{{ $route->title_en }}" required>
+                                                <input type="text" name="route_title_en[]" class="form-control" value="{{ $route->title_en }}" required>
                                             </div>
                                             <div class="col-md-4 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Title (AR)</label>
-                                                <input type="text" name="route_title_ar[]" class="form-control"
-                                                       value="{{ $route->title_ar }}">
+                                                <input type="text" name="route_title_ar[]" class="form-control" value="{{ $route->title_ar }}">
                                             </div>
                                             <div class="col-md-3 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Icon/Image</label>
                                                 <div class="media-selector-group">
-                                                    <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]"
-                                                           readonly placeholder="Icon..."
-                                                           value="{{ $route->icon ? asset($route->icon) : '' }}"
-                                                           onclick="$('#btn_route_{{ $uid }}').click()">
-                                                    <button type="button" id="btn_route_{{ $uid }}"
-                                                            class="btn btn-primary btn-choose open-gallery"
-                                                            data-input="route_icon_{{ $uid }}"
-                                                            data-preview="preview_route_{{ $uid }}">Choose
-                                                    </button>
+                                                    <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]" readonly placeholder="Icon..." value="{{ $route->icon ? asset($route->icon) : '' }}" onclick="$('#btn_route_{{ $uid }}').click()">
+                                                    <button type="button" id="btn_route_{{ $uid }}" class="btn btn-primary btn-choose open-gallery" data-input="route_icon_{{ $uid }}" data-preview="preview_route_{{ $uid }}">Choose</button>
                                                 </div>
                                                 <div id="preview_route_{{ $uid }}" class="mt-1">
-                                                    @if($route->icon)
-                                                        <img src="{{ asset($route->icon) }}" width="40" height="40"
-                                                             class="rounded">
-                                                    @endif
+                                                    @if($route->icon) <img src="{{ asset($route->icon) }}" width="40" height="40" class="rounded"> @endif
                                                 </div>
                                             </div>
                                             <div class="col-md-1 mt-4 text-center">
-                                                <button type="button"
-                                                        class="btn btn-danger remove-route-row w-100 shadow-sm"
-                                                        title="Remove"><i class="fas fa-times"></i></button>
+                                                <button type="button" class="btn btn-danger remove-route-row w-100 shadow-sm" title="Remove"><i class="fas fa-times"></i></button>
                                             </div>
                                         </div>
                                     @endforeach
                                 @else
                                     @php $uid = uniqid(); @endphp
-                                    <div class="row route-row mb-3 align-items-center p-3 rounded"
-                                         style="background-color: #fff; border: 1px dashed #ced4da;">
+                                    <div class="row route-row mb-3 align-items-center p-3 rounded" style="background-color: #f0fdf4; border: 1px dashed #bbf7d0;">
                                         <div class="col-md-4 mb-2 mb-md-0">
                                             <label class="form-label fw-bold">Title (EN)</label>
-                                            <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Day 1: Arrival">
+                                            <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Flight ticket, Hotel 5 stars" required>
                                         </div>
                                         <div class="col-md-4 mb-2 mb-md-0">
                                             <label class="form-label fw-bold">Title (AR)</label>
-                                            <input type="text" name="route_title_ar[]" class="form-control" placeholder="اليوم الأول: الوصول">
+                                            <input type="text" name="route_title_ar[]" class="form-control" placeholder="مثال: تذاكر الطيران، فندق 5 نجوم">
                                         </div>
                                         <div class="col-md-3 mb-2 mb-md-0">
                                             <label class="form-label fw-bold">Icon/Image</label>
                                             <div class="media-selector-group">
-                                                <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]"
-                                                       readonly placeholder="Icon..."
-                                                       onclick="$('#btn_route_{{ $uid }}').click()">
-                                                <button type="button" id="btn_route_{{ $uid }}"
-                                                        class="btn btn-primary btn-choose open-gallery"
-                                                        data-input="route_icon_{{ $uid }}"
-                                                        data-preview="preview_route_{{ $uid }}">Choose
-                                                </button>
+                                                <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]" readonly placeholder="Icon..." onclick="$('#btn_route_{{ $uid }}').click()">
+                                                <button type="button" id="btn_route_{{ $uid }}" class="btn btn-primary btn-choose open-gallery" data-input="route_icon_{{ $uid }}" data-preview="preview_route_{{ $uid }}">Choose</button>
                                             </div>
                                             <div id="preview_route_{{ $uid }}" class="mt-1"></div>
                                         </div>
                                         <div class="col-md-1 mt-4 text-center">
-                                            <button type="button"
-                                                    class="btn btn-danger remove-route-row w-100 shadow-sm"
-                                                    title="Remove"><i class="fas fa-times"></i></button>
+                                            <button type="button" class="btn btn-danger remove-route-row w-100 shadow-sm" title="Remove"><i class="fas fa-times"></i></button>
                                         </div>
-
                                     </div>
+                                @endif
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="text-dark fw-bold mb-0"><i class="fas fa-times-circle me-2 text-danger"></i> What's Excluded (Optional)</h6>
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="addExcludeRow()">
+                                    <i class="fas fa-plus me-1"></i> Add Excluded Item
+                                </button>
+                            </div>
+
+                            <div id="exclude-repeater">
+                                @if(isset($item) && $item->excludes && $item->excludes->count() > 0)
+                                    @foreach($item->excludes as $exclude)
+                                        @php $uid = uniqid(); @endphp
+                                        <div class="row exclude-row mb-3 align-items-center p-3 rounded" style="background-color: #fef2f2; border: 1px dashed #fecaca;">
+                                            <div class="col-md-4 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Title (EN)</label>
+                                                <input type="text" name="exclude_title_en[]" class="form-control" value="{{ $exclude->title_en }}">
+                                            </div>
+                                            <div class="col-md-4 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Title (AR)</label>
+                                                <input type="text" name="exclude_title_ar[]" class="form-control" value="{{ $exclude->title_ar }}">
+                                            </div>
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Icon/Image</label>
+                                                <div class="media-selector-group">
+                                                    <input type="text" id="exclude_icon_{{ $uid }}" name="exclude_icon[]" readonly placeholder="Icon..." value="{{ $exclude->icon ? asset($exclude->icon) : '' }}" onclick="$('#btn_exclude_{{ $uid }}').click()">
+                                                    <button type="button" id="btn_exclude_{{ $uid }}" class="btn btn-primary btn-choose open-gallery" data-input="exclude_icon_{{ $uid }}" data-preview="preview_exclude_{{ $uid }}">Choose</button>
+                                                </div>
+                                                <div id="preview_exclude_{{ $uid }}" class="mt-1">
+                                                    @if($exclude->icon) <img src="{{ asset($exclude->icon) }}" width="40" height="40" class="rounded"> @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1 mt-4 text-center">
+                                                <button type="button" class="btn btn-danger remove-exclude-row w-100 shadow-sm" title="Remove"><i class="fas fa-times"></i></button>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 @endif
                             </div>
                         </div>
@@ -1015,18 +1025,17 @@
                 }
             }
 
-
             window.addRouteRow = function () {
                 let uid = Date.now();
                 let rowHtml = `
-        <div class="row route-row mb-3 align-items-center p-3 rounded" style="background-color: #fff; border: 1px dashed #ced4da; animation: fadeIn 0.3s;">
+        <div class="row route-row mb-3 align-items-center p-3 rounded" style="background-color: #f0fdf4; border: 1px dashed #bbf7d0; animation: fadeIn 0.3s;">
             <div class="col-md-4 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Title (EN)</label>
-                <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Day 1: Arrival" required>
+                <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Flight ticket, Hotel 5 stars" required>
             </div>
             <div class="col-md-4 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Title (AR)</label>
-                <input type="text" name="route_title_ar[]" class="form-control" placeholder="اليوم الأول: الوصول">
+                <input type="text" name="route_title_ar[]" class="form-control" placeholder="مثال: تذاكر الطيران، فندق 5 نجوم">
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Icon/Image</label>
@@ -1046,6 +1055,38 @@
 
             $(document).on('click', '.remove-route-row', function () {
                 $(this).closest('.route-row').remove();
+            });
+
+            window.addExcludeRow = function () {
+                let uid = Date.now();
+                let rowHtml = `
+        <div class="row exclude-row mb-3 align-items-center p-3 rounded" style="background-color: #fef2f2; border: 1px dashed #fecaca; animation: fadeIn 0.3s;">
+            <div class="col-md-4 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Title (EN)</label>
+                <input type="text" name="exclude_title_en[]" class="form-control" placeholder="e.g. Personal Expenses, Visas">
+            </div>
+            <div class="col-md-4 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Title (AR)</label>
+                <input type="text" name="exclude_title_ar[]" class="form-control" placeholder="مثال: المصاريف الشخصية، التأشيرات">
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Icon/Image</label>
+                <div class="media-selector-group">
+                    <input type="text" id="exclude_icon_${uid}" name="exclude_icon[]" readonly placeholder="Icon..." onclick="$('#btn_exclude_${uid}').click()">
+                    <button type="button" id="btn_exclude_${uid}" class="btn btn-primary btn-choose open-gallery" data-input="exclude_icon_${uid}" data-preview="preview_exclude_${uid}">Choose</button>
+                </div>
+                <div id="preview_exclude_${uid}" class="mt-1"></div>
+            </div>
+            <div class="col-md-1 mt-4 text-center">
+                <button type="button" class="btn btn-danger remove-exclude-row w-100 shadow-sm"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+    `;
+                document.getElementById('exclude-repeater').insertAdjacentHTML('beforeend', rowHtml);
+            }
+
+            $(document).on('click', '.remove-exclude-row', function () {
+                $(this).closest('.exclude-row').remove();
             });
 
 
