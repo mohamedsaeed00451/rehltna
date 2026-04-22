@@ -26,10 +26,25 @@ class ItemType extends Model
         return $this->belongsTo(ItemType::class, 'parent_id');
     }
 
+    public function allItems()
+    {
+        $childrenIds = $this->children()->pluck('id')->toArray();
+        $allIds = array_merge([$this->id], $childrenIds);
+        return Item::whereIn('item_type_id', $allIds);
+    }
+
+    protected $appends = ['total_items_recursive'];
+
+    public function getTotalItemsRecursiveAttribute()
+    {
+        return $this->items_count + $this->children->sum('items_count');
+    }
+
     public function children(): HasMany
     {
         return $this->hasMany(ItemType::class, 'parent_id');
     }
+
     public function getBannerEnAttribute($value): null|string
     {
         return $value ? asset($value) : null;

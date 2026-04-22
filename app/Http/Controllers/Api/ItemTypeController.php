@@ -16,11 +16,18 @@ class ItemTypeController extends Controller
 
     public function getItemTypes(): JsonResponse
     {
-        $itemTypes = ItemType::query()->whereNull('parent_id')->orderByDesc('id')->withCount('items')
-            ->with(['items.galleries' => function ($query) {
-                $query->orderByDesc('id')->take(3);
-            }])->with('children')
-            ->paginate(10);
+        $itemTypes = ItemType::query()
+            ->whereNull('parent_id')
+            ->orderByDesc('id')
+            ->withCount('items')
+            ->with([
+                'children' => function ($q) {
+                    $q->withCount('items');
+                },
+                'items.galleries' => function ($query) {
+                    $query->orderByDesc('id')->take(3);
+                }
+            ])->paginate(10);
 
         return $this->responseMessage(200, 'success', $itemTypes);
     }
