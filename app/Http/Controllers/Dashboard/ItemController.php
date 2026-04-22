@@ -59,7 +59,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon', 'itinerary_places_en', 'itinerary_places_ar'];
 
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
@@ -118,35 +118,42 @@ class ItemController extends Controller
             }
 
             if ($request->has('itinerary_city_id')) {
-
-                if (isset($item)) {
-                    $item->itineraries()->delete();
-                }
-
+                if (isset($item)) { $item->itineraries()->delete(); }
 
                 $cityIds = $request->input('itinerary_city_id');
                 $starts = $request->input('itinerary_start');
                 $ends = $request->input('itinerary_end');
                 $nights = $request->input('itinerary_nights');
-
                 $maps = $request->input('itinerary_map');
+
+                $placesEn = $request->input('itinerary_places_en');
+                $placesAr = $request->input('itinerary_places_ar');
 
                 foreach ($cityIds as $index => $cityId) {
                     if (!empty($cityId) && !empty($starts[$index])) {
-                        $item->itineraries()->create([
+                        $itin = $item->itineraries()->create([
                             'city_id' => $cityId,
                             'start_date' => $starts[$index],
                             'end_date' => $ends[$index],
                             'nights' => $nights[$index] ?? 0,
-
                             'map' => $maps[$index] ?? null,
                         ]);
+
+                        if (isset($placesEn[$index]) && is_array($placesEn[$index])) {
+                            foreach ($placesEn[$index] as $pIndex => $pEn) {
+                                $pAr = $placesAr[$index][$pIndex] ?? null;
+                                if (!empty($pEn) || !empty($pAr)) {
+                                    $itin->places()->create([
+                                        'title_en' => $pEn,
+                                        'title_ar' => $pAr,
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }
             } else {
-                if (isset($item)) {
-                    $item->itineraries()->delete();
-                }
+                if (isset($item)) { $item->itineraries()->delete(); }
             }
 
             if ($request->has('route_title_en')) {
@@ -199,7 +206,9 @@ class ItemController extends Controller
             }
 
             if ($request->has('exclude_title_en')) {
-                if (isset($item)) { $item->excludes()->delete(); }
+                if (isset($item)) {
+                    $item->excludes()->delete();
+                }
                 $excludeEn = $request->input('exclude_title_en');
                 $excludeAr = $request->input('exclude_title_ar');
                 $excludeIcons = $request->input('exclude_icon');
@@ -213,7 +222,9 @@ class ItemController extends Controller
                     }
                 }
             } else {
-                if (isset($item)) { $item->excludes()->delete(); }
+                if (isset($item)) {
+                    $item->excludes()->delete();
+                }
             }
 
             try {
@@ -285,7 +296,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon', 'itinerary_places_en', 'itinerary_places_ar'];
 
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
@@ -344,38 +355,42 @@ class ItemController extends Controller
             }
 
             if ($request->has('itinerary_city_id')) {
-
-                if (isset($item)) {
-                    $item->itineraries()->delete();
-                }
-
+                if (isset($item)) { $item->itineraries()->delete(); }
 
                 $cityIds = $request->input('itinerary_city_id');
                 $starts = $request->input('itinerary_start');
                 $ends = $request->input('itinerary_end');
                 $nights = $request->input('itinerary_nights');
-
                 $maps = $request->input('itinerary_map');
 
+                $placesEn = $request->input('itinerary_places_en');
+                $placesAr = $request->input('itinerary_places_ar');
 
                 foreach ($cityIds as $index => $cityId) {
                     if (!empty($cityId) && !empty($starts[$index])) {
-                        $item->itineraries()->create([
+                        $itin = $item->itineraries()->create([
                             'city_id' => $cityId,
                             'start_date' => $starts[$index],
                             'end_date' => $ends[$index],
                             'nights' => $nights[$index] ?? 0,
-
                             'map' => $maps[$index] ?? null,
-
                         ]);
+
+                        if (isset($placesEn[$index]) && is_array($placesEn[$index])) {
+                            foreach ($placesEn[$index] as $pIndex => $pEn) {
+                                $pAr = $placesAr[$index][$pIndex] ?? null;
+                                if (!empty($pEn) || !empty($pAr)) {
+                                    $itin->places()->create([
+                                        'title_en' => $pEn,
+                                        'title_ar' => $pAr,
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }
             } else {
-
-                if (isset($item)) {
-                    $item->itineraries()->delete();
-                }
+                if (isset($item)) { $item->itineraries()->delete(); }
             }
 
             if ($request->has('route_title_en')) {
@@ -427,7 +442,9 @@ class ItemController extends Controller
             }
 
             if ($request->has('exclude_title_en')) {
-                if (isset($item)) { $item->excludes()->delete(); }
+                if (isset($item)) {
+                    $item->excludes()->delete();
+                }
                 $excludeEn = $request->input('exclude_title_en');
                 $excludeAr = $request->input('exclude_title_ar');
                 $excludeIcons = $request->input('exclude_icon');
@@ -441,7 +458,9 @@ class ItemController extends Controller
                     }
                 }
             } else {
-                if (isset($item)) { $item->excludes()->delete(); }
+                if (isset($item)) {
+                    $item->excludes()->delete();
+                }
             }
 
             if ($request->has('price_value') && count($request->price_value) > 0) {
