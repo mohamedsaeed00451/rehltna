@@ -15,4 +15,9 @@ class ItemItinerary extends Model
     {
         return $this->belongsTo(City::class, 'city_id');
     }
+
+    public function places()
+    {
+        return $this->hasMany(ItemItineraryPlace::class, 'itinerary_id');
+    }
 }

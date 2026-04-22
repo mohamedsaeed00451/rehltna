@@ -13,11 +13,34 @@ class ItemController extends Controller
 {
     use ResponseTrait;
 
+    private function getOrderedRelations(): array
+    {
+        return [
+            'galleries',
+            'itemType',
+            'itineraries' => function ($q) {
+                $q->orderBy('start_date', 'asc');
+            },
+            'itineraries.places' => function ($q) {
+                $q->orderBy('id', 'asc');
+            },
+            'itineraries.city',
+            'routes' => function ($q) {
+                $q->orderBy('id', 'asc');
+            },
+            'prices' => function ($q) {
+                $q->orderBy('id', 'asc');
+            },
+            'excludes' => function ($q) {
+                $q->orderBy('id', 'asc');
+            }
+        ];
+    }
+
     public function getItems(Request $request): JsonResponse
     {
 
-        $query = Item::query()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices', 'excludes');
-
+        $query = Item::query()->where('status', 1)->with($this->getOrderedRelations());
 
         if ($request->filled('search')) {
             $keyword = trim($request->get('search'));
@@ -117,7 +140,7 @@ class ItemController extends Controller
     public function getItem($slug): JsonResponse
     {
 
-        $Item = Item::query()->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices', 'excludes')->where(function ($query) use ($slug) {
+        $Item = Item::query()->with($this->getOrderedRelations())->where(function ($query) use ($slug) {
 
             $query->where('slug_en', $slug)
                 ->orWhere('slug_ar', $slug)
@@ -136,7 +159,7 @@ class ItemController extends Controller
         if (!$itemType)
             return $this->responseMessage(404, 'not found');
 
-        $items = $itemType->items()->where('status', 1)->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices', 'excludes')->orderByDesc('id')->paginate(10);
+        $items = $itemType->items()->where('status', 1)->with($this->getOrderedRelations())->orderByDesc('id')->paginate(10);
 
         $data = [
             'itemType' => $itemType,
@@ -149,7 +172,7 @@ class ItemController extends Controller
 
     public function getItemsFeatures(): JsonResponse
     {
-        $itemsFeatures = Item::query()->with('galleries', 'itemType', 'itineraries.city', 'routes', 'prices', 'excludes')->orderByDesc('id')->where('status', 1)->where('is_feature', 1)->get();
+        $itemsFeatures = Item::query()->with($this->getOrderedRelations())->orderByDesc('id')->where('status', 1)->where('is_feature', 1)->get();
 
         return $this->responseMessage(200, 'success', $itemsFeatures);
     }

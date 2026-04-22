@@ -653,55 +653,34 @@
 
                             <div id="itinerary-repeater">
                                 @if(isset($item) && $item->itineraries->count() > 0)
-                                    @foreach($item->itineraries as $itin)
-                                        <div class="row itinerary-row mb-3 align-items-end p-3 rounded"
-                                             style="background-color: #f4f6f9; border: 1px solid #e1e5ef;">
+                                    @foreach($item->itineraries as $index => $itin)
+                                        <div class="row itinerary-row mb-4 align-items-end p-3 rounded shadow-sm" style="background-color: #f4f6f9; border: 1px solid #e1e5ef;" data-index="{{ $index }}">
                                             <div class="col-md-3 mb-2 mb-md-0">
-                                                <label class="form-label text-dark fw-bold">City <span
-                                                        class="text-danger">*</span></label>
-                                                <select name="itinerary_city_id[]"
-                                                        class="form-select bg-white shadow-sm"
-                                                        style="border-color: #ced4da;" required>
+                                                <label class="form-label text-dark fw-bold">City <span class="text-danger">*</span></label>
+                                                <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm" required>
                                                     <option value="">-- Select City --</option>
                                                     @foreach($cities as $city)
-                                                        <option
-                                                            value="{{ $city->id }}" {{ $itin->city_id == $city->id ? 'selected' : '' }}>
-                                                            {{ transDB($city, 'title') }}
-                                                        </option>
+                                                        <option value="{{ $city->id }}" {{ $itin->city_id == $city->id ? 'selected' : '' }}>{{ transDB($city, 'title') }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="col-md-3 mb-2 mb-md-0">
-                                                <label class="form-label text-dark fw-bold">Start Date <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="date" name="itinerary_start[]"
-                                                       class="form-control start-date bg-white shadow-sm"
-                                                       style="border-color: #ced4da;" onchange="calculateNights(this)"
-                                                       value="{{ $itin->start_date }}" required>
+                                                <label class="form-label text-dark fw-bold">Start Date <span class="text-danger">*</span></label>
+                                                <input type="date" name="itinerary_start[]" class="form-control start-date bg-white shadow-sm" onchange="calculateNights(this)" value="{{ $itin->start_date }}" required>
                                             </div>
                                             <div class="col-md-3 mb-2 mb-md-0">
-                                                <label class="form-label text-dark fw-bold">End Date <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="date" name="itinerary_end[]"
-                                                       class="form-control end-date bg-white shadow-sm"
-                                                       style="border-color: #ced4da;" onchange="calculateNights(this)"
-                                                       value="{{ $itin->end_date }}" required>
+                                                <label class="form-label text-dark fw-bold">End Date <span class="text-danger">*</span></label>
+                                                <input type="date" name="itinerary_end[]" class="form-control end-date bg-white shadow-sm" onchange="calculateNights(this)" value="{{ $itin->end_date }}" required>
                                             </div>
                                             <div class="col-md-2 mb-2 mb-md-0">
                                                 <label class="form-label text-dark fw-bold">Nights</label>
-                                                <input type="number" name="itinerary_nights[]"
-                                                       class="form-control nights-input"
-                                                       style="background-color: #e9ecef; border-color: #ced4da; cursor: not-allowed;"
-                                                       value="{{ $itin->nights }}" readonly>
+                                                <input type="number" name="itinerary_nights[]" class="form-control nights-input" style="background-color: #e9ecef; cursor: not-allowed;" value="{{ $itin->nights }}" readonly>
                                             </div>
                                             <div class="col-md-1 mb-2 mb-md-0 text-center">
-                                                <button type="button" class="btn btn-danger remove-row w-100 shadow-sm"
-                                                        style="height: 46px; border-radius: 8px;" title="Remove">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                <button type="button" class="btn btn-danger remove-row w-100 shadow-sm" style="height: 46px; border-radius: 8px;"><i class="fas fa-trash-alt"></i></button>
                                             </div>
 
-                                            <div class="col-md-12 mt-2">
+                                            <div class="col-md-12 mt-3">
                                                 <label class="form-label text-dark fw-bold">City Map Link</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt text-danger"></i></span>
@@ -709,58 +688,80 @@
                                                 </div>
                                             </div>
 
+                                            <div class="col-md-12 mt-3">
+                                                <div class="p-3 bg-white rounded border border-secondary border-opacity-25">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <label class="form-label text-secondary fw-bold mb-0"><i class="fas fa-map-signs me-1"></i> Tourist Attractions</label>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="addPlaceRow(this)">
+                                                            <i class="fas fa-plus"></i> Add Place
+                                                        </button>
+                                                    </div>
+                                                    <div class="places-repeater">
+                                                        @if($itin->places && $itin->places->count() > 0)
+                                                            @foreach($itin->places as $place)
+                                                                <div class="row place-row mb-2 mt-2 align-items-center">
+                                                                    <div class="col-md-5">
+                                                                        <input type="text" name="itinerary_places_en[{{ $index }}][]" class="form-control form-control-sm" placeholder="Place Name (EN)" value="{{ $place->title_en }}">
+                                                                    </div>
+                                                                    <div class="col-md-5">
+                                                                        <input type="text" name="itinerary_places_ar[{{ $index }}][]" class="form-control form-control-sm" placeholder="اسم المكان (AR)" value="{{ $place->title_ar }}">
+                                                                    </div>
+                                                                    <div class="col-md-2 text-end">
+                                                                        <button type="button" class="btn btn-sm btn-danger remove-place-row"><i class="fas fa-times"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     @endforeach
                                 @else
-                                    <div class="row itinerary-row mb-3 align-items-end p-3 rounded"
-                                         style="background-color: #f4f6f9; border: 1px solid #e1e5ef;">
+                                    <div class="row itinerary-row mb-4 align-items-end p-3 rounded shadow-sm" style="background-color: #f4f6f9; border: 1px solid #e1e5ef;" data-index="0">
                                         <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label text-dark fw-bold">City <span
-                                                    class="text-danger">*</span></label>
-                                            <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm"
-                                                    style="border-color: #ced4da;" required>
+                                            <label class="form-label text-dark fw-bold">City <span class="text-danger">*</span></label>
+                                            <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm" required>
                                                 <option value="">-- Select City --</option>
                                                 @foreach($cities as $city)
-                                                    <option
-                                                        value="{{ $city->id }}">{{ transDB($city, 'title') }}</option>
+                                                    <option value="{{ $city->id }}">{{ transDB($city, 'title') }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                         <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label text-dark fw-bold">Start Date <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="date" name="itinerary_start[]"
-                                                   class="form-control start-date bg-white shadow-sm"
-                                                   style="border-color: #ced4da;" onchange="calculateNights(this)"
-                                                   required>
+                                            <label class="form-label text-dark fw-bold">Start Date <span class="text-danger">*</span></label>
+                                            <input type="date" name="itinerary_start[]" class="form-control start-date bg-white shadow-sm" onchange="calculateNights(this)" required>
                                         </div>
                                         <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label text-dark fw-bold">End Date <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="date" name="itinerary_end[]"
-                                                   class="form-control end-date bg-white shadow-sm"
-                                                   style="border-color: #ced4da;" onchange="calculateNights(this)"
-                                                   required>
+                                            <label class="form-label text-dark fw-bold">End Date <span class="text-danger">*</span></label>
+                                            <input type="date" name="itinerary_end[]" class="form-control end-date bg-white shadow-sm" onchange="calculateNights(this)" required>
                                         </div>
                                         <div class="col-md-2 mb-2 mb-md-0">
                                             <label class="form-label text-dark fw-bold">Nights</label>
-                                            <input type="number" name="itinerary_nights[]"
-                                                   class="form-control nights-input"
-                                                   style="background-color: #e9ecef; border-color: #ced4da; cursor: not-allowed;"
-                                                   readonly>
+                                            <input type="number" name="itinerary_nights[]" class="form-control nights-input" style="background-color: #e9ecef; cursor: not-allowed;" readonly>
                                         </div>
                                         <div class="col-md-1 mb-2 mb-md-0 text-center">
-                                            <button type="button" class="btn btn-danger remove-row w-100 shadow-sm"
-                                                    style="height: 46px; border-radius: 8px;" title="Remove">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                            <button type="button" class="btn btn-danger remove-row w-100 shadow-sm" style="height: 46px; border-radius: 8px;"><i class="fas fa-trash-alt"></i></button>
                                         </div>
 
-                                        <div class="col-md-12 mt-2">
+                                        <div class="col-md-12 mt-3">
                                             <label class="form-label text-dark fw-bold">City Map Link</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt text-danger"></i></span>
-                                                <input type="text" name="itinerary_map[]" class="form-control" placeholder="Google Maps Link" value="{{ $itin->map ?? '' }}">
+                                                <input type="text" name="itinerary_map[]" class="form-control" placeholder="Google Maps Link">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12 mt-3">
+                                            <div class="p-3 bg-white rounded border border-secondary border-opacity-25">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <label class="form-label text-secondary fw-bold mb-0"><i class="fas fa-map-signs me-1"></i> Tourist Attractions</label>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="addPlaceRow(this)">
+                                                        <i class="fas fa-plus"></i> Add Place
+                                                    </button>
+                                                </div>
+                                                <div class="places-repeater"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -1190,39 +1191,38 @@
             });
 
 
+            let itineraryIndex = {{ isset($item) && $item->itineraries ? $item->itineraries->count() : 1 }};
+
             window.addItineraryRow = function () {
+                let currentIndex = itineraryIndex++;
                 let cityOptions = '<option value="">-- Select City --</option>';
                 @foreach($cities as $city)
                     cityOptions += '<option value="{{ $city->id }}">{{ transDB($city, 'title') }}</option>';
                 @endforeach
 
                 let rowHtml = `
-                    <div class="row itinerary-row mb-3 align-items-end p-3 rounded" style="background-color: #f4f6f9; border: 1px solid #e1e5ef; animation: fadeIn 0.3s;">
+                    <div class="row itinerary-row mb-4 align-items-end p-3 rounded shadow-sm" style="background-color: #f4f6f9; border: 1px solid #e1e5ef; animation: fadeIn 0.3s;" data-index="${currentIndex}">
                         <div class="col-md-3 mb-2 mb-md-0">
-                            <label class="form-label text-dark fw-bold">City</label>
-                            <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm" style="border-color: #ced4da;" required>
-                                ${cityOptions}
-                            </select>
+                            <label class="form-label text-dark fw-bold">City <span class="text-danger">*</span></label>
+                            <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm" required>${cityOptions}</select>
                         </div>
                         <div class="col-md-3 mb-2 mb-md-0">
-                            <label class="form-label text-dark fw-bold">Start Date</label>
-                            <input type="date" name="itinerary_start[]" class="form-control start-date bg-white shadow-sm" style="border-color: #ced4da;" onchange="calculateNights(this)" required>
+                            <label class="form-label text-dark fw-bold">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" name="itinerary_start[]" class="form-control start-date bg-white shadow-sm" onchange="calculateNights(this)" required>
                         </div>
                         <div class="col-md-3 mb-2 mb-md-0">
-                            <label class="form-label text-dark fw-bold">End Date</label>
-                            <input type="date" name="itinerary_end[]" class="form-control end-date bg-white shadow-sm" style="border-color: #ced4da;" onchange="calculateNights(this)" required>
+                            <label class="form-label text-dark fw-bold">End Date <span class="text-danger">*</span></label>
+                            <input type="date" name="itinerary_end[]" class="form-control end-date bg-white shadow-sm" onchange="calculateNights(this)" required>
                         </div>
                         <div class="col-md-2 mb-2 mb-md-0">
                             <label class="form-label text-dark fw-bold">Nights</label>
-                            <input type="number" name="itinerary_nights[]" class="form-control nights-input" style="background-color: #e9ecef; border-color: #ced4da; cursor: not-allowed;" readonly>
+                            <input type="number" name="itinerary_nights[]" class="form-control nights-input" style="background-color: #e9ecef; cursor: not-allowed;" readonly>
                         </div>
                         <div class="col-md-1 mb-2 mb-md-0 text-center">
-                            <button type="button" class="btn btn-danger remove-row w-100 shadow-sm" style="height: 46px; border-radius: 8px;" title="Remove">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            <button type="button" class="btn btn-danger remove-row w-100 shadow-sm" style="height: 46px; border-radius: 8px;"><i class="fas fa-trash-alt"></i></button>
                         </div>
 
-                        <div class="col-md-12 mt-2">
+                        <div class="col-md-12 mt-3">
                             <label class="form-label text-dark fw-bold">City Map Link</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt text-danger"></i></span>
@@ -1230,15 +1230,52 @@
                             </div>
                         </div>
 
+                        <div class="col-md-12 mt-3">
+                            <div class="p-3 bg-white rounded border border-secondary border-opacity-25">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <label class="form-label text-secondary fw-bold mb-0"><i class="fas fa-map-signs me-1"></i> Tourist Attractions</label>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="addPlaceRow(this)">
+                                        <i class="fas fa-plus"></i> Add Place
+                                    </button>
+                                </div>
+                                <div class="places-repeater"></div>
+                            </div>
+                        </div>
                     </div>
                 `;
                 document.getElementById('itinerary-repeater').insertAdjacentHTML('beforeend', rowHtml);
             }
+
+            window.addPlaceRow = function(btn) {
+                let itineraryRow = $(btn).closest('.itinerary-row');
+                let idx = itineraryRow.data('index');
+
+                let placeHtml = `
+                    <div class="row place-row mb-2 mt-2 align-items-center animation-fadeIn">
+                        <div class="col-md-5">
+                            <input type="text" name="itinerary_places_en[${idx}][]" class="form-control form-control-sm" placeholder="Place Name (EN)">
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" name="itinerary_places_ar[${idx}][]" class="form-control form-control-sm" placeholder="اسم المكان (AR)">
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button type="button" class="btn btn-sm btn-danger remove-place-row"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                `;
+                itineraryRow.find('.places-repeater').append(placeHtml);
+            }
+
+            $(document).on('click', '.remove-place-row', function () {
+                $(this).closest('.place-row').remove();
+            });
+
             $(document).on('click', '.remove-row', function () {
                 if ($('.itinerary-row').length > 1) {
                     $(this).closest('.itinerary-row').remove();
                 } else {
-                    $(this).closest('.itinerary-row').find('input').val('');
+                    $(this).closest('.itinerary-row').find('input').not('[type="button"]').val('');
+                    $(this).closest('.itinerary-row').find('.places-repeater').empty();
                 }
             });
 
