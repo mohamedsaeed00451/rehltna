@@ -460,8 +460,10 @@
                             {{-- Price & Map Row --}}
                             <div class="row mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-tags me-2 text-success"></i> Pricing Packages</h6>
-                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="addPriceRow()">
+                                    <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-tags me-2 text-success"></i>
+                                        Pricing Packages</h6>
+                                    <button type="button" class="btn btn-outline-success btn-sm"
+                                            onclick="addPriceRow()">
                                         <i class="fas fa-plus me-1"></i> Add Price Option
                                     </button>
                                 </div>
@@ -470,31 +472,49 @@
                                     @if(isset($item) && $item->prices && $item->prices->count() > 0)
                                         {{-- لو بنعمل Edit وفيه أسعار متسجلة --}}
                                         @foreach($item->prices as $price)
-                                            <div class="row price-row mb-3 align-items-end p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                            <div class="row price-row mb-3 align-items-end p-3 rounded"
+                                                 style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
                                                 <div class="col-md-3 mb-2 mb-md-0">
-                                                    <label class="form-label fw-bold">Title (AR) <span class="text-danger">*</span></label>
-                                                    <input type="text" name="price_title_ar[]" class="form-control" value="{{ $price->title_ar }}" required>
+                                                    <label class="form-label fw-bold">Title (AR) <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" name="price_title_ar[]" class="form-control"
+                                                           value="{{ $price->title_ar }}" required>
                                                 </div>
                                                 <div class="col-md-3 mb-2 mb-md-0">
                                                     <label class="form-label fw-bold">Title (EN)</label>
-                                                    <input type="text" name="price_title_en[]" class="form-control" value="{{ $price->title_en }}">
+                                                    <input type="text" name="price_title_en[]" class="form-control"
+                                                           value="{{ $price->title_en }}">
                                                 </div>
                                                 <div class="col-md-2 mb-2 mb-md-0">
-                                                    <label class="form-label fw-bold">Price (SAR) <span class="text-danger">*</span></label>
-                                                    <input type="number" name="price_value[]" class="form-control" value="{{ $price->price }}" step="0.01" min="0" required>
+                                                    <label class="form-label fw-bold">Price (SAR) <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="number" name="price_value[]" class="form-control"
+                                                           value="{{ $price->price }}" step="0.01" min="0" required>
                                                 </div>
                                                 <div class="col-md-3 mb-2 mb-md-0">
                                                     <label class="form-label fw-bold">Discount</label>
                                                     <div class="input-group">
-                                                        <input type="number" name="price_discount[]" class="form-control" value="{{ $price->discount }}" step="0.01" min="0">
-                                                        <select name="price_discount_type[]" class="form-select bg-light" style="flex: 0 0 110px;">
-                                                            <option value="amount" {{ $price->discount_type == 'amount' ? 'selected' : '' }}>مبلغ (SAR)</option>
-                                                            <option value="percent" {{ $price->discount_type == 'percent' ? 'selected' : '' }}>نسبة (%)</option>
+                                                        <input type="number" name="price_discount[]"
+                                                               class="form-control" value="{{ $price->discount }}"
+                                                               step="0.01" min="0">
+                                                        <select name="price_discount_type[]"
+                                                                class="form-select bg-light" style="flex: 0 0 110px;">
+                                                            <option
+                                                                value="amount" {{ $price->discount_type == 'amount' ? 'selected' : '' }}>
+                                                                مبلغ (SAR)
+                                                            </option>
+                                                            <option
+                                                                value="percent" {{ $price->discount_type == 'percent' ? 'selected' : '' }}>
+                                                                نسبة (%)
+                                                            </option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-1 mb-2 mb-md-0 text-center">
-                                                    <button type="button" class="btn btn-danger remove-price-row shadow-sm" style="padding: 10px 15px; border-radius: 8px;" title="Remove">
+                                                    <button type="button"
+                                                            class="btn btn-danger remove-price-row shadow-sm"
+                                                            style="padding: 10px 15px; border-radius: 8px;"
+                                                            title="Remove">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </div>
@@ -510,31 +530,42 @@
                                             ];
                                         @endphp
                                         @foreach($defaultPrices as $dp)
-                                            <div class="row price-row mb-3 align-items-end p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                            <div class="row price-row mb-3 align-items-end p-3 rounded"
+                                                 style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
                                                 <div class="col-md-3 mb-2 mb-md-0">
-                                                    <label class="form-label fw-bold">Title (AR) <span class="text-danger">*</span></label>
-                                                    <input type="text" name="price_title_ar[]" class="form-control" value="{{ $dp['ar'] }}" required>
+                                                    <label class="form-label fw-bold">Title (AR) <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" name="price_title_ar[]" class="form-control"
+                                                           value="{{ $dp['ar'] }}" required>
                                                 </div>
                                                 <div class="col-md-3 mb-2 mb-md-0">
                                                     <label class="form-label fw-bold">Title (EN)</label>
-                                                    <input type="text" name="price_title_en[]" class="form-control" value="{{ $dp['en'] }}">
+                                                    <input type="text" name="price_title_en[]" class="form-control"
+                                                           value="{{ $dp['en'] }}">
                                                 </div>
                                                 <div class="col-md-2 mb-2 mb-md-0">
-                                                    <label class="form-label fw-bold">Price (SAR) <span class="text-danger">*</span></label>
-                                                    <input type="number" name="price_value[]" class="form-control" step="0.01" min="0" required>
+                                                    <label class="form-label fw-bold">Price (SAR) <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="number" name="price_value[]" class="form-control"
+                                                           step="0.01" min="0" required>
                                                 </div>
                                                 <div class="col-md-3 mb-2 mb-md-0">
                                                     <label class="form-label fw-bold">Discount</label>
                                                     <div class="input-group">
-                                                        <input type="number" name="price_discount[]" class="form-control" value="0" step="0.01" min="0">
-                                                        <select name="price_discount_type[]" class="form-select bg-light" style="flex: 0 0 110px;">
+                                                        <input type="number" name="price_discount[]"
+                                                               class="form-control" value="0" step="0.01" min="0">
+                                                        <select name="price_discount_type[]"
+                                                                class="form-select bg-light" style="flex: 0 0 110px;">
                                                             <option value="amount">مبلغ (SAR)</option>
                                                             <option value="percent">نسبة (%)</option>
                                                         </select>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-1 mb-2 mb-md-0 text-center">
-                                                    <button type="button" class="btn btn-danger remove-price-row shadow-sm" style="padding: 10px 15px; border-radius: 8px;" title="Remove">
+                                                    <button type="button"
+                                                            class="btn btn-danger remove-price-row shadow-sm"
+                                                            style="padding: 10px 15px; border-radius: 8px;"
+                                                            title="Remove">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </div>
@@ -654,45 +685,71 @@
                             <div id="itinerary-repeater">
                                 @if(isset($item) && $item->itineraries->count() > 0)
                                     @foreach($item->itineraries as $index => $itin)
-                                        <div class="row itinerary-row mb-4 align-items-end p-3 rounded shadow-sm" style="background-color: #f4f6f9; border: 1px solid #e1e5ef;" data-index="{{ $index }}">
+                                        <div class="row itinerary-row mb-4 align-items-end p-3 rounded shadow-sm"
+                                             style="background-color: #f4f6f9; border: 1px solid #e1e5ef;"
+                                             data-index="{{ $index }}">
                                             <div class="col-md-3 mb-2 mb-md-0">
-                                                <label class="form-label text-dark fw-bold">City <span class="text-danger">*</span></label>
-                                                <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm" required>
+                                                <label class="form-label text-dark fw-bold">City <span
+                                                        class="text-danger">*</span></label>
+                                                <select name="itinerary_city_id[]"
+                                                        class="form-select bg-white shadow-sm" required>
                                                     <option value="">-- Select City --</option>
                                                     @foreach($cities as $city)
-                                                        <option value="{{ $city->id }}" {{ $itin->city_id == $city->id ? 'selected' : '' }}>{{ transDB($city, 'title') }}</option>
+                                                        <option
+                                                            value="{{ $city->id }}" {{ $itin->city_id == $city->id ? 'selected' : '' }}>{{ transDB($city, 'title') }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                             <div class="col-md-3 mb-2 mb-md-0">
-                                                <label class="form-label text-dark fw-bold">Start Date <span class="text-danger">*</span></label>
-                                                <input type="date" name="itinerary_start[]" class="form-control start-date bg-white shadow-sm" onchange="calculateNights(this)" value="{{ $itin->start_date }}" required>
+                                                <label class="form-label text-dark fw-bold">Start Date <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="date" name="itinerary_start[]"
+                                                       class="form-control start-date bg-white shadow-sm"
+                                                       onchange="calculateNights(this)" value="{{ $itin->start_date }}"
+                                                       required>
                                             </div>
                                             <div class="col-md-3 mb-2 mb-md-0">
-                                                <label class="form-label text-dark fw-bold">End Date <span class="text-danger">*</span></label>
-                                                <input type="date" name="itinerary_end[]" class="form-control end-date bg-white shadow-sm" onchange="calculateNights(this)" value="{{ $itin->end_date }}" required>
+                                                <label class="form-label text-dark fw-bold">End Date <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="date" name="itinerary_end[]"
+                                                       class="form-control end-date bg-white shadow-sm"
+                                                       onchange="calculateNights(this)" value="{{ $itin->end_date }}"
+                                                       required>
                                             </div>
                                             <div class="col-md-2 mb-2 mb-md-0">
                                                 <label class="form-label text-dark fw-bold">Nights</label>
-                                                <input type="number" name="itinerary_nights[]" class="form-control nights-input" style="background-color: #e9ecef; cursor: not-allowed;" value="{{ $itin->nights }}" readonly>
+                                                <input type="number" name="itinerary_nights[]"
+                                                       class="form-control nights-input"
+                                                       style="background-color: #e9ecef; cursor: not-allowed;"
+                                                       value="{{ $itin->nights }}" readonly>
                                             </div>
                                             <div class="col-md-1 mb-2 mb-md-0 text-center">
-                                                <button type="button" class="btn btn-danger remove-row w-100 shadow-sm" style="height: 46px; border-radius: 8px;"><i class="fas fa-trash-alt"></i></button>
+                                                <button type="button" class="btn btn-danger remove-row w-100 shadow-sm"
+                                                        style="height: 46px; border-radius: 8px;"><i
+                                                        class="fas fa-trash-alt"></i></button>
                                             </div>
 
                                             <div class="col-md-12 mt-3">
                                                 <label class="form-label text-dark fw-bold">City Map Link</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt text-danger"></i></span>
-                                                    <input type="text" name="itinerary_map[]" class="form-control" placeholder="Google Maps Link" value="{{ $itin->map ?? '' }}">
+                                                    <span class="input-group-text bg-white"><i
+                                                            class="fas fa-map-marker-alt text-danger"></i></span>
+                                                    <input type="text" name="itinerary_map[]" class="form-control"
+                                                           placeholder="Google Maps Link"
+                                                           value="{{ $itin->map ?? '' }}">
                                                 </div>
                                             </div>
 
                                             <div class="col-md-12 mt-3">
-                                                <div class="p-3 bg-white rounded border border-secondary border-opacity-25">
+                                                <div
+                                                    class="p-3 bg-white rounded border border-secondary border-opacity-25">
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <label class="form-label text-secondary fw-bold mb-0"><i class="fas fa-map-signs me-1"></i> Tourist Attractions</label>
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="addPlaceRow(this)">
+                                                        <label class="form-label text-secondary fw-bold mb-0"><i
+                                                                class="fas fa-map-signs me-1"></i> Tourist
+                                                            Attractions</label>
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-secondary py-1 px-2"
+                                                                onclick="addPlaceRow(this)">
                                                             <i class="fas fa-plus"></i> Add Place
                                                         </button>
                                                     </div>
@@ -701,13 +758,23 @@
                                                             @foreach($itin->places as $place)
                                                                 <div class="row place-row mb-2 mt-2 align-items-center">
                                                                     <div class="col-md-5">
-                                                                        <input type="text" name="itinerary_places_en[{{ $index }}][]" class="form-control form-control-sm" placeholder="Place Name (EN)" value="{{ $place->title_en }}">
+                                                                        <input type="text"
+                                                                               name="itinerary_places_en[{{ $index }}][]"
+                                                                               class="form-control form-control-sm"
+                                                                               placeholder="Place Name (EN)"
+                                                                               value="{{ $place->title_en }}">
                                                                     </div>
                                                                     <div class="col-md-5">
-                                                                        <input type="text" name="itinerary_places_ar[{{ $index }}][]" class="form-control form-control-sm" placeholder="اسم المكان (AR)" value="{{ $place->title_ar }}">
+                                                                        <input type="text"
+                                                                               name="itinerary_places_ar[{{ $index }}][]"
+                                                                               class="form-control form-control-sm"
+                                                                               placeholder="اسم المكان (AR)"
+                                                                               value="{{ $place->title_ar }}">
                                                                     </div>
                                                                     <div class="col-md-2 text-end">
-                                                                        <button type="button" class="btn btn-sm btn-danger remove-place-row"><i class="fas fa-times"></i></button>
+                                                                        <button type="button"
+                                                                                class="btn btn-sm btn-danger remove-place-row">
+                                                                            <i class="fas fa-times"></i></button>
                                                                     </div>
                                                                 </div>
                                                             @endforeach
@@ -719,45 +786,65 @@
                                         </div>
                                     @endforeach
                                 @else
-                                    <div class="row itinerary-row mb-4 align-items-end p-3 rounded shadow-sm" style="background-color: #f4f6f9; border: 1px solid #e1e5ef;" data-index="0">
+                                    <div class="row itinerary-row mb-4 align-items-end p-3 rounded shadow-sm"
+                                         style="background-color: #f4f6f9; border: 1px solid #e1e5ef;" data-index="0">
                                         <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label text-dark fw-bold">City <span class="text-danger">*</span></label>
-                                            <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm" required>
+                                            <label class="form-label text-dark fw-bold">City <span
+                                                    class="text-danger">*</span></label>
+                                            <select name="itinerary_city_id[]" class="form-select bg-white shadow-sm"
+                                                    required>
                                                 <option value="">-- Select City --</option>
                                                 @foreach($cities as $city)
-                                                    <option value="{{ $city->id }}">{{ transDB($city, 'title') }}</option>
+                                                    <option
+                                                        value="{{ $city->id }}">{{ transDB($city, 'title') }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                         <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label text-dark fw-bold">Start Date <span class="text-danger">*</span></label>
-                                            <input type="date" name="itinerary_start[]" class="form-control start-date bg-white shadow-sm" onchange="calculateNights(this)" required>
+                                            <label class="form-label text-dark fw-bold">Start Date <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="date" name="itinerary_start[]"
+                                                   class="form-control start-date bg-white shadow-sm"
+                                                   onchange="calculateNights(this)" required>
                                         </div>
                                         <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label text-dark fw-bold">End Date <span class="text-danger">*</span></label>
-                                            <input type="date" name="itinerary_end[]" class="form-control end-date bg-white shadow-sm" onchange="calculateNights(this)" required>
+                                            <label class="form-label text-dark fw-bold">End Date <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="date" name="itinerary_end[]"
+                                                   class="form-control end-date bg-white shadow-sm"
+                                                   onchange="calculateNights(this)" required>
                                         </div>
                                         <div class="col-md-2 mb-2 mb-md-0">
                                             <label class="form-label text-dark fw-bold">Nights</label>
-                                            <input type="number" name="itinerary_nights[]" class="form-control nights-input" style="background-color: #e9ecef; cursor: not-allowed;" readonly>
+                                            <input type="number" name="itinerary_nights[]"
+                                                   class="form-control nights-input"
+                                                   style="background-color: #e9ecef; cursor: not-allowed;" readonly>
                                         </div>
                                         <div class="col-md-1 mb-2 mb-md-0 text-center">
-                                            <button type="button" class="btn btn-danger remove-row w-100 shadow-sm" style="height: 46px; border-radius: 8px;"><i class="fas fa-trash-alt"></i></button>
+                                            <button type="button" class="btn btn-danger remove-row w-100 shadow-sm"
+                                                    style="height: 46px; border-radius: 8px;"><i
+                                                    class="fas fa-trash-alt"></i></button>
                                         </div>
 
                                         <div class="col-md-12 mt-3">
                                             <label class="form-label text-dark fw-bold">City Map Link</label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white"><i class="fas fa-map-marker-alt text-danger"></i></span>
-                                                <input type="text" name="itinerary_map[]" class="form-control" placeholder="Google Maps Link">
+                                                <span class="input-group-text bg-white"><i
+                                                        class="fas fa-map-marker-alt text-danger"></i></span>
+                                                <input type="text" name="itinerary_map[]" class="form-control"
+                                                       placeholder="Google Maps Link">
                                             </div>
                                         </div>
 
                                         <div class="col-md-12 mt-3">
                                             <div class="p-3 bg-white rounded border border-secondary border-opacity-25">
                                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                                    <label class="form-label text-secondary fw-bold mb-0"><i class="fas fa-map-signs me-1"></i> Tourist Attractions</label>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="addPlaceRow(this)">
+                                                    <label class="form-label text-secondary fw-bold mb-0"><i
+                                                            class="fas fa-map-signs me-1"></i> Tourist
+                                                        Attractions</label>
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-secondary py-1 px-2"
+                                                            onclick="addPlaceRow(this)">
                                                         <i class="fas fa-plus"></i> Add Place
                                                     </button>
                                                 </div>
@@ -768,10 +855,9 @@
                                 @endif
                             </div>
 
-                            <div class="col-12"><hr class="my-4 border-light"></div>
-
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="text-dark fw-bold mb-0"><i class="fas fa-check-circle me-2 text-success"></i> What's Included (ما تشمله الرحلة)</h6>
+                                <h6 class="text-dark fw-bold mb-0"><i class="fas fa-check-circle me-2 text-success"></i>
+                                    What's Included (ما تشمله الرحلة)</h6>
                                 <button type="button" class="btn btn-outline-success btn-sm" onclick="addRouteRow()">
                                     <i class="fas fa-plus me-1"></i> Add Included Item
                                 </button>
@@ -781,58 +867,94 @@
                                 @if(isset($item) && $item->routes && $item->routes->count() > 0)
                                     @foreach($item->routes as $route)
                                         @php $uid = uniqid(); @endphp
-                                        <div class="row route-row mb-3 align-items-center p-3 rounded" style="background-color: #f0fdf4; border: 1px dashed #bbf7d0;">
-                                            <div class="col-md-4 mb-2 mb-md-0">
+                                        <div class="row route-row mb-3 align-items-center p-3 rounded"
+                                             style="background-color: #f0fdf4; border: 1px dashed #bbf7d0;">
+                                            <div class="col-md-3 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Title (EN)</label>
-                                                <input type="text" name="route_title_en[]" class="form-control" value="{{ $route->title_en }}" required>
+                                                <input type="text" name="route_title_en[]" class="form-control"
+                                                       value="{{ $route->title_en }}" required>
                                             </div>
-                                            <div class="col-md-4 mb-2 mb-md-0">
+                                            <div class="col-md-3 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Title (AR)</label>
-                                                <input type="text" name="route_title_ar[]" class="form-control" value="{{ $route->title_ar }}">
+                                                <input type="text" name="route_title_ar[]" class="form-control"
+                                                       value="{{ $route->title_ar }}">
                                             </div>
                                             <div class="col-md-3 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Icon/Image</label>
                                                 <div class="media-selector-group">
-                                                    <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]" readonly placeholder="Icon..." value="{{ $route->icon ? asset($route->icon) : '' }}" onclick="$('#btn_route_{{ $uid }}').click()">
-                                                    <button type="button" id="btn_route_{{ $uid }}" class="btn btn-primary btn-choose open-gallery" data-input="route_icon_{{ $uid }}" data-preview="preview_route_{{ $uid }}">Choose</button>
+                                                    <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]"
+                                                           readonly placeholder="Icon..."
+                                                           value="{{ $route->icon ? asset($route->icon) : '' }}"
+                                                           onclick="$('#btn_route_{{ $uid }}').click()">
+                                                    <button type="button" id="btn_route_{{ $uid }}"
+                                                            class="btn btn-primary btn-choose open-gallery"
+                                                            data-input="route_icon_{{ $uid }}"
+                                                            data-preview="preview_route_{{ $uid }}">Choose
+                                                    </button>
                                                 </div>
                                                 <div id="preview_route_{{ $uid }}" class="mt-1">
-                                                    @if($route->icon) <img src="{{ asset($route->icon) }}" width="40" height="40" class="rounded"> @endif
+                                                    @if($route->icon)
+                                                        <img src="{{ asset($route->icon) }}" width="40" height="40"
+                                                             class="rounded">
+                                                    @endif
                                                 </div>
                                             </div>
+                                            <div class="col-md-2 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Order (الترتيب)</label>
+                                                <input type="number" name="route_order[]" class="form-control"
+                                                       value="{{ $route->order ?? 0 }}">
+                                            </div>
                                             <div class="col-md-1 mt-4 text-center">
-                                                <button type="button" class="btn btn-danger remove-route-row w-100 shadow-sm" title="Remove"><i class="fas fa-times"></i></button>
+                                                <button type="button"
+                                                        class="btn btn-danger remove-route-row w-100 shadow-sm"
+                                                        title="Remove"><i class="fas fa-times"></i></button>
                                             </div>
                                         </div>
                                     @endforeach
                                 @else
                                     @php $uid = uniqid(); @endphp
-                                    <div class="row route-row mb-3 align-items-center p-3 rounded" style="background-color: #f0fdf4; border: 1px dashed #bbf7d0;">
-                                        <div class="col-md-4 mb-2 mb-md-0">
+                                    <div class="row route-row mb-3 align-items-center p-3 rounded"
+                                         style="background-color: #f0fdf4; border: 1px dashed #bbf7d0;">
+                                        <div class="col-md-3 mb-2 mb-md-0">
                                             <label class="form-label fw-bold">Title (EN)</label>
-                                            <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Flight ticket, Hotel 5 stars" required>
+                                            <input type="text" name="route_title_en[]" class="form-control"
+                                                   placeholder="e.g. Flight ticket" required>
                                         </div>
-                                        <div class="col-md-4 mb-2 mb-md-0">
+                                        <div class="col-md-3 mb-2 mb-md-0">
                                             <label class="form-label fw-bold">Title (AR)</label>
-                                            <input type="text" name="route_title_ar[]" class="form-control" placeholder="مثال: تذاكر الطيران، فندق 5 نجوم">
+                                            <input type="text" name="route_title_ar[]" class="form-control"
+                                                   placeholder="مثال: تذاكر الطيران">
                                         </div>
                                         <div class="col-md-3 mb-2 mb-md-0">
                                             <label class="form-label fw-bold">Icon/Image</label>
                                             <div class="media-selector-group">
-                                                <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]" readonly placeholder="Icon..." onclick="$('#btn_route_{{ $uid }}').click()">
-                                                <button type="button" id="btn_route_{{ $uid }}" class="btn btn-primary btn-choose open-gallery" data-input="route_icon_{{ $uid }}" data-preview="preview_route_{{ $uid }}">Choose</button>
+                                                <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]"
+                                                       readonly placeholder="Icon..."
+                                                       onclick="$('#btn_route_{{ $uid }}').click()">
+                                                <button type="button" id="btn_route_{{ $uid }}"
+                                                        class="btn btn-primary btn-choose open-gallery"
+                                                        data-input="route_icon_{{ $uid }}"
+                                                        data-preview="preview_route_{{ $uid }}">Choose
+                                                </button>
                                             </div>
                                             <div id="preview_route_{{ $uid }}" class="mt-1"></div>
                                         </div>
+                                        <div class="col-md-2 mb-2 mb-md-0">
+                                            <label class="form-label fw-bold">Order (الترتيب)</label>
+                                            <input type="number" name="route_order[]" class="form-control" value="0">
+                                        </div>
                                         <div class="col-md-1 mt-4 text-center">
-                                            <button type="button" class="btn btn-danger remove-route-row w-100 shadow-sm" title="Remove"><i class="fas fa-times"></i></button>
+                                            <button type="button"
+                                                    class="btn btn-danger remove-route-row w-100 shadow-sm"
+                                                    title="Remove"><i class="fas fa-times"></i></button>
                                         </div>
                                     </div>
                                 @endif
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="text-dark fw-bold mb-0"><i class="fas fa-times-circle me-2 text-danger"></i> What's Excluded (Optional)</h6>
+                                <h6 class="text-dark fw-bold mb-0"><i class="fas fa-times-circle me-2 text-danger"></i>
+                                    What's Excluded (Optional)</h6>
                                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="addExcludeRow()">
                                     <i class="fas fa-plus me-1"></i> Add Excluded Item
                                 </button>
@@ -842,27 +964,47 @@
                                 @if(isset($item) && $item->excludes && $item->excludes->count() > 0)
                                     @foreach($item->excludes as $exclude)
                                         @php $uid = uniqid(); @endphp
-                                        <div class="row exclude-row mb-3 align-items-center p-3 rounded" style="background-color: #fef2f2; border: 1px dashed #fecaca;">
-                                            <div class="col-md-4 mb-2 mb-md-0">
+                                        <div class="row exclude-row mb-3 align-items-center p-3 rounded"
+                                             style="background-color: #fef2f2; border: 1px dashed #fecaca;">
+                                            <div class="col-md-3 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Title (EN)</label>
-                                                <input type="text" name="exclude_title_en[]" class="form-control" value="{{ $exclude->title_en }}">
+                                                <input type="text" name="exclude_title_en[]" class="form-control"
+                                                       value="{{ $exclude->title_en }}">
                                             </div>
-                                            <div class="col-md-4 mb-2 mb-md-0">
+                                            <div class="col-md-3 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Title (AR)</label>
-                                                <input type="text" name="exclude_title_ar[]" class="form-control" value="{{ $exclude->title_ar }}">
+                                                <input type="text" name="exclude_title_ar[]" class="form-control"
+                                                       value="{{ $exclude->title_ar }}">
                                             </div>
                                             <div class="col-md-3 mb-2 mb-md-0">
                                                 <label class="form-label fw-bold">Icon/Image</label>
                                                 <div class="media-selector-group">
-                                                    <input type="text" id="exclude_icon_{{ $uid }}" name="exclude_icon[]" readonly placeholder="Icon..." value="{{ $exclude->icon ? asset($exclude->icon) : '' }}" onclick="$('#btn_exclude_{{ $uid }}').click()">
-                                                    <button type="button" id="btn_exclude_{{ $uid }}" class="btn btn-primary btn-choose open-gallery" data-input="exclude_icon_{{ $uid }}" data-preview="preview_exclude_{{ $uid }}">Choose</button>
+                                                    <input type="text" id="exclude_icon_{{ $uid }}"
+                                                           name="exclude_icon[]" readonly placeholder="Icon..."
+                                                           value="{{ $exclude->icon ? asset($exclude->icon) : '' }}"
+                                                           onclick="$('#btn_exclude_{{ $uid }}').click()">
+                                                    <button type="button" id="btn_exclude_{{ $uid }}"
+                                                            class="btn btn-primary btn-choose open-gallery"
+                                                            data-input="exclude_icon_{{ $uid }}"
+                                                            data-preview="preview_exclude_{{ $uid }}">Choose
+                                                    </button>
                                                 </div>
                                                 <div id="preview_exclude_{{ $uid }}" class="mt-1">
-                                                    @if($exclude->icon) <img src="{{ asset($exclude->icon) }}" width="40" height="40" class="rounded"> @endif
+                                                    @if($exclude->icon)
+                                                        <img src="{{ asset($exclude->icon) }}" width="40" height="40"
+                                                             class="rounded">
+                                                    @endif
                                                 </div>
                                             </div>
+                                            <div class="col-md-2 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Order (الترتيب)</label>
+                                                <input type="number" name="exclude_order[]" class="form-control"
+                                                       value="{{ $exclude->order ?? 0 }}">
+                                            </div>
                                             <div class="col-md-1 mt-4 text-center">
-                                                <button type="button" class="btn btn-danger remove-exclude-row w-100 shadow-sm" title="Remove"><i class="fas fa-times"></i></button>
+                                                <button type="button"
+                                                        class="btn btn-danger remove-exclude-row w-100 shadow-sm"
+                                                        title="Remove"><i class="fas fa-times"></i></button>
                                             </div>
                                         </div>
                                     @endforeach
@@ -1130,13 +1272,13 @@
                 let uid = Date.now();
                 let rowHtml = `
         <div class="row route-row mb-3 align-items-center p-3 rounded" style="background-color: #f0fdf4; border: 1px dashed #bbf7d0; animation: fadeIn 0.3s;">
-            <div class="col-md-4 mb-2 mb-md-0">
+            <div class="col-md-3 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Title (EN)</label>
-                <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Flight ticket, Hotel 5 stars" required>
+                <input type="text" name="route_title_en[]" class="form-control" placeholder="e.g. Flight ticket" required>
             </div>
-            <div class="col-md-4 mb-2 mb-md-0">
+            <div class="col-md-3 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Title (AR)</label>
-                <input type="text" name="route_title_ar[]" class="form-control" placeholder="مثال: تذاكر الطيران، فندق 5 نجوم">
+                <input type="text" name="route_title_ar[]" class="form-control" placeholder="مثال: تذاكر الطيران">
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Icon/Image</label>
@@ -1146,6 +1288,10 @@
                 </div>
                 <div id="preview_route_${uid}" class="mt-1"></div>
             </div>
+            <div class="col-md-2 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Order (الترتيب)</label>
+                <input type="number" name="route_order[]" class="form-control" value="0">
+            </div>
             <div class="col-md-1 mt-4 text-center">
                 <button type="button" class="btn btn-danger remove-route-row w-100 shadow-sm"><i class="fas fa-times"></i></button>
             </div>
@@ -1154,21 +1300,17 @@
                 document.getElementById('route-repeater').insertAdjacentHTML('beforeend', rowHtml);
             }
 
-            $(document).on('click', '.remove-route-row', function () {
-                $(this).closest('.route-row').remove();
-            });
-
             window.addExcludeRow = function () {
                 let uid = Date.now();
                 let rowHtml = `
         <div class="row exclude-row mb-3 align-items-center p-3 rounded" style="background-color: #fef2f2; border: 1px dashed #fecaca; animation: fadeIn 0.3s;">
-            <div class="col-md-4 mb-2 mb-md-0">
+            <div class="col-md-3 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Title (EN)</label>
-                <input type="text" name="exclude_title_en[]" class="form-control" placeholder="e.g. Personal Expenses, Visas">
+                <input type="text" name="exclude_title_en[]" class="form-control" placeholder="e.g. Visas">
             </div>
-            <div class="col-md-4 mb-2 mb-md-0">
+            <div class="col-md-3 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Title (AR)</label>
-                <input type="text" name="exclude_title_ar[]" class="form-control" placeholder="مثال: المصاريف الشخصية، التأشيرات">
+                <input type="text" name="exclude_title_ar[]" class="form-control" placeholder="مثال: التأشيرات">
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Icon/Image</label>
@@ -1178,6 +1320,10 @@
                 </div>
                 <div id="preview_exclude_${uid}" class="mt-1"></div>
             </div>
+            <div class="col-md-2 mb-2 mb-md-0">
+                <label class="form-label fw-bold">Order (الترتيب)</label>
+                <input type="number" name="exclude_order[]" class="form-control" value="0">
+            </div>
             <div class="col-md-1 mt-4 text-center">
                 <button type="button" class="btn btn-danger remove-exclude-row w-100 shadow-sm"><i class="fas fa-times"></i></button>
             </div>
@@ -1185,6 +1331,11 @@
     `;
                 document.getElementById('exclude-repeater').insertAdjacentHTML('beforeend', rowHtml);
             }
+
+            $(document).on('click', '.remove-route-row', function () {
+                $(this).closest('.route-row').remove();
+            });
+
 
             $(document).on('click', '.remove-exclude-row', function () {
                 $(this).closest('.exclude-row').remove();
@@ -1246,7 +1397,7 @@
                 document.getElementById('itinerary-repeater').insertAdjacentHTML('beforeend', rowHtml);
             }
 
-            window.addPlaceRow = function(btn) {
+            window.addPlaceRow = function (btn) {
                 let itineraryRow = $(btn).closest('.itinerary-row');
                 let idx = itineraryRow.data('index');
 
