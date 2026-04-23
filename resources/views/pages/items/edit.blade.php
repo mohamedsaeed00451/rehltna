@@ -865,6 +865,7 @@
 
                             <div id="route-repeater" class="mb-5">
                                 @if(isset($item) && $item->routes && $item->routes->count() > 0)
+                                    {{-- لو بنعمل Edit وفيه داتا متسجلة --}}
                                     @foreach($item->routes as $route)
                                         @php $uid = uniqid(); @endphp
                                         <div class="row route-row mb-3 align-items-center p-3 rounded"
@@ -912,43 +913,62 @@
                                         </div>
                                     @endforeach
                                 @else
-                                    @php $uid = uniqid(); @endphp
-                                    <div class="row route-row mb-3 align-items-center p-3 rounded"
-                                         style="background-color: #f0fdf4; border: 1px dashed #bbf7d0;">
-                                        <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label fw-bold">Title (EN)</label>
-                                            <input type="text" name="route_title_en[]" class="form-control"
-                                                   placeholder="e.g. Flight ticket" required>
-                                        </div>
-                                        <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label fw-bold">Title (AR)</label>
-                                            <input type="text" name="route_title_ar[]" class="form-control"
-                                                   placeholder="مثال: تذاكر الطيران">
-                                        </div>
-                                        <div class="col-md-3 mb-2 mb-md-0">
-                                            <label class="form-label fw-bold">Icon/Image</label>
-                                            <div class="media-selector-group">
-                                                <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]"
-                                                       readonly placeholder="Icon..."
-                                                       onclick="$('#btn_route_{{ $uid }}').click()">
-                                                <button type="button" id="btn_route_{{ $uid }}"
-                                                        class="btn btn-primary btn-choose open-gallery"
-                                                        data-input="route_icon_{{ $uid }}"
-                                                        data-preview="preview_route_{{ $uid }}">Choose
-                                                </button>
+                                    {{-- القيم الافتراضية لما ييجي يضيف رحلة جديدة --}}
+                                    @php
+                                        $defaultIncludes = [
+                                            ['ar' => 'طيران دولي', 'en' => 'International Flight'],
+                                            ['ar' => 'طيران دولي و طيران داخلي', 'en' => 'International and Domestic Flights'],
+                                            ['ar' => 'فنادق ٤ نجوم', 'en' => '4-Star Hotels'],
+                                            ['ar' => 'فنادق ٥ نجوم', 'en' => '5-Star Hotels'],
+                                            ['ar' => 'فنادق ٥ و ٤ نجوم', 'en' => '5 and 4-Star Hotels'],
+                                            ['ar' => 'المواصلات والتنقلات', 'en' => 'Transportation and Transfers'],
+                                            ['ar' => 'الجولات السياحية', 'en' => 'Sightseeing Tours'],
+                                            ['ar' => 'مشرف سياحي', 'en' => 'Tour Escort'],
+                                            ['ar' => 'مرشد سياحي', 'en' => 'Tour Guide'],
+                                            ['ar' => 'خطوط اتصال', 'en' => 'SIM Cards / Communication'],
+                                        ];
+                                    @endphp
+
+                                    @foreach($defaultIncludes as $index => $include)
+                                        @php $uid = uniqid() . $index; @endphp
+                                        <div class="row route-row mb-3 align-items-center p-3 rounded"
+                                             style="background-color: #f0fdf4; border: 1px dashed #bbf7d0;">
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Title (EN)</label>
+                                                <input type="text" name="route_title_en[]" class="form-control"
+                                                       value="{{ $include['en'] }}" required>
                                             </div>
-                                            <div id="preview_route_{{ $uid }}" class="mt-1"></div>
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Title (AR)</label>
+                                                <input type="text" name="route_title_ar[]" class="form-control"
+                                                       value="{{ $include['ar'] }}">
+                                            </div>
+                                            <div class="col-md-3 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Icon/Image</label>
+                                                <div class="media-selector-group">
+                                                    <input type="text" id="route_icon_{{ $uid }}" name="route_icon[]"
+                                                           readonly placeholder="Icon..."
+                                                           onclick="$('#btn_route_{{ $uid }}').click()">
+                                                    <button type="button" id="btn_route_{{ $uid }}"
+                                                            class="btn btn-primary btn-choose open-gallery"
+                                                            data-input="route_icon_{{ $uid }}"
+                                                            data-preview="preview_route_{{ $uid }}">Choose
+                                                    </button>
+                                                </div>
+                                                <div id="preview_route_{{ $uid }}" class="mt-1"></div>
+                                            </div>
+                                            <div class="col-md-2 mb-2 mb-md-0">
+                                                <label class="form-label fw-bold">Order (الترتيب)</label>
+                                                <input type="number" name="route_order[]" class="form-control"
+                                                       value="{{ $index + 1 }}">
+                                            </div>
+                                            <div class="col-md-1 mt-4 text-center">
+                                                <button type="button"
+                                                        class="btn btn-danger remove-route-row w-100 shadow-sm"
+                                                        title="Remove"><i class="fas fa-times"></i></button>
+                                            </div>
                                         </div>
-                                        <div class="col-md-2 mb-2 mb-md-0">
-                                            <label class="form-label fw-bold">Order (الترتيب)</label>
-                                            <input type="number" name="route_order[]" class="form-control" value="0">
-                                        </div>
-                                        <div class="col-md-1 mt-4 text-center">
-                                            <button type="button"
-                                                    class="btn btn-danger remove-route-row w-100 shadow-sm"
-                                                    title="Remove"><i class="fas fa-times"></i></button>
-                                        </div>
-                                    </div>
+                                    @endforeach
                                 @endif
                             </div>
 
@@ -1267,7 +1287,6 @@
                 }
             }
 
-
             window.addRouteRow = function () {
                 let uid = Date.now();
                 let rowHtml = `
@@ -1341,8 +1360,7 @@
                 $(this).closest('.exclude-row').remove();
             });
 
-
-            let itineraryIndex = {{ isset($item) && $item->itineraries ? $item->itineraries->count() : 1 }};
+            let itineraryIndex = {{ (isset($item) && $item->itineraries) ? $item->itineraries->count() : 1 }};
 
             window.addItineraryRow = function () {
                 let currentIndex = itineraryIndex++;
@@ -1430,10 +1448,9 @@
                 }
             });
 
-        });
 
-        window.addPriceRow = function () {
-            let rowHtml = `
+            window.addPriceRow = function () {
+                let rowHtml = `
         <div class="row price-row mb-3 align-items-end p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6; animation: fadeIn 0.3s;">
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="form-label fw-bold">Title (AR) <span class="text-danger">*</span></label>
@@ -1464,42 +1481,44 @@
             </div>
         </div>
     `;
-            document.getElementById('price-repeater').insertAdjacentHTML('beforeend', rowHtml);
-        }
-        $(document).on('click', '.remove-price-row', function () {
-            if ($('.price-row').length > 1) {
-                $(this).closest('.price-row').remove();
-            } else {
-                alert('You must have at least one pricing option.');
+                document.getElementById('price-repeater').insertAdjacentHTML('beforeend', rowHtml);
             }
-        });
+            $(document).on('click', '.remove-price-row', function () {
+                if ($('.price-row').length > 1) {
+                    $(this).closest('.price-row').remove();
+                } else {
+                    alert('You must have at least one pricing option.');
+                }
+            });
 
-        window.addMultiFile = function (url, type) {
-            let inputName = targetInputId + "[]";
-            let ext = url.split('.').pop().toLowerCase();
-            let previewContent = '';
+            window.addMultiFile = function (url, type) {
+                let inputName = targetInputId + "[]";
+                let ext = url.split('.').pop().toLowerCase();
+                let previewContent = '';
 
-            if (['mp4', 'mov', 'avi', 'mkv'].includes(ext) || type === 'video') {
-                previewContent = `<video width="100%" height="100%" class="rounded bg-black"><source src="${url}"></video><i class="fas fa-play-circle position-absolute text-white" style="top:50%; left:50%; transform:translate(-50%,-50%);"></i>`;
-            } else if (['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(ext)) {
-                previewContent = `
+                if (['mp4', 'mov', 'avi', 'mkv'].includes(ext) || type === 'video') {
+                    previewContent = `<video width="100%" height="100%" class="rounded bg-black"><source src="${url}"></video><i class="fas fa-play-circle position-absolute text-white" style="top:50%; left:50%; transform:translate(-50%,-50%);"></i>`;
+                } else if (['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(ext)) {
+                    previewContent = `
                         <div class="w-100 h-100 rounded bg-light d-flex flex-column align-items-center justify-content-center border">
                             <i class="fas fa-file-pdf fs-1 text-danger mb-1"></i>
                             <span class="small text-muted fw-bold">${ext.toUpperCase()}</span>
                         </div>`;
-            } else {
-                previewContent = `<img src="${url}" class="w-100 h-100 rounded" style="object-fit:cover">`;
-            }
+                } else {
+                    previewContent = `<img src="${url}" class="w-100 h-100 rounded" style="object-fit:cover">`;
+                }
 
-            let itemHtml = `
+                let itemHtml = `
                     <div class="d-inline-block position-relative shadow-sm border rounded bg-white me-2 mb-2" style="width: 100px; height: 100px; animation: fadeIn 0.3s;">
                         <input type="hidden" name="${inputName}" value="${url}">
                         ${previewContent}
                         <button type="button" class="remove-btn btn btn-danger btn-sm p-0 d-flex justify-content-center align-items-center" onclick="$(this).parent().remove()">×</button>
                     </div>
                 `;
-            $(`#${targetPreviewId}`).append(itemHtml);
-        };
+                $(`#${targetPreviewId}`).append(itemHtml);
+            };
+
+        });
 
     </script>
 @endsection
