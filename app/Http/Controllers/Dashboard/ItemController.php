@@ -59,7 +59,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon', 'itinerary_places_en', 'itinerary_places_ar'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'route_order', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon', 'exclude_order', 'itinerary_places_en', 'itinerary_places_ar'];
 
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
@@ -164,12 +164,14 @@ class ItemController extends Controller
                 $routeEn = $request->input('route_title_en');
                 $routeAr = $request->input('route_title_ar');
                 $routeIcons = $request->input('route_icon');
+                $routeOrders = $request->input('route_order');
 
                 foreach ($routeEn as $index => $titleEn) {
                     if (!empty($titleEn) || !empty($routeAr[$index])) {
                         $item->routes()->create([
                             'title_en' => $titleEn,
                             'title_ar' => $routeAr[$index] ?? null,
+                            'order' => $routeOrders[$index] ?? 0,
                             'icon' => isset($routeIcons[$index]) ? $this->cleanPath($routeIcons[$index]) : null,
                         ]);
                     }
@@ -212,11 +214,14 @@ class ItemController extends Controller
                 $excludeEn = $request->input('exclude_title_en');
                 $excludeAr = $request->input('exclude_title_ar');
                 $excludeIcons = $request->input('exclude_icon');
+                $excludeOrders = $request->input('exclude_order');
+
                 foreach ($excludeEn as $index => $titleEn) {
                     if (!empty($titleEn) || !empty($excludeAr[$index])) {
                         $item->excludes()->create([
                             'title_en' => $titleEn,
                             'title_ar' => $excludeAr[$index] ?? null,
+                            'order' => $excludeOrders[$index] ?? 0,
                             'icon' => isset($excludeIcons[$index]) ? $this->cleanPath($excludeIcons[$index]) : null,
                         ]);
                     }
@@ -296,7 +301,7 @@ class ItemController extends Controller
 
             $activeLangs = get_active_langs();
 
-            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon', 'itinerary_places_en', 'itinerary_places_ar'];
+            $fieldsToExclude = ['meta_img', 'pdf', 'gallery', 'private_gallery', 'itinerary_city_id', 'itinerary_start', 'itinerary_end', 'itinerary_nights', 'itinerary_map', 'route_title_en', 'route_title_ar', 'route_icon', 'route_order', 'price_title_ar', 'price_title_en', 'price_value', 'price_discount', 'price_discount_type', 'exclude_title_en', 'exclude_title_ar', 'exclude_icon', 'exclude_order', 'itinerary_places_en', 'itinerary_places_ar'];
 
             foreach ($activeLangs as $lang) {
                 $fieldsToExclude[] = 'banner_' . $lang;
@@ -401,12 +406,14 @@ class ItemController extends Controller
                 $routeEn = $request->input('route_title_en');
                 $routeAr = $request->input('route_title_ar');
                 $routeIcons = $request->input('route_icon');
+                $routeOrders = $request->input('route_order');
 
                 foreach ($routeEn as $index => $titleEn) {
                     if (!empty($titleEn) || !empty($routeAr[$index])) {
                         $item->routes()->create([
                             'title_en' => $titleEn,
                             'title_ar' => $routeAr[$index] ?? null,
+                            'order' => $routeOrders[$index] ?? 0,
                             'icon' => isset($routeIcons[$index]) ? $this->cleanPath($routeIcons[$index]) : null,
                         ]);
                     }
@@ -448,11 +455,14 @@ class ItemController extends Controller
                 $excludeEn = $request->input('exclude_title_en');
                 $excludeAr = $request->input('exclude_title_ar');
                 $excludeIcons = $request->input('exclude_icon');
+                $excludeOrders = $request->input('exclude_order');
+
                 foreach ($excludeEn as $index => $titleEn) {
                     if (!empty($titleEn) || !empty($excludeAr[$index])) {
                         $item->excludes()->create([
                             'title_en' => $titleEn,
                             'title_ar' => $excludeAr[$index] ?? null,
+                            'order' => $excludeOrders[$index] ?? 0,
                             'icon' => isset($excludeIcons[$index]) ? $this->cleanPath($excludeIcons[$index]) : null,
                         ]);
                     }
@@ -764,6 +774,66 @@ class ItemController extends Controller
         ImportItemsJob::dispatch("uploads/tenant_" . getTenantId() . "/excels/{$fileName}");
 
         return back()->with('success', 'File uploaded successfully, import will start in background.');
+    }
+
+    public function duplicate($id): RedirectResponse
+    {
+        try {
+
+            $originalItem = Item::query()->with([
+                'galleries', 'privateGalleries', 'itineraries.places',
+                'routes', 'prices', 'excludes'
+            ])->findOrFail(decrypt($id));
+
+            $newItem = $originalItem->replicate();
+
+            $newItem->status = 0;
+            $newItem->is_feature = 0;
+            $newItem->featured_at = null;
+
+            $activeLangs = get_active_langs();
+            foreach ($activeLangs as $lang) {
+                if (!empty($newItem->{"title_$lang"})) {
+                    $newItem->{"title_$lang"} = $newItem->{"title_$lang"} . ' (Copy)';
+                    $newItem->{"slug_$lang"} = $this->generateSlug("slug_$lang", $newItem->{"title_$lang"});
+                }
+            }
+
+            $newItem->save();
+
+            foreach ($originalItem->galleries as $gallery) {
+                $newItem->galleries()->create($gallery->only(['image', 'type']));
+            }
+
+            foreach ($originalItem->privateGalleries as $gallery) {
+                $newItem->privateGalleries()->create($gallery->only(['image', 'type']));
+            }
+
+            foreach ($originalItem->prices as $price) {
+                $newItem->prices()->create($price->except(['id', 'item_id', 'created_at', 'updated_at']));
+            }
+
+            foreach ($originalItem->routes as $route) {
+                $newItem->routes()->create($route->except(['id', 'item_id', 'created_at', 'updated_at']));
+            }
+
+            foreach ($originalItem->excludes as $exclude) {
+                $newItem->excludes()->create($exclude->except(['id', 'item_id', 'created_at', 'updated_at']));
+            }
+
+            foreach ($originalItem->itineraries as $itin) {
+                $newItin = $newItem->itineraries()->create($itin->except(['id', 'item_id', 'created_at', 'updated_at']));
+                foreach ($itin->places as $place) {
+                    $newItin->places()->create($place->except(['id', 'itinerary_id', 'created_at', 'updated_at']));
+                }
+            }
+
+            return redirect()->route('items.edit', encrypt($newItem->id))->with('success', 'Trip duplicated successfully! You are now editing the copy.');
+
+        } catch (\Exception $e) {
+            Log::error("Error duplicating item: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Oops! Something went wrong');
+        }
     }
 
 }

@@ -159,6 +159,12 @@
             background: #fef2f2;
         }
 
+        .btn-duplicate-course:hover {
+            color: #10b981;
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
         .lang-tag {
             font-size: 9px;
             padding: 2px 6px;
@@ -391,6 +397,11 @@
 
                                     <td class="text-center px-4">
                                         <div class="d-flex justify-content-center gap-2">
+                                            <a class="btn-action btn-duplicate-course"
+                                               href="{{ route('items.duplicate', encrypt($item->id)) }}"
+                                               title="Duplicate Trip">
+                                                <i class="las la-copy fs-18"></i>
+                                            </a>
                                             <a class="btn-action btn-notification open-notification-modal"
                                                data-id="{{ $item->id }}"
                                                data-title-en="{{ $item->title_en }}"

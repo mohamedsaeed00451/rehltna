@@ -104,6 +104,7 @@ Route::group([
 
         Route::resource('/item-types', ItemTypeController::class);  #------------ ItemType => get -> create -> update -> delete -------------#
         Route::post('/item-types-change-is-feature/{id}', [ItemTypeController::class, 'itemTypesChangeIsFeature'])->name('item.types.change.is_feature'); #-------- Item Types Change Is Feature ---------#
+        Route::get('items/{id}/duplicate', [ItemController::class, 'duplicate'])->name('items.duplicate');
 
         // Lead Magnet Types (CRUD)
         Route::resource('/lead-magnet-types', LeadMagnetTypeController::class);
